@@ -35,7 +35,11 @@ steps:
     organization: 'mgroupntua'
     scannerMode: 'MSBuild'
     projectKey: 'LinearAlgebra'
-    extraProperties: 'sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/coverage/coverage.opencover.xml'
+    extraProperties: |
+      sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)/coverage/coverage.opencover.xml"
+      sonar.c.file.suffixes=-
+      sonar.cpp.file.suffixes=-
+      sonar.objc.file.suffixes=-
 
 
 - task: DotNetCoreCLI@2
