@@ -107,7 +107,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 		[Fact]
 		private static void TestFactorizationOf3DStructureStiffness() // 3D problem: 6 rigid body modes, 0 are constrained
 		{
-			string resourcesPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\Resources";
+			string resourcesPath = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\MGroup.LinearAlgebra.Tests\\Resources";
 			string valuesPath = resourcesPath + "\\Hexa8_10x10x10_stiffness_values.txt";
 			string diagOffsetsPath = resourcesPath + "\\Hexa8_10x10x10_stiffness_diagonal_offsets.txt";
 			var reader = new RawArraysReader();
