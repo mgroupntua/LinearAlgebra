@@ -1,0 +1,10 @@
+# Introduction
+Direct sparse system solution methods are based on factorizing the linear system matrix, e.g. **A = L * L<sup>T</sup>** for symmetric positive definite matrices. The numerical efficiency of said factorization greatly depends on the bandwidth of the matrix, namely the distance from the diagonal of each column, up to the minimum row index where a non-zero entry lies. The greater the bandwidth, the more fill-in will occur during factorization, which significantly increases the memory requirements and computational work of the algorithms. 
+
+Therefore, direct sparse solvers are usually preceded by a reordering step,which aims to reduce the bandwidth. During reordering, a permutation of the matrix rows and columns is calculated and applied. The goal is to obtain a permuted matrix **P * A * P<sup>T</sup>** which will result in less fill-in during factorization. A variety of heuristic methods have been proposed to calculate the permutation matrix **P**.
+
+# Approximate Minimum Degree (AMD)
+The Approximate Minimum Degree is a heuristic method that finds a fill-reducing permutation of the matrix **C = A + A<sup>T</sup>** where **A** is the linear system matrix. It is computationally efficent and usually results in low fill-in for a variety of matrices. For more details see [An Approximate Minimum Degree Ordering Algorithm](http://faculty.cse.tamu.edu/davis/publications_files/An_Approximate_Minimum_Degree_Ordering_Algorithm.pdf).
+
+# Constrained Approximate Minimum Degree (CAMD)
+Constrained Approximate Minimum Degree is a variant of AMD, that allows specifying groups of rows/columns. During the calculation of a fill-reducing permutation, CAMD will place rows/columns of the same group consecutively, without mixing rows/columns from different groups. This results in a worse permutation overall, but may be required by some applications.
