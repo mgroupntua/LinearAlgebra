@@ -28,7 +28,7 @@ Library that provides implementations or wrappers for linear algebra operations 
   * Cholesky/LDL factorization for symmetric positive definite matrices
   * Reordering algorithms to reduce the fill-in of the factorization process, thereby reducing memory consumption and computational time
   
-- **Iterative linear system solvers:** Solving large sparse linear systems using algorithms based on matrix-vectors multiplication and vector-vector operations.
+- **Iterative linear system solvers:** Solving large sparse linear systems using algorithms based on matrix-vector multiplication and vector-vector operations.
   * Generalized Minimum Residual method for general matrices
   * Minimum Residual method for symmetric matrices
   * Conjugate Gradient method for symmetric positive definite matrices
