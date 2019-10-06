@@ -1,0 +1,6 @@
+1. [Matrix and vector storage formats](Storage_formats.md)
+2. [Direct linear system solution methods](Direct_system_solution.md)
+3. [Reordering algorithms](Reordering.md)
+4. [Iterative linear system solution methods](Iterative_system_solution.md) 
+5. [Static condensation](Static_condensation.md)
+6. [Least squares](Least_squares.md)
