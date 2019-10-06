@@ -19,7 +19,7 @@ Library that provides implementations or wrappers for linear algebra operations 
   * Matrix-matrix operations: Addition, subtraction, linear combinations, scaling, matrix-matrix multiplication
 
 - **Sparse matrix and vector formats:** Sparse formats avoid storing and processing zero entries, which reduces memory consumption and computational time.
-  * Compressed Sparse Rows, Compressed Sparse Columns: Optimimal for matrix-vector and matrix-matrix multiplications 
+  * Compressed Sparse Rows, Compressed Sparse Columns: Optimal for matrix-vector and matrix-matrix multiplications 
   * Dictionary Of Keys: Optimal for creating a sparse matrix and then copying it to another format.
   * Skyline: Optimal for Cholesky/LDL factorization
 
