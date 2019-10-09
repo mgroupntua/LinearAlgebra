@@ -1,5 +1,3 @@
-{% include mathjax.html %}
-
 # Create vectors
 Create dense vectors
 ```csharp
@@ -7,7 +5,7 @@ Vector x = Vector.CreateZero(10); // creates a vector with 10 zero entries
 Vector y = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 }) // creates a vector with the specified array
  ```
 
-Create sparse vectors to represent $\left[\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}\right]$
+Create sparse vectors to represent <a href="https://www.codecogs.com/eqnedit.php?latex=\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" title="\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}" /></a>
 ```csharp
 Dictionary entries = new Dictionary();
 entries[0] = 3.0;
@@ -132,9 +130,10 @@ Vector y = Vector.CreateFromArray(new double[] { 4, 5, 6 });
 Vector z = x.Append(y); // c = { 0, 1, 2, 3, 4, 5, 6 }
 ```
 
-The tensor product of $x = \left[\begin{bmatrix}x0 & x1\end{bmatrix}\right]^T$ and 
-$y = \left[\begin{bmatrix}y0 & y1 & y2\end{bmatrix}\right]^T$ is defined as
-$A = x * y^T = \left[\begin{bmatrix}x0*y0 & x0*y1 & x0*y2 \\ x1*y0 & x1*y1 & x1*y2 \end{bmatrix}\right]$. To calculate it:
+Calculate the tensor product of <a href="https://www.codecogs.com/eqnedit.php?latex=x&space;=&space;\begin{bmatrix}x_0&space;&&space;x_1\end{bmatrix}^T" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x&space;=&space;\begin{bmatrix}x_0&space;&&space;x_1\end{bmatrix}^T" title="x = \begin{bmatrix}x_0 & x_1\end{bmatrix}^T" /></a> /></a> 
+and <a href="https://www.codecogs.com/eqnedit.php?latex=y&space;=&space;\begin{bmatrix}y_0&space;&&space;y_1&space;&&space;y_2\end{bmatrix}^T" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y&space;=&space;\begin{bmatrix}y_0&space;&&space;y_1&space;&&space;y_2\end{bmatrix}^T" title="y = \begin{bmatrix}y_0 & y_1 & y_2\end{bmatrix}^T" /></a>, which is defined as
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=A&space;=&space;x&space;*&space;y^T&space;=&space;\begin{bmatrix}x0*y0&space;&&space;x0*y1&space;&&space;x0*y2&space;\\&space;x1*y0&space;&&space;x1*y1&space;&&space;x1*y2&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?A&space;=&space;x&space;*&space;y^T&space;=&space;\begin{bmatrix}x0*y0&space;&&space;x0*y1&space;&&space;x0*y2&space;\\&space;x1*y0&space;&&space;x1*y1&space;&&space;x1*y2&space;\end{bmatrix}" title="A = x * y^T = \begin{bmatrix}x0*y0 & x0*y1 & x0*y2 \\ x1*y0 & x1*y1 & x1*y2 \end{bmatrix}" /></a> 
 
 ```csharp
 Vector x = Vector.CreateFromArray(new double[] { 1, 2,});
