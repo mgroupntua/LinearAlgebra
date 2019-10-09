@@ -3,7 +3,7 @@
 [mgroupntua.github.io/LinearAlgebra](https://mgroupntua.github.io/LinearAlgebra)
 ===================
 
-Here, you can find all documentation related to the [MSolve.IGA](https://github.com/mgroupntua/LinearAlgebra) repo
+Here, you can find all documentation related to the [LinearAlgebra](https://github.com/mgroupntua/LinearAlgebra) repo
 
 You can find all of open-source coding activities of [MGroup](http://mgroup.ntua.gr) at [mgroupntua.github.io](https://mgroupntua.github.io).
 
