@@ -2,7 +2,7 @@
 Create dense vectors
 ```csharp
 Vector x = Vector.CreateZero(10); // creates a vector with 10 zero entries
-Vector y = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 }) // creates a vector with the specified array
+Vector y = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 }); // creates a vector with the specified array
  ```
 
 Create sparse vectors to represent <a href="https://www.codecogs.com/eqnedit.php?latex=\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{bmatrix}3&space;&&space;0&space;&&space;5&space;&&space;0&space;&&space;0&space;&&space;0&space;&&space;4&space;&&space;0&space;\end{bmatrix}" title="\begin{bmatrix}3 & 0 & 5 & 0 & 0 & 0 & 4 & 0 \end{bmatrix}" /></a>
@@ -13,13 +13,14 @@ entries[2] = 5.0;
 entries[6] = 4.0;
 SparseVector x = SparseVector.CreateFromDictionary(8, entries);
 
-SparseVector y = SparseVector.CreateFromDense(new double[] { 3.0, 0.0, 5.0, 0.0, 0.0, 0.0, 4.0, 0.0 })
+SparseVector y = SparseVector.CreateFromDense(new double[] { 3.0, 0.0, 5.0, 0.0, 0.0, 0.0, 4.0, 0.0 });
  ```
 
 # Indexing
+We can find the length of a vector and get or set the entry at some index:
 ```csharp
-Vector x = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 })
-SparseVector y = SparseVector.CreateFromDense(new double[] { 3.0, 0.0, 5.0, 0.0, 0.0, 0.0, 4.0, 0.0 })
+Vector x = Vector.CreateFromArray(new double[] { 10.0, 0.0, 3.0, 5.0, 6.0 });
+SparseVector y = SparseVector.CreateFromDense(new double[] { 3.0, 0.0, 5.0, 0.0, 0.0, 0.0, 4.0, 0.0 });
 
 int length = y.Length; // length = number of entries: y.Length = 8
 double x1 = x[1]; // get entry at index
@@ -32,17 +33,17 @@ double y1 = y[1]; // 0 will be reuturned
 Linear combinations:
 ```csharp
 Operation                  Code
-                           IVector x, y, z;
+                           IVector x, y, z; // Initialize them with the same dimensions
 z = x + y                  z = x.Add(y);
 z = x - y                  z = x.Subtract(y);
 z = 2 * x                  z = x.Scale(2);
 z = y + 2 * x              z = y.Axpy(x, 2)
 z = 2 * x + 3 * y          z = y.LinearCombination(3, x, 2);
 ```
-Variations of the above can be used to overwrite one of the operands, instead of allocating new vectors:
+Variations of the above can be used to overwrite one of the operands, instead of allocating new vectors. However these will fail, if they try to overwrite entries that are not explicitly stored:
 ```csharp
 Operation                  Code
-                           IVector x, y, z;
+                           IVector x, y, z; // Initialize them with the same dimensions
 y = x + y				   y.AddIntoThis(x);
 y = x - y                  y.SubtractIntoThis(x);
 x = 2 * x                  x.ScaleIntoThis(2);
@@ -53,13 +54,13 @@ y = 2 * x + 3 * y          y.LinearCombinationIntoThis(3, x, 2);
 Dot (inner) vector product and euclidian norm:
 ```csharp
 Operation                  Code
-                           IVector x, y;
+                           IVector x, y; // Initialize them with the same dimensions
 a = x * y				   double a = x.DotProduct(y);
 b = ||x||                  double b = x.Norm2();
 ```
 
 # Arbitrary entrywise operations
-User chooses which operation to apply to each entry:
+User can choose which operation to apply to each entry:
 ```csharp
 IVector x, y;
 IVector xSquared = x.DoToAllEntries(xi => xi * xi); // Single vector: xSquared[i] = x[i] * x[i]
