@@ -50,7 +50,7 @@ Linear combinations:
 ```csharp
 Operation                  Code
                            IMatrix C;
-C = A + B				   C = A.Add(B);
+C = A + B                  C = A.Add(B);
 C = A - B                  C = A.Subtract(B);
 C = 2 * A                  C = A.Scale(2);
 C = B + 2 * A              C = B.Axpy(A, 2)
