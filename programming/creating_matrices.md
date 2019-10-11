@@ -98,8 +98,8 @@ var localIndices = new List<int[]>();
 for (int i = 0; i < 3; ++i) localIndices[i] = new int[] { 0, 1 };
 var globalIndices = new List<int[]>();
 globalIndices[0] = new int[] { 0, 1 };
-globalIndices[0] = new int[] { 1, 2 };
-globalIndices[0] = new int[] { 2, 3 };
+globalIndices[1] = new int[] { 1, 2 };
+globalIndices[2] = new int[] { 2, 3 };
 
 // Skyline matrices need some more data to determine the bandwidth.
 int[] colHeights = { 0, 1, 1, 1 }; // Number of entries from the diagonal (exclusive) to the top non-zero entry. 
@@ -124,4 +124,3 @@ CsrMatrix csrGlobalA = dokForCsr.BuildCsrMatrix(sortRowsCols);
 SymmetricCscMatrix symCscGlobalA = dokForSymCsc.BuildSymmetricCscMatrix(sortRowsCols);
 SkylineMatrix skyGlobalA = builderForSky.BuildSkylineMatrix();
 ```
-
