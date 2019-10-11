@@ -89,3 +89,45 @@ Debug.Assert(stats.HasConverged == true);
 ```
 
 # Generalized Minimum Residual
+Let us solve the linear system `A * x = b`, where:
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=A=\begin{bmatrix}&space;3&space;&&space;8&space;&&space;0&space;&&space;15\\&space;0&space;&&space;1&space;&&space;3&space;&&space;-7\\&space;6&space;&&space;0&space;&&space;12&space;&&space;0\\&space;3&space;&&space;0&space;&&space;9&space;&&space;15&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?A=\begin{bmatrix}&space;3&space;&&space;8&space;&&space;0&space;&&space;15\\&space;0&space;&&space;1&space;&&space;3&space;&&space;-7\\&space;6&space;&&space;0&space;&&space;12&space;&&space;0\\&space;3&space;&&space;0&space;&&space;9&space;&&space;15&space;\end{bmatrix}" title="A=\begin{bmatrix} 3 & 8 & 0 & 15\\ 0 & 1 & 3 & -7\\ 6 & 0 & 12 & 0\\ 3 & 0 & 9 & 15 \end{bmatrix}" /></a>
+
+A is invertible, but not symmetric. We will solve the linear system using the Generalized Minimum Residual method. No preconditioning will be used. The matrix will be in CSR format, since it is optimal for (untransposed) matrix-vector multiplications and can be used for very large sparse matrices (not that it matters in this small example):
+
+```csharp
+// Create the matrix
+IMatrix A = Matrix.CreateFromArray(new double[,] 
+{
+    { 3.0, 8.0,  0.0,  15.0 },
+    { 0.0, 1.0,  3.0,  -7.0 },
+    { 6.0, 0.0, 12.0,   0.0 },
+    { 3.0, 0.0,  9.0,  15.0 }
+});
+DokRowMajor dokA = DokRowMajor.CreateEmpty(4, 4);
+for (int i = 0; i < 4; ++i)
+{
+    for (int j = 0; j < 4; ++j)
+    {
+        if (A[i, j] != 0) dokA[i, j] = A[i, j];
+    }
+}
+CsrMatrix csrA = dokA.BuildCsrMatrix(sortRowsCols: true);
+
+// No preconditioning
+var M = new IdentityPreconditioner();
+
+// GMRES settings
+var builder = new GmresAlgorithm.Builder();
+builder.MaximumIterations = 20;
+builder.InnerIterationsProvider = new FixedMaxIterationsProvider(4);
+builder.AbsoluteTolerance = 1E-7;
+builder.RelativeTolerance = 1E-7;
+GmresAlgorithm gmres = gmresAlgorithmBuilder.Build();
+
+// Solve the linear system
+Vector b = Vector.CreateFromArray(new double[] { 1.0, 2.0, 3.0, 4.0 });
+Vector x = Vector.CreateZero(4);
+gmres.Solve(matrix, new IdentityPreconditioner(), b, x, initialGuessIsZero: true, () => Vector.CreateZero(4));
+Debug.Assert(stats.HasConverged == true);
+```
