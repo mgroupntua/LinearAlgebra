@@ -1,15 +1,15 @@
 # LU factorization
 To solve a linear system `A*x = b`, the square matrix `A (n x n)` must first be decomposed into simpler matrices that we can work with easier. If we record the operations done during [Gauss elimination](https://en.wikipedia.org/wiki/Gaussian_elimination) in matrices, then the LU factorization is obtained `A = L*U`, where `L (n x n)` is a lower triangular matrix with its diagonal entries being 1 and `U (n x n)` is an upper triangular matrix. To solve the linear system after factorizing the matrix, we perform [back substitution](https://algowiki-project.org/en/Backward_substitution) and [forward substitution](https://en.wikipedia.org/wiki/Triangular_matrix#Forward_and_back_substitution) with its factors L, U respectively: 
 ```
-L * y = b (back substitution)
-U * x = y (forward substitution)
+L * y = b (forward substitution)
+U * x = y (back substitution)
 ```
 
 Only matrices that do not need pivoting during Gauss elimination admit a LU factorization. In general pivoting is needed, which leads to the LUP factorization `A = P*L*U` where `P (n x n)` is a permutation matrix. All matrices admit an LUP factorization, but if the matrix is singular, the last diagonal entries of U will be 0 and the factorization cannot be used to solve linear systems. To solve the linear system, after the factorization, we perform again back and forward substitutions, but also multiply with the inverse of P, which is its transpose:
 ```
 z = P^T * b (permutation)
-L * y = z (back substitution)
-U * x = y (forward substitution)
+L * y = z (forward substitution)
+U * x = y (back substitution)
 ```
 
 For more details about LU and LUP factorizations, see [Numerical Linear Algebra - Tefethen, Bau](https://books.google.gr/books/about/Numerical_Linear_Algebra.html?id=JaPtxOytY7kC&redir_esc=y) or [this wikipedia article](https://en.wikipedia.org/wiki/LU_decomposition).
@@ -17,15 +17,15 @@ For more details about LU and LUP factorizations, see [Numerical Linear Algebra 
 # Cholesky factorization
 If the linear system matrix A is (symmetric) positive definite, then it will always admit a Cholesky factorization `A=L*L^T`, where L is a lower triangular matrix. Cholesky factorization performs half the operations needed by LU, does not need pivoting and is always the better choice, provided the matrix is positive definite. After factorizing the matrix, we solve the linear system:
 ```
-L * y = b (back substitution)
-L^T * x = y (forward substitution)
+L * y = b (forward substitution)
+L^T * x = y (back substitution)
 ```
 
 A variant of Cholesky factorization is the LDL factorization  `A = L*D*L^T`, where D is a diagonal matrix and L is a lower triangular matrix with its diagonal entries being 1. The LDL factorization avoids calculating square roots and can be used for some symmetric indefinite matrices, for which Cholesky is unsuitable. To solve the linear system after factorizing the matrix, we must multiply with the inverse of D, which is trivial to calculate: D<sup>-1</sup><sub>ii</sub> = 1 / D<sub>ii</sub>.
 ```
-L * z = b (back substitution)
+L * z = b (forward substitution)
 y = inv(D) * z (diagonal inversion)
-L^T * x = y (forward substitution)
+L^T * x = y (back substitution)
 ```
 
 For more details about Cholesky and LDL factorizations, see [Numerical Linear Algebra - Tefethen, Bau](https://books.google.gr/books/about/Numerical_Linear_Algebra.html?id=JaPtxOytY7kC&redir_esc=y) or [this wikipedia article](https://en.wikipedia.org/wiki/Cholesky_decomposition).
