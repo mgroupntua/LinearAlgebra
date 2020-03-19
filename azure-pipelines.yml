@@ -104,7 +104,7 @@ steps:
     ArtifactName: 'drop'
 
 - task: DotNetCoreCLI@2
-  name: dotnetPushNuget
+  name: dotnetPushNugetPrivate
   condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Push nugets to feed"
   inputs:
@@ -114,11 +114,31 @@ steps:
     feedPublish: 'MSolve-Nugets'
 
 - task: DotNetCoreCLI@2
+  name: dotnetPushNugetPublic
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  displayName: "Push nugets to public feed"
+  inputs:
+    command: 'push'
+    packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
+    verbosityPack: 'Minimal'
+    feedPublish: 'MSolve/MGroup'
+
+- task: DotNetCoreCLI@2
   enabled: false
   condition: ne(variables['Build.Reason'], 'PullRequest')
-  name: dotnetPushSymbol
+  name: dotnetPushSymbolPrivate
   displayName: "Publishes symbol nugets"
   inputs:
     command: 'push'
     searchPatternPush: '$(Build.ArtifactStagingDirectory)/*.snupkg'
     feedPublish: 'MSolve-Nugets'
+
+- task: DotNetCoreCLI@2
+  enabled: false
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  name: dotnetPushSymbolPublic
+  displayName: "Publishes symbol nugets"
+  inputs:
+    command: 'push'
+    searchPatternPush: '$(Build.ArtifactStagingDirectory)/*.snupkg'
+    feedPublish: 'MSolve/MGroup'
