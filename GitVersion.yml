@@ -4,9 +4,6 @@ branches:
   develop:
     mode: ContinuousDeployment
     tag: unstable
-  test:
-    mode: ContinuousDeployment
-    tag: test
   master:
     mode: ContinuousDelivery
 ignore:
