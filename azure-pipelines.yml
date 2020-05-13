@@ -25,7 +25,8 @@ steps:
   inputs:
     command: 'restore'
     verbosityRestore: 'Normal'
-    feedRestore: 'MSolve-Nugets'
+    feedsToUse: 'config'
+    nugetConfigPath: 'NuGet.Config'
 
 
 - task: SonarCloudPrepare@1
