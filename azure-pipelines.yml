@@ -125,14 +125,14 @@ steps:
     feedPublish: 'MSolve/MGroup'
 
 - task: DotNetCoreCLI@2
-  enabled: false
+  name: dotnetPushNugetPublic
   condition: ne(variables['Build.Reason'], 'PullRequest')
-  name: dotnetPushSymbolPrivate
-  displayName: "Publishes symbol nugets"
+  displayName: "Push nugets to public feed"
   inputs:
     command: 'push'
-    searchPatternPush: '$(Build.ArtifactStagingDirectory)/*.snupkg'
-    feedPublish: 'MSolve-Nugets'
+    packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
+    verbosityPack: 'Minimal'
+    feedPublish: 'MSolve/MGroup'
 
 - task: DotNetCoreCLI@2
   enabled: false
