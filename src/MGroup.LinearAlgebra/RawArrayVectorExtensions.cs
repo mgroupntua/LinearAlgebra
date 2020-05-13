@@ -219,7 +219,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static double[] Subtract(this double[] thisVector, double[] otherVector)
-            => thisVector.Axpy(otherVector, 1.0);
+            => thisVector.Axpy(otherVector, -1.0);
 
         /// <summary>
         /// Performs the following operation for all i:
