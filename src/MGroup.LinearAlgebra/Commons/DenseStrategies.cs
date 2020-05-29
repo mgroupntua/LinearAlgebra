@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
@@ -303,7 +303,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < vector.Length; ++j)
                     {
-                        result[i] = matrix[j, i] * vector[j];
+                        result[i] = matrix[i, j] * vector[j];
                     }
                 }
                 return result;
@@ -333,7 +333,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < lhsVector.Length; ++j)
                     {
-                        rhsVector.Set(i, matrix[j, i] * lhsVector[j]);
+                        rhsVector.Set(i, matrix[i, j] * lhsVector[j]);
                     }
                 }
             }
