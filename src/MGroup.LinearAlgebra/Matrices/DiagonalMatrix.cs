@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Commons;
@@ -35,10 +35,15 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public int NumRows { get; }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.this[int, int]"/>.
-        /// </summary>
-        public double this[int rowIdx, int colIdx]
+		/// <summary>
+		/// The internal array that stores the entries of the main diagonal.
+		/// </summary>
+		public double[] RawDiagonal => diagonal;
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.this[int, int]"/>.
+		/// </summary>
+		public double this[int rowIdx, int colIdx]
         {
             //TODO: add index checking
             get { return (rowIdx == colIdx) ? diagonal[rowIdx] : 0.0; }

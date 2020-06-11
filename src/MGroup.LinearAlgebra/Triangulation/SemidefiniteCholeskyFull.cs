@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Commons;
@@ -43,7 +43,16 @@ namespace MGroup.LinearAlgebra.Triangulation
 
         public IReadOnlyList<int> DependentColumns { get; }
 
+		/// <summary>
+		/// A list of columns that form a basis for the null space of the original matrix. 
+		/// </summary>
         public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IVectorView
+
+		/// <summary>
+		/// The internal data containing the factorization of a matrix. Only the upper triangle (including the diagonal) 
+		/// is factorized. The lower triangle (excluding the diagonal) remains as in the original matrix.
+		/// </summary>
+		public Matrix RawData => upperFactorized;
 
         /// <summary>
         /// Applies the Cholesky factorization to the independent columns of a symmetric positive semi-definite matrix,

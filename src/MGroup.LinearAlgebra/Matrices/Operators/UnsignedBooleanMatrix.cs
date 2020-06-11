@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,13 +42,19 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// </summary>
         public int NumRows { get; }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.this[int, int]"/>.
-        /// </summary>
-        /// <remarks>
-        /// The entries can be 0.0, 1.0 or -1.0
-        /// </remarks>
-        double IIndexable2D.this[int rowIdx, int colIdx] => this[rowIdx, colIdx];
+		/// <summary>
+		/// The internal representation of the non-zero entries of the matrix: 
+		/// Dictionary[int, HashSet[int]] corresponds to Dictionary[row, HashSet[column]]
+		/// </summary>
+		public Dictionary<int, HashSet<int>> RawData => data;
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.this[int, int]"/>.
+		/// </summary>
+		/// <remarks>
+		/// The entries can be 0.0, 1.0 or -1.0
+		/// </remarks>
+		double IIndexable2D.this[int rowIdx, int colIdx] => this[rowIdx, colIdx];
 
         /// <summary>
         /// The entry with row index = rowIdx and column index = colIdx. 

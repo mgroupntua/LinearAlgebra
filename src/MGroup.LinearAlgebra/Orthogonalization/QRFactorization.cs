@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Providers;
@@ -42,19 +42,23 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// </summary>
         public int NumRows { get; }
 
-        /// <summary>
-        /// Calculates the QR factorization of a matrix, such that A = Q * R. Requires an extra 
-        /// min(<paramref name="numRows"/>, <paramref name="numCols"/>) available memory.
-        /// </summary>
-        /// <param name="numRows">The number of rows of the original matrix.</param>
-        /// <param name="numCols">The number of columns of the original matrix.</param>
-        /// <param name="matrix">The internal buffer storing the matrix entries in column major layout. It will 
-        ///     be overwritten with the factorization data.</param>
-        /// <exception cref="NotImplementedException">Thrown if <paramref name="numCols"/> &gt; <paramref name="numRows"/>.
-        ///     </exception>
-        /// <exception cref="Exceptions.LapackException">Thrown if tha call to LAPACK fails due to an invalid 
-        ///     <paramref name="matrix"/>.</exception>
-        public static QRFactorization Factorize(int numRows, int numCols, double[] matrix)
+		public double[] RawReflectorsAndR => reflectorsAndR;
+
+		public double[] RawReflectorScalars => reflectorScalars;
+
+		/// <summary>
+		/// Calculates the QR factorization of a matrix, such that A = Q * R. Requires an extra 
+		/// min(<paramref name="numRows"/>, <paramref name="numCols"/>) available memory.
+		/// </summary>
+		/// <param name="numRows">The number of rows of the original matrix.</param>
+		/// <param name="numCols">The number of columns of the original matrix.</param>
+		/// <param name="matrix">The internal buffer storing the matrix entries in column major layout. It will 
+		///     be overwritten with the factorization data.</param>
+		/// <exception cref="NotImplementedException">Thrown if <paramref name="numCols"/> &gt; <paramref name="numRows"/>.
+		///     </exception>
+		/// <exception cref="Exceptions.LapackException">Thrown if tha call to LAPACK fails due to an invalid 
+		///     <paramref name="matrix"/>.</exception>
+		public static QRFactorization Factorize(int numRows, int numCols, double[] matrix)
         {
             if (numRows < numCols)
             {

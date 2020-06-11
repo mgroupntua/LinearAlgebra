@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -75,23 +75,23 @@ namespace MGroup.LinearAlgebra.Matrices
         /// consecutive. Its length is equal to the number of non-zero entries. 
         /// It should only be used for passing the raw array to linear algebra libraries.
         /// </summary>
-        internal double[] RawValues => values;
+        public double[] RawValues => values;
 
-        /// <summary>
-        /// The internal array that stores the index into the arrays <see cref="RawValues"/> and <see cref="RawRowIndices"/> of  
-        /// the first entry of each column. Its length is equal to <paramref name="NumColumns"/> + 1. 
-        /// The last entry is the number of non-zero entries, which must be equal to 
-        /// <see cref="RawValues"/>.Length == <see cref="RawRowIndices"/>.Length.
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// </summary>
-        internal int[] RawColOffsets => colOffsets;
+		/// <summary>
+		/// The internal array that stores the index into the arrays <see cref="RawValues"/> and <see cref="RawRowIndices"/> of  
+		/// the first entry of each column. Its length is equal to <paramref name="NumColumns"/> + 1. 
+		/// The last entry is the number of non-zero entries, which must be equal to 
+		/// <see cref="RawValues"/>.Length == <see cref="RawRowIndices"/>.Length.
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		public int[] RawColOffsets => colOffsets;
 
-        /// <summary>
-        /// The internal array that stores the row indices of the non-zero entries in <see cref="RawValues"/>.
-        /// Its length is equal to the number of non-zero entries. 
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// </summary>
-        internal int[] RawRowIndices => rowIndices;
+		/// <summary>
+		/// The internal array that stores the row indices of the non-zero entries in <see cref="RawValues"/>.
+		/// Its length is equal to the number of non-zero entries. 
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		public int[] RawRowIndices => rowIndices;
 
         /// <summary>
         /// Initializes a new <see cref="CscMatrix"/> with the specified dimensions and the provided arrays 

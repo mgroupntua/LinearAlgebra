@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -35,10 +35,22 @@ namespace MGroup.LinearAlgebra.Triangulation
 
         public int Order { get; }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.this[int, int]"/>.
-        /// </summary>
-        public double this[int rowIdx, int colIdx]
+		/// <summary>
+		/// The internal array that stores the non-zero entries of the matrix's upper triangle in column major order, 
+		/// starting from the diagonal and going upwards. Its length is equal to the number of non-zero entries. 
+		/// </summary>
+		public double[] RawValues => values;
+
+		/// <summary>
+		/// The internal array that stores the indices into <see cref="RawValues"/> of the diagonal entries of the matrix. 
+		/// Its length = order + 1, with the last entry being equal to nnz.
+		/// </summary>
+		public int[] RawDiagOffsets => diagOffsets;
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.this[int, int]"/>.
+		/// </summary>
+		public double this[int rowIdx, int colIdx]
         {
             get
             {

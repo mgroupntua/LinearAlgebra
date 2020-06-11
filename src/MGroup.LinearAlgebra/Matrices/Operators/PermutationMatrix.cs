@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Matrices.Operators
@@ -28,6 +28,12 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// The number of rows of the permutation matrix. 
         /// </summary>
         public int NumRows { get { return order; } }
+
+		/// <summary>
+		/// The internal array that stores the permutation. If P is the permutation matrix, x a vector, y = p * x, 
+		/// z = transpose(P) * x, then: y[RawData[i]] = P[i] and z[i] = RawData[i]
+		/// </summary>
+		public int[] RawData => data;
 
         /// <summary>
         /// Initializes a new instance of <see cref="PermutationMatrix"/> that is equal to the identity matrix, namely a square 

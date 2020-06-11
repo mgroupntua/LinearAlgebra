@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -55,10 +55,17 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// </summary>
         public int NumRows { get => order; }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.this[int, int]"/>, <see cref="IMatrixBuilder.this[int, int]"/>.
-        /// </summary>
-        public double this[int rowIdx, int colIdx]
+		/// <summary>
+		/// The internal representation of the non-zero entries of the upper triangle of the matrix. Each entry of the array 
+		/// Dictionary[int, double][] is a column of the matrix and each entry Dictionary[int, double] corresponds to 
+		/// Dictionary[row, value].
+		/// </summary>
+		public Dictionary<int, double>[] RawColumns => columns;
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.this[int, int]"/>, <see cref="IMatrixBuilder.this[int, int]"/>.
+		/// </summary>
+		public double this[int rowIdx, int colIdx]
         {
             get
             {

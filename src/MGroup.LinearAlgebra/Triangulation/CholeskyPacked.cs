@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -41,13 +41,18 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// </summary>
         public int Order { get; }
 
-        /// <summary>
-        /// Calculates the cholesky factorization of a symmetric positive definite matrix, such that A = transpose(U) * U. 
-        /// </summary>
-        /// <param name="order">The number of rows/columns of the square matrix.</param>
-        /// <param name="matrix">The entries of the original symmetric matrix in packed column major layout.</param>
-        /// <exception cref="IndefiniteMatrixException">Thrown if the matrix is not symmetric positive definite.</exception>
-        public static CholeskyPacked Factorize(int order, double[] matrix)
+		/// <summary>
+		/// The internal data containing the factorized upper triangle of a matrix in PACKED column major format.
+		/// </summary>
+		public double[] RawData => data;
+
+		/// <summary>
+		/// Calculates the cholesky factorization of a symmetric positive definite matrix, such that A = transpose(U) * U. 
+		/// </summary>
+		/// <param name="order">The number of rows/columns of the square matrix.</param>
+		/// <param name="matrix">The entries of the original symmetric matrix in packed column major layout.</param>
+		/// <exception cref="IndefiniteMatrixException">Thrown if the matrix is not symmetric positive definite.</exception>
+		public static CholeskyPacked Factorize(int order, double[] matrix)
         {
             // Call LAPACK
             int indefiniteMinorIdx = LapackLinearEquations.Dpptrf(StoredTriangle.Upper, order, matrix, 0);

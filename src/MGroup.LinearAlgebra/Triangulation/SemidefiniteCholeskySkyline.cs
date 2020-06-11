@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Commons;
@@ -49,35 +49,50 @@ namespace MGroup.LinearAlgebra.Triangulation
 
         public IReadOnlyList<int> DependentColumns { get; }
 
-        public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IVectorView
+		/// <summary>
+		/// A list of columns that form a basis for the null space of the original matrix. 
+		/// </summary>
+		public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IVectorView
 
         /// <summary>
         /// The number of rows/columns of the original square matrix.
         /// </summary>
         public int Order { get; }
 
-        /// <summary>
-        /// Applies the Cholesky factorization to the independent columns of a symmetric positive semi-definite matrix,
-        /// sets the dependent ones equal to columns of the identity matrix and return the nullspace of the matrix. Requires 
-        /// extra memory for the basis vectors of the nullspace.
-        /// </summary>
-        /// <param name="order">The number of rows/ columns of the square matrix.</param>
-        /// <param name="skyValues">
-        /// The non-zero entries of the original <see cref="SkylineMatrix"/>. This array will be overwritten during the 
-        /// factorization.
-        /// </param>
-        /// <param name="skyDiagOffsets">
-        /// The indexes of the diagonal entries into <paramref name="skyValues"/>. The new 
-        /// <see cref="SemidefiniteCholeskySkyline"/> instance will hold a reference to <paramref name="skyDiagOffsets"/>. 
-        /// However they do not need copying, since they will not be altered during or after the factorization.
-        /// </param>
-        /// <param name="pivotTolerance">
-        /// If a diagonal entry is &lt;= <paramref name="pivotTolerance"/> it means that the corresponding column is dependent 
-        /// on the rest. The Cholesky factorization only applies to independent column, while dependent ones are used to compute
-        /// the nullspace. Therefore it is important to select a tolerance that will identify small pivots that result from 
-        /// singularity, but not from ill-conditioning.
-        /// </param>
-        public static SemidefiniteCholeskySkyline Factorize(int order, double[] skyValues, int[] skyDiagOffsets,
+		/// <summary>
+		/// The internal array that stores the non-zero entries of the matrix's upper triangle in column major order, 
+		/// starting from the diagonal and going upwards. Its length is equal to the number of non-zero entries. 
+		/// </summary>
+		public double[] RawValues => values;
+
+		/// <summary>
+		/// The internal array that stores the indices into <see cref="RawValues"/> of the diagonal entries of the matrix. 
+		/// Its length = order + 1, with the last entry being equal to nnz.
+		/// </summary>
+		public int[] RawDiagOffsets => diagOffsets;
+
+		/// <summary>
+		/// Applies the Cholesky factorization to the independent columns of a symmetric positive semi-definite matrix,
+		/// sets the dependent ones equal to columns of the identity matrix and return the nullspace of the matrix. Requires 
+		/// extra memory for the basis vectors of the nullspace.
+		/// </summary>
+		/// <param name="order">The number of rows/ columns of the square matrix.</param>
+		/// <param name="skyValues">
+		/// The non-zero entries of the original <see cref="SkylineMatrix"/>. This array will be overwritten during the 
+		/// factorization.
+		/// </param>
+		/// <param name="skyDiagOffsets">
+		/// The indexes of the diagonal entries into <paramref name="skyValues"/>. The new 
+		/// <see cref="SemidefiniteCholeskySkyline"/> instance will hold a reference to <paramref name="skyDiagOffsets"/>. 
+		/// However they do not need copying, since they will not be altered during or after the factorization.
+		/// </param>
+		/// <param name="pivotTolerance">
+		/// If a diagonal entry is &lt;= <paramref name="pivotTolerance"/> it means that the corresponding column is dependent 
+		/// on the rest. The Cholesky factorization only applies to independent column, while dependent ones are used to compute
+		/// the nullspace. Therefore it is important to select a tolerance that will identify small pivots that result from 
+		/// singularity, but not from ill-conditioning.
+		/// </param>
+		public static SemidefiniteCholeskySkyline Factorize(int order, double[] skyValues, int[] skyDiagOffsets,
             double pivotTolerance = SemidefiniteCholeskySkyline.PivotTolerance)
         {
             (List<int> dependentColumns, List<double[]> nullSpaceBasis) = 
