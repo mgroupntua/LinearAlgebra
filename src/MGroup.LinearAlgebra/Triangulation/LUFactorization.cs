@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -70,17 +70,29 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// </summary>
         public int Order { get; }
 
-        /// <summary>
-        /// Calculates the LUP factorization of a square matrix, such that A = P * L * U. Requires an extra O(n) available 
-        /// memory, where n is the <paramref name="order"/>.
-        /// </summary>
-        /// <param name="order">The number of rows/columns of the square matrix.</param>
-        /// <param name="matrix">The internal buffer stroring the matrix entries in column major order. It will 
-        ///     be overwritten.</param>
-        /// <param name="pivotTolerance">If a diagonal entry (called pivot) is &lt;= <paramref name="pivotTolerance"/> it will be  
-        ///     considered as zero and a permutation will be used to find a non-zero pivot (the process is called pivoting).
-        ///     </param>
-        public static LUFactorization Factorize(int order, double[] matrix,
+		/// <summary>
+		/// The internal data containing the factorization of a matrix in FULL column major format.
+		/// </summary>
+		public double[] RawData => lowerUpper;
+
+		/// <summary>
+		/// The internal data containing the row exchanges performed during pivoting. Its entries are in 1-based indexing. 
+		/// This is not the actual permutation vector. Instead it records the row exchanges: 
+		/// E.g. { 4, 4, 4, 4} means that rows 0, 1, 2 have been switched with the last row (the last row doesn't change).
+		/// </summary>
+		public int[] RawRowExchanges => rowExchanges;
+
+		/// <summary>
+		/// Calculates the LUP factorization of a square matrix, such that A = P * L * U. Requires an extra O(n) available 
+		/// memory, where n is the <paramref name="order"/>.
+		/// </summary>
+		/// <param name="order">The number of rows/columns of the square matrix.</param>
+		/// <param name="matrix">The internal buffer stroring the matrix entries in column major order. It will 
+		///     be overwritten.</param>
+		/// <param name="pivotTolerance">If a diagonal entry (called pivot) is &lt;= <paramref name="pivotTolerance"/> it will be  
+		///     considered as zero and a permutation will be used to find a non-zero pivot (the process is called pivoting).
+		///     </param>
+		public static LUFactorization Factorize(int order, double[] matrix,
             double pivotTolerance = LUFactorization.PivotTolerance)
         {
             int[] rowExchanges = new int[order];

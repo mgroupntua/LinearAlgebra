@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Commons;
@@ -66,14 +66,14 @@ namespace MGroup.LinearAlgebra.Matrices
         /// starting from the diagonal and going upwards. Its length is equal to the number of non-zero entries. 
         /// It should only be used for passing the raw array to linear algebra libraries.
         /// </summary>
-        internal double[] RawValues => values;
+        public double[] RawValues => values;
 
-        /// <summary>
-        /// The internal array that stores the indices into <see cref="RawValues"/> of the diagonal entries of the matrix. 
-        /// Its length = order + 1, with the last entry being equal to nnz.
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// </summary>
-        internal int[] RawDiagOffsets => diagOffsets;
+		/// <summary>
+		/// The internal array that stores the indices into <see cref="RawValues"/> of the diagonal entries of the matrix. 
+		/// Its length = order + 1, with the last entry being equal to nnz.
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		public int[] RawDiagOffsets => diagOffsets;
 
         /// <summary>
         /// See <see cref="IIndexable2D.this[int, int]"/>.

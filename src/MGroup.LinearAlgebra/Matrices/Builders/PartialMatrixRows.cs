@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -35,16 +35,22 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// </summary>
         public int NumRows { get; }
 
-        /// <summary>
-        /// Adds the provided <paramref name="value"/> to the entry (<paramref name="rowIdx"/>, <paramref name="colIdx"/>). 
-        /// </summary>
-        /// <param name="rowIdx">The row index of the entry to modify. Constraints: 
-        ///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumRows"/>.</param>
-        /// <param name="colIdx">The column index of the entry to modify. Constraints: 
-        ///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumColumns"/>.</param>
-        /// <param name="value">The value that will be added to the entry (<paramref name="colIdx"/>, <paramref name="colIdx"/>).
-        ///     </param>
-        public void AddToEntry(int rowIdx, int colIdx, double value)
+		/// <summary>
+		/// The internal representation of the non-zero entries of the matrix: 
+		/// Dictionary[int, Dictionary[int, double]] corresponds to Dictionary[row, Dictionary[column, value]]
+		/// </summary>
+		public Dictionary<int, Dictionary<int, double>> RawRow => rows;
+
+		/// <summary>
+		/// Adds the provided <paramref name="value"/> to the entry (<paramref name="rowIdx"/>, <paramref name="colIdx"/>). 
+		/// </summary>
+		/// <param name="rowIdx">The row index of the entry to modify. Constraints: 
+		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumRows"/>.</param>
+		/// <param name="colIdx">The column index of the entry to modify. Constraints: 
+		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumColumns"/>.</param>
+		/// <param name="value">The value that will be added to the entry (<paramref name="colIdx"/>, <paramref name="colIdx"/>).
+		///     </param>
+		public void AddToEntry(int rowIdx, int colIdx, double value)
         {
             if (rows.TryGetValue(rowIdx, out Dictionary<int, double> wholeRow)) // The row exists. Mutate it.
             {

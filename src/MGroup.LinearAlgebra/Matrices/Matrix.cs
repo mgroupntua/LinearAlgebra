@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -55,11 +55,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public int NumRows { get; }
 
-        /// <summary>
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// The internal array that stores the entries of the matrix in column major layout. 
-        /// </summary>
-        internal double[] RawData { get { return data; } }
+		/// <summary>
+		/// The internal array that stores the entries of the matrix in column major layout.
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		public double[] RawData { get { return data; } }
 
         /// <summary>
         /// See <see cref="IIndexable2D.this[int, int]"/>.

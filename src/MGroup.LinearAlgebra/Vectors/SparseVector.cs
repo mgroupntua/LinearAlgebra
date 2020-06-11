@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MGroup.LinearAlgebra.Commons;
@@ -39,14 +39,14 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Its length is equal to the number of non-zero entries.
         /// It should only be used for passing the raw array to linear algebra libraries.
         /// </summary>
-        internal int[] RawIndices => indices;
+        public int[] RawIndices => indices;
 
         /// <summary>
         /// The internal array that stores the values of the non-zero entries of the vector.
         /// Its length is equal to the number of non-zero entries.
         /// It should only be used for passing the raw array to linear algebra libraries.
         /// </summary>
-        internal double[] RawValues => values;
+        public double[] RawValues => values;
 
         /// <summary>
         /// See <see cref="IIndexable1D.this[int]"/>

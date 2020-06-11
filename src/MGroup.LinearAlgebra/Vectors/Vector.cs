@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// The internal array that stores the entries of the vector. 
         /// It should only be used for passing the raw array to linear algebra libraries.
         /// </summary>
-        internal double[] RawData => data;
+        public double[] RawData => data;
 
         /// <summary>
         /// See <see cref="IIndexable1D.this[int]"/>.
