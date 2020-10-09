@@ -222,10 +222,13 @@ namespace MGroup.LinearAlgebra.Matrices
             {
                 int colCurrent = colOffsets[j];
                 int colNext = colOffsets[j + 1]; // TODO: 1 of the two accesses can be removed
-                for (int i = colCurrent; i < colNext; ++i)
+                for (int k = colCurrent; k < colNext; ++k)
                 {
-                    fullMatrix[rowIndices[i], colCurrent] = values[i];
-                }
+					int i = rowIndices[k];
+					double val = values[k];
+					fullMatrix[i, j] = val;
+                    fullMatrix[j, i] = val;
+				}
             }
             return fullMatrix;
         }

@@ -389,7 +389,7 @@ namespace MGroup.LinearAlgebra.Matrices
         public bool Equals(IIndexable2D other, double tolerance = 1e-13)
         {
             if ((this.NumRows != other.NumRows) || (this.NumColumns != other.NumColumns)) return false;
-            var comparer = new ValueComparer(1e-13);
+            var comparer = new ValueComparer(tolerance);
             for (int j = 0; j < NumColumns; ++j)
             {
                 int colStart = colOffsets[j]; // Inclusive
