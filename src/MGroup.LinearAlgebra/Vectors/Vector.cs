@@ -286,9 +286,11 @@ namespace MGroup.LinearAlgebra.Vectors
                 Preconditions.CheckVectorDimensions(this, otherVector);
                 if (otherVector is SparseVector sparse)
                 {
-                    //TODO: should I check whether the sparse vector is all 0, in order to avoid the BLAS call?
-                    SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
-                        sparse.RawIndices, 0, data, 0);
+					if (sparse.RawIndices.Length != 0)
+					{
+						SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
+							sparse.RawIndices, 0, data, 0);
+					}
                 }
                 else
                 {
