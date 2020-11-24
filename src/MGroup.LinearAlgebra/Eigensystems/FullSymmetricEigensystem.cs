@@ -30,9 +30,9 @@ namespace MGroup.LinearAlgebra.Eigensystems
 
 		/// <summary>
 		/// See <see cref="IEigensystem.EigenvaluesImaginary"/>. 
-		/// Empty since symmetric matrices have real eigenvalues.
+		/// Null since symmetric matrices have real eigenvalues.
 		/// </summary>
-		public Vector EigenvaluesImaginary { get; } = Vector.CreateZero(0);
+		public Vector EigenvaluesImaginary { get; } = null;
 
 		/// <summary>
 		/// See <see cref="IEigensystem.EigenvectorsRight"/>.
@@ -41,9 +41,9 @@ namespace MGroup.LinearAlgebra.Eigensystems
 
 		/// <summary>
 		/// See <see cref="IEigensystem.EigenvectorsLeft"/>.
-		/// Empty since they are the transpose of <see cref="EigenvectorsRight"/>.
+		/// Null since they are the transpose of <see cref="EigenvectorsRight"/>.
 		/// </summary>
-		public Matrix EigenvectorsLeft { get; } = Matrix.CreateZero(0, 0);
+		public Matrix EigenvectorsLeft { get; } = null;
 
 		/// <summary>
 		/// See <see cref="IEigensystem.Order"/>.
@@ -77,9 +77,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			}
 			else
 			{
-				// The original matrix is partially overwritten by intermediate computations
-				var eigenvectors = Matrix.CreateZero(0, 0);
-				return new FullSymmetricEigensystem(order, Vector.CreateFromArray(eigenvalues), eigenvectors);
+				return new FullSymmetricEigensystem(order, Vector.CreateFromArray(eigenvalues), null);
 			}
 		}
 	}

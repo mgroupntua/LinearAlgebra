@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 		Vector EigenvaluesReal { get; }
 
 		/// <summary>
-		/// The imaginary parts of eigenvalues of a matrix. Will be empty if all eigenvalues are real, 
+		/// The imaginary parts of eigenvalues of a matrix. Will be null if all eigenvalues are real, 
 		/// e.g. for symmetric matrices.
 		/// </summary>
 		Vector EigenvaluesImaginary { get; }
@@ -25,14 +25,14 @@ namespace MGroup.LinearAlgebra.Eigensystems
 		/// <summary>
 		/// The right eigenvectors of a matrix. Each column j is an eigenvector v that corresponds to 
 		/// lambda=<see cref="Eigenvalues"/>[j], such as A*v = lambda * v.
-		/// This matrix may be empty, if the user requested that no right eigenvectors were computed.
+		/// It may be null, if the user requested that no right eigenvectors were computed.
 		/// </summary>
 		Matrix EigenvectorsRight { get; }
 
 		/// <summary>
 		/// The left eigenvectors of a matrix. Each column j is an eigenvector v that corresponds to 
 		/// lambda=<see cref="Eigenvalues"/>[j], such as transpose(v)*A = lambda * v.
-		/// This matrix may be empty, if the user requested that no left eigenvectors were computed.
+		/// It may be null, if the user requested that no left eigenvectors were computed.
 		/// </summary>
 		Matrix EigenvectorsLeft { get; }
 
