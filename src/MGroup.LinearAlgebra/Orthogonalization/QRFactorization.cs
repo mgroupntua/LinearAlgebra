@@ -65,7 +65,6 @@ namespace MGroup.LinearAlgebra.Orthogonalization
                 throw new NotImplementedException("For now, the number of rows must be >= the number of columns");
             }
 
-
             int leadingDimA = numRows;
             int minDim = Math.Min(numRows, numCols); //TODO: this is known to be numCols (though it may change in the future)
             double[] reflectorScalars = new double[minDim];

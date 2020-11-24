@@ -8,6 +8,7 @@ using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Orthogonalization;
+using MGroup.LinearAlgebra.Eigensystems;
 
 //TODO: align data using mkl_malloc
 //TODO: add inplace option for factorizations and leave all subsequent operations (determinant, system solution, etc.) to them
@@ -342,6 +343,18 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else return FactorLU().CalcDeterminant();
         }
+
+		/// <summary>
+		/// Calculates the eigenvalues and eigenvectors of the matrix. The matrix must be symmetric for this to work correctly.
+		/// </summary>
+		/// <returns>The eigenvalues and eigenvectors of the matrix.</returns>
+		public (Vector eigenvalues, Matrix eigenvectors) CalcEigensystemSymmetric()
+		{
+			Preconditions.CheckSquare(this);
+			double[] clone = CopyInternalData();
+			var eigensystem = FullSymmetricEigensystem.Create(NumRows, clone, true);
+			return (eigensystem.EigenvaluesReal, eigensystem.EigenvectorsRight);
+		}
 
         /// <summary>
         /// See <see cref="IMatrix.Clear"/>.

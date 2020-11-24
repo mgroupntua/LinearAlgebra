@@ -1,4 +1,4 @@
-﻿namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Providers
 {
     /// <summary>
     /// Provides linear algebra operations as defined by the LAPACK (Linear ALgebra PACKage) interface. These operations are 
@@ -134,5 +134,13 @@
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gaa0b8f7830a459c434c84ce5e7a939850.html#gaa0b8f7830a459c434c84ce5e7a939850
         /// </summary>
         void Dpptrs(string uplo, int n, int nRhs, double[] a, int offsetA, double[] b, int offsetB, int ldB, ref int info);
+
+		/// <summary>
+		/// Computes all eigenvalues and, optionally, eigenvectors of a real symmetric matrix. The matrix is stored in full 
+		/// format in the upper or lower triangle. See
+		/// http://www.netlib.org/lapack/explore-html/d2/d8a/group__double_s_yeigen_ga442c43fca5493590f8f26cf42fed4044.html#ga442c43fca5493590f8f26cf42fed4044
+		/// </summary>
+		void Dsyev(string jobz, string uplo, int n, ref double[] a, int offsetA, int ldA, ref double[] w, int offsetW,
+			ref double[] work, int offsetWork, int lWork, ref int info); //TODO: also for PACKED format
     }
 }

@@ -1,4 +1,4 @@
-﻿using IntelMKL.LP64;
+using IntelMKL.LP64;
 
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
 namespace MGroup.LinearAlgebra.Providers.MKL
@@ -120,5 +120,12 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         /// </summary>
         public void Dpptrs(string uplo, int n, int nRhs, double[] a, int offsetA, double[] b, int offsetB, int ldB, ref int info)
             => Lapack.Dpptrs(uplo, ref n, ref nRhs, ref a[offsetA], ref b[offsetB], ref ldB, ref info);
-    }
+
+		/// <summary>
+		/// See https://software.intel.com/content/www/us/en/develop/documentation/mkl-developer-reference-fortran/top/lapack-routines/lapack-least-squares-and-eigenvalue-problem-routines/lapack-least-squares-and-eigenvalue-problem-driver-routines/symmetric-eigenvalue-problems-lapack-driver-routines/syev.html#syev
+		/// </summary>
+		public void Dsyev(string jobz, string uplo, int n, ref double[] a, int offsetA, int ldA, ref double[] w, int offsetW,
+			ref double[] work, int offsetWork, int lWork, ref int info)
+			=> Lapack.Dsyev(jobz, uplo, ref n, ref a[offsetA], ref ldA, ref w[offsetW], ref work[offsetWork], ref lWork, ref info);
+	}
 }
