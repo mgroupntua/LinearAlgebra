@@ -107,7 +107,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			else
 			{
 				jobLeft = EigensystemJob.OnlyEigenvalues;
-				eigenvectorsLeft = new double[0];
+				eigenvectorsLeft = new double[1];
 				leadingDimEigenvectorsLeft = 1;
 			}
 
@@ -123,7 +123,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			else
 			{
 				jobRight = EigensystemJob.OnlyEigenvalues;
-				eigenvectorsRight = new double[0];
+				eigenvectorsRight = new double[1];
 				leadingDimEigenvectorsRight = 1;
 			}
 

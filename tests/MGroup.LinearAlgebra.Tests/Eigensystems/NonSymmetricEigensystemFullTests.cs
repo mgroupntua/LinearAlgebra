@@ -51,7 +51,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 				// Check
 				comparer.AssertEqual(eigenvaluesRealExpected, eigensystem.EigenvaluesReal);
 				comparer.AssertEqual(eigenvaluesImaginaryExpected, eigensystem.EigenvaluesImaginary);
-				comparer.AssertEqual(eigenvectorsRightExpected, eigensystem.EigenvectorsRight);
+				CheckEigenvectors(eigenvectorsRightExpected, eigensystem.EigenvectorsRight);
 				Assert.True(eigensystem.EigenvectorsLeft == null);
 			});
 		}
@@ -71,7 +71,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 				// Check
 				comparer.AssertEqual(eigenvaluesRealExpected, eigensystem.EigenvaluesReal);
 				comparer.AssertEqual(eigenvaluesImaginaryExpected, eigensystem.EigenvaluesImaginary);
-				comparer.AssertEqual(eigenvectorsLeftExpected, eigensystem.EigenvectorsLeft);
+				CheckEigenvectors(eigenvectorsLeftExpected, eigensystem.EigenvectorsLeft);
 				Assert.True(eigensystem.EigenvectorsRight == null);
 			});
 		}
@@ -92,8 +92,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 				// Check
 				comparer.AssertEqual(eigenvaluesRealExpected, eigensystem.EigenvaluesReal);
 				comparer.AssertEqual(eigenvaluesImaginaryExpected, eigensystem.EigenvaluesImaginary);
-				comparer.AssertEqual(eigenvectorsRightExpected, eigensystem.EigenvectorsRight);
-				comparer.AssertEqual(eigenvectorsLeftExpected, eigensystem.EigenvectorsLeft);
+				CheckEigenvectors(eigenvectorsRightExpected, eigensystem.EigenvectorsRight);
+				CheckEigenvectors(eigenvectorsLeftExpected, eigensystem.EigenvectorsLeft);
 			});
 		}
 
@@ -114,9 +114,34 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 				// Check
 				comparer.AssertEqual(eigenvaluesRealExpected, eigenvaluesReal);
 				comparer.AssertEqual(eigenvaluesImaginaryExpected, eigenvaluesImaginary);
-				comparer.AssertEqual(eigenvectorsRightExpected, eigenvectorsRight);
-				comparer.AssertEqual(eigenvectorsLeftExpected, eigenvectorsLeft);
+				CheckEigenvectors(eigenvectorsRightExpected, eigenvectorsRight);
+				CheckEigenvectors(eigenvectorsLeftExpected, eigenvectorsLeft);
 			});
+		}
+
+		private static void CheckEigenvectors(Matrix expected, Matrix computed)
+		{
+			// The expected and computed eigenvectors may be opposite, depending on the implementation.
+			for (int j = 0; j < expected.NumColumns; ++j)
+			{
+				// Find a non zero entry
+				int i;
+				for (i = 0; i < expected.NumRows; ++i)
+				{
+					if (expected[i, j] != 0) break;
+				}
+
+				// Probably opposite eigenvectors 
+				if (expected[i, j] * computed[i, j] < 0)
+				{
+					// Change the sign of all entries of the computed eigenvector
+					for (i = 0; i < computed.NumRows; ++i)
+					{
+						computed[i, j] = -computed[i, j];
+					}
+				}
+			}
+			comparer.AssertEqual(expected, computed);
 		}
 	}
 }
