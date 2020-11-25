@@ -16,6 +16,15 @@ namespace MGroup.LinearAlgebra.Providers
     /// </remarks>
     internal interface ILapackProvider
     {
+		/// <summary>
+		/// Computes the eigenvalues and, optionally, left and right eigenvectors of a real square (nonsymmetric) matrix. The 
+		/// matrix is stored in full format. See 
+		/// http://www.netlib.org/lapack/explore-html/d9/d8e/group__double_g_eeigen_ga66e19253344358f5dee1e60502b9e96f.html#ga66e19253344358f5dee1e60502b9e96f
+		/// </summary>
+		void Dgeev(string jobVl, string jobVr, int n, ref double[] a, int offsetA, int ldA, ref double[] wr, int offsetWr,
+			ref double[] wi, int offsetWi, ref double[] vl, int offsetVl, int ldVl, ref double[] vr, int offsetVr, int ldVr,
+			ref double[] work, int offsetWork, int lWork, ref int info);
+
         /// <summary>
         /// LQ factorization. The matrix is general, stored in full column major format. See
         /// http://www.netlib.org/lapack/explore-html/dd/d9a/group__double_g_ecomputational_ga436228e38ef5c55e3229502afa2c4220.html#ga436228e38ef5c55e3229502afa2c4220

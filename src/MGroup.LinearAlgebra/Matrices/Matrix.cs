@@ -345,6 +345,20 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
 		/// <summary>
+		/// Calculates the eigenvalues and eigenvectors of the matrix. The matrix can be symmetric or not, but it must be square.
+		/// </summary>
+		/// <returns>The eigenvalues and eigenvectors of the matrix.</returns>
+		public (Vector eigenvaluesReal, Vector eigenvaluesImaginary, Matrix eigenvectorsRight, Matrix eigenvectorsLeft)
+			CalcEigensystemNonSymmetric()
+		{
+			Preconditions.CheckSquare(this);
+			double[] clone = CopyInternalData();
+			var eigensystem = NonSymmetricEigensystemFull.Create(NumRows, clone, true, true);
+			return (eigensystem.EigenvaluesReal, eigensystem.EigenvaluesImaginary,
+				eigensystem.EigenvectorsRight, eigensystem.EigenvectorsLeft);
+		}
+
+		/// <summary>
 		/// Calculates the eigenvalues and eigenvectors of the matrix. The matrix must be symmetric for this to work correctly.
 		/// </summary>
 		/// <returns>The eigenvalues and eigenvectors of the matrix.</returns>
@@ -352,7 +366,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSquare(this);
 			double[] clone = CopyInternalData();
-			var eigensystem = FullSymmetricEigensystem.Create(NumRows, clone, true);
+			var eigensystem = SymmetricEigensystemFull.Create(NumRows, clone, true);
 			return (eigensystem.EigenvaluesReal, eigensystem.EigenvectorsRight);
 		}
 

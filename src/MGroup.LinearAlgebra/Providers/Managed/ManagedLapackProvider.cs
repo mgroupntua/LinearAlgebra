@@ -16,6 +16,7 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 	/// </summary>
 	internal class ManagedLapackProvider : ILapackProvider
 	{
+		private static readonly DGEEV dgeev = new DGEEV();
 		private static readonly DGELQF dgelqf = new DGELQF();
 		private static readonly DGEQRF dgeqrf = new DGEQRF();
 		private static readonly DORGLQ dorglq = new DORGLQ();
@@ -31,6 +32,17 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 		internal static ManagedLapackProvider UniqueInstance { get; } = new ManagedLapackProvider();
 
 		private ManagedLapackProvider() { } // private constructor for singleton pattern
+
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgeev.aspx
+		/// </summary>
+		public void Dgeev(string jobVl, string jobVr, int n, ref double[] a, int offsetA, int ldA, ref double[] wr, int offsetWr,
+			ref double[] wi, int offsetWi, ref double[] vl, int offsetVl, int ldVl, ref double[] vr, int offsetVr, int ldVr,
+			ref double[] work, int offsetWork, int lWork, ref int info)
+		{
+			dgeev.Run(jobVl, jobVr, n, ref a, offsetA, ldA, ref wr, offsetWr, ref wi, offsetWi, ref vl, offsetVl, ldVl,
+				ref vr, offsetVr, ldVr, ref work, offsetWork, lWork, ref info);
+		}
 
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgelqf.aspx

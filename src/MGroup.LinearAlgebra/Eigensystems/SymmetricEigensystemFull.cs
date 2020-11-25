@@ -13,9 +13,9 @@ namespace MGroup.LinearAlgebra.Eigensystems
 	/// triangle or lower part of the original matrix is modified. The other part of the original matrix is still stored in the 
 	/// array but it is ignored. Uses Lapack.
 	/// </summary>
-	public class FullSymmetricEigensystem : IEigensystem
+	public class SymmetricEigensystemFull : IEigensystem
 	{
-		private FullSymmetricEigensystem(int order, Vector eigenvaluesReal, Matrix eigenvectorsRight)
+		private SymmetricEigensystemFull(int order, Vector eigenvaluesReal, Matrix eigenvectorsRight)
 		{
 			this.Order = order;
 			this.EigenvaluesReal = eigenvaluesReal;
@@ -59,10 +59,10 @@ namespace MGroup.LinearAlgebra.Eigensystems
 		/// The original matrix in full column major format. Will be overwritten.
 		/// </param>
 		/// <param name="calcEigenvectors">
-		/// If true both eigenvalues and eigenvectors will be computed. Else only eigenvalues will be computed.
+		/// If true, both eigenvalues and eigenvectors will be computed. Else only eigenvalues will be computed.
 		/// </param>
 		/// <returns>An object holding the eigensystem of the matrix.</returns>
-		public static FullSymmetricEigensystem Create(int order, double[] matrix, bool calcEigenvectors)
+		public static SymmetricEigensystemFull Create(int order, double[] matrix, bool calcEigenvectors)
 		{
 			EigensystemJob job = calcEigenvectors ? EigensystemJob.EigenvaluesAndEigenVectors : EigensystemJob.OnlyEigenvalues;
 			int leadingDimA = order;
@@ -73,11 +73,11 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			{
 				// The original matrix is overwritten by the eigenvectors
 				var eigenvectors = Matrix.CreateFromArray(matrix, order, order);
-				return new FullSymmetricEigensystem(order, Vector.CreateFromArray(eigenvalues), eigenvectors);
+				return new SymmetricEigensystemFull(order, Vector.CreateFromArray(eigenvalues), eigenvectors);
 			}
 			else
 			{
-				return new FullSymmetricEigensystem(order, Vector.CreateFromArray(eigenvalues), null);
+				return new SymmetricEigensystemFull(order, Vector.CreateFromArray(eigenvalues), null);
 			}
 		}
 	}

@@ -280,7 +280,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSquare(this);
 			double[] fullMatrix = Conversions.PackedUpperColMajorToFullSymmColMajor(data, Order);
-			var eigensystem = FullSymmetricEigensystem.Create(Order, fullMatrix, true);
+			var eigensystem = SymmetricEigensystemFull.Create(Order, fullMatrix, true);
 			return (eigensystem.EigenvaluesReal, eigensystem.EigenvectorsRight);
 		}
 

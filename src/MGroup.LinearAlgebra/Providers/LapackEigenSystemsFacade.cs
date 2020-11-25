@@ -22,8 +22,31 @@ namespace MGroup.LinearAlgebra.Providers
 
 		internal ILapackProvider Provider { get; }
 
-		internal void Dsyev(EigensystemJob job, StoredTriangle triangle, int orderA, double[] matrixA, int offsetA, int leadingDimA,
-			double[] eigenvalues, int offsetEigenvalues)
+		internal void Dgeev(EigensystemJob jobLeft, EigensystemJob jobRight, int orderA, 
+			double[] matrixA, int offsetA, int leadingDimA, 
+			double[] eigvaluesReal, int offsetEigvaluesReal, double[] eigvaluesImaginary, int offsetEigvaluesImaginary,
+			double[] eigvectorsLeft, int offsetEigvectorsLeft, int leadingDimEigvectorsLeft,
+			double[] eigvectorsRight, int offsetEigvectorsRight, int leadingDimEigvectorsRight)
+		{
+			int info = DefaultInfo;
+			QueryWorkspaceAndExecute((work, offsetWork, lWork) => Provider.Dgeev(jobLeft.Translate(), jobRight.Translate(), 
+				orderA, ref matrixA, offsetA, leadingDimA,
+				ref eigvaluesReal, offsetEigvaluesReal, ref eigvaluesImaginary, offsetEigvaluesImaginary,
+				ref eigvectorsLeft, offsetEigvectorsLeft, leadingDimEigvectorsLeft,
+				ref eigvectorsRight, offsetEigvectorsRight, leadingDimEigvectorsRight,
+				ref work, offsetWork, lWork, ref info));
+
+			if (info > 0)
+			{
+				throw new LapackException($"The QR algorithm failed to compute all the eigenvalues, and no eigenvectors have "
+				+$"been computed. Elements {info+1:N} of the eigenvalues arrays (real and imaginary) contain eigenvalues which" 
+				+ "have converged");
+			}
+			else if (info < 0) ProcessNegativeInfo(info);
+		}
+
+		internal void Dsyev(EigensystemJob job, StoredTriangle triangle, int orderA, double[] matrixA, int offsetA,
+			int leadingDimA, double[] eigenvalues, int offsetEigenvalues)
 		{
 			int info = DefaultInfo;
 			QueryWorkspaceAndExecute((work, offsetWork, lWork) => Provider.Dsyev(
