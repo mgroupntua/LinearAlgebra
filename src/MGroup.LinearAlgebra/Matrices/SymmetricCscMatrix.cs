@@ -159,7 +159,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
 
                 // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                return new SymmetricCscMatrix(NumRows, NumColumns, resultValues, this.rowIndices, this.colOffsets);
+                return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
             }
             else return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
         }
@@ -374,7 +374,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 }
 
                 // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                return new SymmetricCscMatrix(NumRows, NumColumns, resultValues, this.rowIndices, this.colOffsets);
+                return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
             }
             else return DoEntrywise(otherMatrix, 
                 (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
@@ -465,6 +465,7 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             // Only apply the operation on non zero entries
             var resultValues = new double[values.Length];
+	    Array.Copy(values, resultValues, values.Length);
             Blas.Dscal(NumNonZerosUpper, scalar, resultValues, 0, 1);
 
             //TODO: Perhaps I should also copy the indexers
