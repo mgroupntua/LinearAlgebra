@@ -290,7 +290,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < vector.Length; ++j)
                     {
-                        result[i] = matrix[j, i] * vector[j];
+                        result[i] += matrix[j, i] * vector[j];
                     }
                 }
                 return result;
@@ -303,7 +303,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < vector.Length; ++j)
                     {
-                        result[i] = matrix[i, j] * vector[j];
+                        result[i] += matrix[i, j] * vector[j];
                     }
                 }
                 return result;
