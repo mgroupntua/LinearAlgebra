@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -184,10 +185,10 @@ namespace MGroup.LinearAlgebra.Triangulation
 
             // Call LAPACK
             int firstZeroDiagonal = LapackLinearEquations.Dgetri(Order, inverse, 0, Order, rowExchanges, 0, pivotTolerance);
-            if (firstZeroDiagonal > 0) // This should not have happened though
+            if (firstZeroDiagonal > 0)
             {
-                throw new SingularMatrixException($"The ({firstZeroDiagonal}, {firstZeroDiagonal}) element of factor U is zero,"
-                    + " U is singular and the inversion could not be completed.");
+				Debug.WriteLine("After consuming the LU factorization to invert the non-singular matrix," +
+					$" LAPACK reported that the ({firstZeroDiagonal}, {firstZeroDiagonal}) element of factor U is zero");
             }
 
             return Matrix.CreateFromArray(inverse, Order, Order, false);

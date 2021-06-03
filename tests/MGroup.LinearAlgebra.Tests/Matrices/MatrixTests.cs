@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -89,7 +89,37 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Theory]
+		[Theory]
+		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
+		internal static void TestInvertAndDeterminant(LinearAlgebraProviderChoice providers)
+		{
+			TestSettings.RunMultiproviderTest(providers, delegate ()
+			{
+				var matrix = Matrix.CreateFromArray(new double[,]
+				{
+					{ 87.5, 0, 0, 1 },
+					{ 90, 0, 0, 1 },
+					{ 90, 2.5, 225, 1 },
+					{ 87.5, 2.5, 218.75, 1 }
+				});
+				(Matrix inverse, double determinant) = matrix.InvertAndDeterminant();
+
+				double detExpected = 39.0625;
+				var inverseExpected = Matrix.CreateFromArray(new double[,]
+				{
+					{ -0.4, 0.4, 0, 0 },
+					{ -14.4, 14, -14, 14.4 },
+					{ 0.16, -0.16, 0.16, -0.16 },
+					{ 36, -35, 0, 0 }
+				});
+
+				// operator+
+				Assert.Equal(detExpected, determinant, 9);
+				comparer.AssertEqual(inverseExpected, inverse);
+			});
+		}
+
+		[Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
         private static void TestLinearCombination(LinearAlgebraProviderChoice providers)
         {

@@ -756,7 +756,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 LUFactorization factor = FactorLU(false);
                 double det = factor.CalcDeterminant(); // Call this before factor.Invert(), else the factor will be overwritten.
                 Matrix inverse = factor.Invert(true); 
-                return (factor.Invert(true), det);
+                return (inverse, det);
             }
         }
 
