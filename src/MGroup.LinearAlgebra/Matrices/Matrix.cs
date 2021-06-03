@@ -244,7 +244,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckSameColDimension(this, matrix);
             double[] result = ArrayColMajor.JoinVertically(this.NumRows, this.NumColumns, this.data,
                 matrix.NumRows, matrix.NumColumns, matrix.data);
-            return new Matrix(result, this.NumRows + matrix.NumColumns, NumColumns);
+            return new Matrix(result, this.NumRows + matrix.NumRows, NumColumns);
         }
 
         /// <summary>
