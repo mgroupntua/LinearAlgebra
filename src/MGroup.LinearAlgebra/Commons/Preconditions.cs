@@ -183,7 +183,7 @@ namespace MGroup.LinearAlgebra.Commons
 
         public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
         {
-            if (startIndex + vector.Length > vector.Length) throw new NonMatchingDimensionsException(
+            if (startIndex + subvectorLength > vector.Length) throw new NonMatchingDimensionsException(
                 "The entries to access exceed the vector's length");
         }
 
