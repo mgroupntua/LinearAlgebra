@@ -17,6 +17,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// major order. Uses LAPACK. Do not use this, since it is an experimantal class, which will probably be removed.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
+	[Serializable]
 	public class SymmetricMatrix : IMatrix, ISymmetricMatrix, IEntrywiseOperableView2D<SymmetricMatrix, SymmetricMatrix>,
 		IEntrywiseOperable2D<SymmetricMatrix>
 	{
