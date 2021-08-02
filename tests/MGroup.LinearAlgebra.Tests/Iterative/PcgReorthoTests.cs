@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
@@ -5,6 +6,7 @@ using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
+using MGroup.LinearAlgebra.Tests.TestData.FiniteElementMatrices;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
@@ -18,6 +20,142 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 	public static class PcgReorthoTests
 	{
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-5);
+
+		//[Fact]
+		private static void InvestigateNoiseStagnation()
+		{
+			double noiseWidth = 100;
+
+			int order = 100;
+			//var A = Matrix.CreateFromArray(MultiDiagonalMatrices.CreateSymmetric(order, new int[] { 0, 1, 5, 7, 12 }));
+			var valueOfEachDiagonal = new Dictionary<int, double>();
+			valueOfEachDiagonal[0] = 10.0;
+			valueOfEachDiagonal[1] = 4.0;
+			valueOfEachDiagonal[5] = 3.0;
+			var A = Matrix.CreateFromArray(MultiDiagonalMatrices.CreateSymmetric(order, valueOfEachDiagonal));
+			var M = new IdentityPreconditioner();
+			//var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+
+			// Method A: Regular PCG
+			var pcgBuilder = new PcgAlgorithm.Builder();
+			pcgBuilder.ResidualTolerance = 1E-15;
+			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcg = pcgBuilder.Build();
+
+			// Method B: Reorthogonalized PCG, but without keeping direction vectors from previous solutions.
+			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Builder();
+			pcgReorthoRestartBuilder.ResidualTolerance = 1E-15;
+			pcgReorthoRestartBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcgReorthoRestart = pcgReorthoRestartBuilder.Build();
+
+			// Method C: Reorthogonalized PCG, where the second solution will reuse direction vectors from the first
+			var pcgReorthoBuilder = new ReorthogonalizedPcg.Builder();
+			pcgReorthoBuilder.ResidualTolerance = 1E-15;
+			pcgReorthoBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcgReortho = pcgReorthoBuilder.Build();
+
+			// Initial rhs
+			Vector x0 = Vector.CreateWithValue(order, 1);
+			Vector x0Expected = x0.Copy();
+			Vector b0 = A * x0Expected;
+
+			Vector xA = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsA = pcg.Solve(A, M, b0, xA, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
+
+			Vector xB = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b0, xB, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
+
+			Vector xC = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsC = pcgReortho.Solve(A, M, b0, xC, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
+
+			// Perturbed rhs
+			int seed = 345;
+			Vector dx = Vector.CreateFromArray(RandomMatrices.CreateRandomVector(order, seed));
+
+			Vector x1Expected = x0 + noiseWidth * dx;
+			Vector b1 = A * x1Expected;
+
+			xA = Vector.CreateZero(A.NumRows);
+			statsA = pcg.Solve(A, M, b1, xA, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method A: iterations = {statsA.NumIterationsRequired}");
+
+			xB = Vector.CreateZero(A.NumRows);
+			pcgReorthoRestart.ReorthoCache.Clear();
+			statsB = pcgReorthoRestart.Solve(A, M, b1, xB, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method B iterations = {statsB.NumIterationsRequired}");
+
+			xC = Vector.CreateZero(A.NumRows);
+			statsC = pcgReortho.Solve(A, M, b1, xC, true, () => Vector.CreateZero(order));
+			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method C: iterations = {statsC.NumIterationsRequired}");
+		}
+
+		//[Fact]
+		private static void InvestigatePFetiDPCoarseProblem2D()
+		{
+			int order = PFetiDPCoarseProblem2D.Order;
+			var A = Matrix.CreateFromArray(PFetiDPCoarseProblem2D.MatrixScc);
+			var M = new IdentityPreconditioner();
+
+			// Method A: Regular PCG
+			var pcgBuilder = new PcgAlgorithm.Builder();
+			pcgBuilder.ResidualTolerance = 1E-20;
+			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcg = pcgBuilder.Build();
+
+			// Method B: Reorthogonalized PCG, but without keeping direction vectors from previous solutions.
+			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Builder();
+			pcgReorthoRestartBuilder.ResidualTolerance = 1E-20;
+			pcgReorthoRestartBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcgReorthoRestart = pcgReorthoRestartBuilder.Build();
+
+			// Method C: Reorthogonalized PCG, where the second solution will reuse direction vectors from the first
+			var pcgReorthoBuilder = new ReorthogonalizedPcg.Builder();
+			pcgReorthoBuilder.ResidualTolerance = 1E-20;
+			pcgReorthoBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
+			var pcgReortho = pcgReorthoBuilder.Build();
+
+			// Initial rhs
+			var b = Vector.CreateFromArray(PFetiDPCoarseProblem2D.RhsVectors[0]);
+			var xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[0]);
+
+			Vector xA = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xA, 1E-10));
+			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
+
+			Vector xB = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xB, 1E-10));
+			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
+
+			Vector xC = Vector.CreateZero(A.NumRows);
+			IterativeStatistics statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xC, 1E-10));
+			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
+
+			// Next rhs
+			b = Vector.CreateFromArray(PFetiDPCoarseProblem2D.RhsVectors[1]);
+			xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[1]);
+
+			xA = Vector.CreateZero(A.NumRows);
+			statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xA, 1E-10));
+			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
+
+			xB = Vector.CreateZero(A.NumRows);
+			pcgReorthoRestart.ReorthoCache.Clear();
+			statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xB, 1E-10));
+			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
+
+			xC = Vector.CreateZero(A.NumRows);
+			statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			Assert.True(xExpected.Equals(xC, 1E-10));
+			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
+		}
 
 		[Theory]
 		[InlineData(0.1, 5, 10)]

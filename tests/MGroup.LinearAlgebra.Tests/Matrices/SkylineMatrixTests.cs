@@ -96,7 +96,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             //var writer = new LinearAlgebra.Output.FullMatrixWriter();
 
             var matrix = Matrix.CreateFromArray(
-                MultiDiagonalMatrices.CreateSymmetric(100, new int[] { 2, 4, 8, 16, 32, 64 }));
+                MultiDiagonalMatrices.CreateSymmetricPosDef(100, new int[] { 2, 4, 8, 16, 32, 64 }));
             var matrixSky = SkylineMatrix.CreateFromMatrix(matrix);
 
             var indices = new int[] { 0, 2, 4, 6, 12, 24, 32, 50, 64, 80 };
