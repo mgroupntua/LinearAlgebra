@@ -196,7 +196,7 @@ namespace MGroup.LinearAlgebra.Triangulation
                     //      semidefinite-LDL algorithm is supposed to work for singular matrices too.
                     if (Math.Abs(values[KI]) < pivotTolerance)
                     {
-                        throw new SingularMatrixException($"Near-zero element in diagonal at index {KI}."); //TODO: Not sure if this happens only to singular matrices.
+                        throw new SingularMatrixException($"Near-zero element in diagonal at column {K}, skyline index {KI}."); //TODO: Not sure if this happens only to singular matrices.
                     }
                     double C = values[KK] / values[KI];
                     B += C * values[KK];
