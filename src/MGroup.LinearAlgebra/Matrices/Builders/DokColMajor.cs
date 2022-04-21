@@ -401,19 +401,59 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return format;
         }
 
-        /// <summary>
-        /// Use this method if 1) both the global DOK and the element matrix are symmetric and 2) the rows and columns correspond
-        /// to the same degrees of freedom. The caller is responsible for making sure that both matrices are symmetric and that 
-        /// the dimensions and dofs of the element matrix and dof mappings match.
-        /// </summary>
-        /// <param name="subMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
-        ///     symmetric and its <see cref="IIndexable2D.NumColumns"/> = <see cref="IIndexable2D.NumRows"/> must be equal to
-        ///     elemenDofs.Length = globalDofs.Length.</param>
-        /// <param name="subDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
-        ///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
-        /// <param name="globalDofs">The entries in the global matrix where element matrix entries will be added to. Specificaly,
-        ///     pairs of (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
-        private void AddSubmatrixSymmetricOLD(IIndexable2D subMatrix, int[] subDofs, int[] globalDofs) //TODO: this should be reworked
+		public DokColMajor GetSubmatrix(int[] rowsToKeep, int[] colsToKeep)
+		{
+			var oldToNewRows = new Dictionary<int, int>();
+			for (int i = 0; i < rowsToKeep.Length; ++i)
+			{
+				oldToNewRows[rowsToKeep[i]] = i;
+			}
+
+			var oldToNewCols = new Dictionary<int, int>();
+			for (int j = 0; j < colsToKeep.Length; ++j)
+			{
+				oldToNewCols[colsToKeep[j]] = j;
+			}
+
+			var result = CreateEmpty(rowsToKeep.Length, colsToKeep.Length);
+			for (int J = 0; J < this.NumColumns; ++J) // Traverse the existing DOK matrix and copy only the requested entries
+			{
+				bool keepCol = oldToNewCols.TryGetValue(J, out int j);
+				if (!keepCol)
+				{
+					continue;
+				}
+
+				foreach (var rowValPair in this.columns[J])
+				{
+					int I = rowValPair.Key;
+					bool keepRow = oldToNewRows.TryGetValue(I, out int i);
+					if (!keepRow)
+					{
+						continue;
+					}
+
+					double val = rowValPair.Value;
+					result[i, j] = val;
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Use this method if 1) both the global DOK and the element matrix are symmetric and 2) the rows and columns correspond
+		/// to the same degrees of freedom. The caller is responsible for making sure that both matrices are symmetric and that 
+		/// the dimensions and dofs of the element matrix and dof mappings match.
+		/// </summary>
+		/// <param name="subMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
+		///     symmetric and its <see cref="IIndexable2D.NumColumns"/> = <see cref="IIndexable2D.NumRows"/> must be equal to
+		///     elemenDofs.Length = globalDofs.Length.</param>
+		/// <param name="subDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
+		///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
+		/// <param name="globalDofs">The entries in the global matrix where element matrix entries will be added to. Specificaly,
+		///     pairs of (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
+		private void AddSubmatrixSymmetricOLD(IIndexable2D subMatrix, int[] subDofs, int[] globalDofs) //TODO: this should be reworked
         {
             int n = subDofs.Length;
             for (int j = 0; j < n; ++j)

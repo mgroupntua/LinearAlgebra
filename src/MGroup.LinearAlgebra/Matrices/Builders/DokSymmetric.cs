@@ -621,32 +621,65 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// </param>
         public DokSymmetric GetSubmatrix(int[] rowsColsToKeep)
         {
+			// OLD CODE THAT WAS NOT VERY EFFICIENT
             //TODO: work with the stored dictionaries to speed this up. However keep in mind that if keep = {2, 1} then some 
             //      transposition is necessary. 
-            int subOrder = rowsColsToKeep.Length;
-            var submatrix = DokSymmetric.CreateEmpty(subOrder);
-            for (int subJ = 0; subJ < subOrder; ++subJ)
-            {
-                int thisJ = rowsColsToKeep[subJ];
-                for (int subI = 0; subI <= subJ; ++subI)
-                {
-                    int thisI = rowsColsToKeep[subI];
-                    double value = this[thisI, thisJ]; //TODO: This should be done explicitly
-                    if (value != 0.0) submatrix[subI, subJ] = value;
-                }
-            }
-            return submatrix;
-        }
+            //int subOrder = rowsColsToKeep.Length;
+            //var submatrix = DokSymmetric.CreateEmpty(subOrder);
+            //for (int subJ = 0; subJ < subOrder; ++subJ)
+            //{
+            //    int thisJ = rowsColsToKeep[subJ];
+            //    for (int subI = 0; subI <= subJ; ++subI)
+            //    {
+            //        int thisI = rowsColsToKeep[subI];
+            //        double value = this[thisI, thisJ]; //TODO: This should be done explicitly
+            //        if (value != 0.0) submatrix[subI, subJ] = value;
+            //    }
+            //}
+            //return submatrix;
 
-        /// <summary>
-        /// Sets the column with index <paramref name="colIdx"/> to be equal to the provided <paramref name="newColumn"/>.
-        /// Since the matrix is symmetric, this method also works for modifying the row with index = <paramref name="colIdx"/>.
-        /// </summary>
-        /// <param name="colIdx">The index of the column to modify. Constraints:
-        ///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
-        /// <param name="newColumn">The new values that column <paramref name="colIdx"/> will be set to. Constraints:
-        ///     <paramref name="newColumn"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="NumRows"/>.</param>
-        public void SetColumn(int colIdx, SparseVector newColumn)
+
+			var oldToNewCols = new Dictionary<int, int>();
+			for (int j = 0; j < rowsColsToKeep.Length; ++j)
+			{
+				oldToNewCols[rowsColsToKeep[j]] = j;
+			}
+
+			var result = CreateEmpty(rowsColsToKeep.Length);
+			for (int J = 0; J < this.NumColumns; ++J) // Traverse the existing DOK matrix and copy only the requested entries
+			{
+				bool keepCol = oldToNewCols.TryGetValue(J, out int j);
+				if (!keepCol)
+				{
+					continue;
+				}
+
+				foreach (var rowValPair in this.columns[J])
+				{
+					int I = rowValPair.Key;
+					bool keepRow = oldToNewCols.TryGetValue(I, out int i);
+					if (!keepRow)
+					{
+						continue;
+					}
+
+					double val = rowValPair.Value;
+					result[i, j] = val;
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Sets the column with index <paramref name="colIdx"/> to be equal to the provided <paramref name="newColumn"/>.
+		/// Since the matrix is symmetric, this method also works for modifying the row with index = <paramref name="colIdx"/>.
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify. Constraints:
+		///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
+		/// <param name="newColumn">The new values that column <paramref name="colIdx"/> will be set to. Constraints:
+		///     <paramref name="newColumn"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="NumRows"/>.</param>
+		public void SetColumn(int colIdx, SparseVector newColumn)
         {
             SetColumnToZero(colIdx); // First remove everything
 

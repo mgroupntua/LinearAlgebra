@@ -405,6 +405,47 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return format;
         }
 
+
+		public DokRowMajor GetSubmatrix(int[] rowsToKeep, int[] colsToKeep)
+		{
+			var oldToNewRows = new Dictionary<int, int>();
+			for (int i = 0; i < rowsToKeep.Length; ++i)
+			{
+				oldToNewRows[rowsToKeep[i]] = i;
+			}
+
+			var oldToNewCols = new Dictionary<int, int>();
+			for (int j = 0; j < colsToKeep.Length; ++j)
+			{
+				oldToNewCols[colsToKeep[j]] = j;
+			}
+
+			var result = CreateEmpty(rowsToKeep.Length, colsToKeep.Length);
+			for (int I = 0; I < this.NumRows; ++I) // Traverse the existing DOK matrix and copy only the requested entries
+			{
+				bool keepRow = oldToNewRows.TryGetValue(I, out int i);
+				if (!keepRow)
+				{
+					continue;
+				}
+
+				foreach (var colValPair in this.rows[I])
+				{
+					int J = colValPair.Key;
+					bool keepCol = oldToNewCols.TryGetValue(J, out int j);
+					if (!keepCol)
+					{
+						continue;
+					}
+
+					double val = colValPair.Value;
+					result[i, j] = val;
+				}
+			}
+
+			return result;
+		}
+
         /// <summary>
         /// Performs the matrix-vector multiplication: this * <paramref name="vector"/>. This method is at least as fast as 
         /// creating a CSR matrix and multiplying it with 1 vector. If more than 1 multiplications are needed, then the CSR 
