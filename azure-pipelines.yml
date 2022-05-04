@@ -111,7 +111,7 @@ steps:
   inputs:
     command: 'push'
     packagesToPush: '$(build.artifactStagingDirectory)/*.nupkg'
-    verbosityPack: 'Minimal'
+    verbosityPack: 'Normal'
     feedPublish: 'MSolve/MGroup'
 
 - task: DotNetCoreCLI@2
