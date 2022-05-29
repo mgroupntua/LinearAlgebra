@@ -17,13 +17,23 @@ pool:
 variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  Version: '1.0.$(Build.BuildId)'
-  Major: '1'
-  Minor: '0'
-  Patch: '$(Build.BuildId)'
   testProject: 'tests/MGroup.LinearAlgebra.Tests'
 
 steps:
+- task: PowerShell@2
+  displayName: Install gitversion.tool
+  inputs:
+    targetType: inline
+    script: dotnet tool install --tool-path .. gitversion.tool
+    pwsh: true
+
+- task: PowerShell@2
+  displayName: Set SemVer from git history and update AssemblyInfo
+  inputs:
+    targetType: inline
+    script: ../dotnet-gitversion /updateassemblyinfo AssemblyInfo.cs AssemblyVersionInfo.cs /output buildserver 
+    pwsh: true
+
 - task: DotNetCoreCLI@2
   name: dotnetRestore
   displayName: "Restore nugets"
@@ -32,7 +42,6 @@ steps:
     verbosityRestore: 'Normal'
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
-
 
 - task: SonarCloudPrepare@1
   displayName: "Prepares SonarCloud analysis"
@@ -47,26 +56,26 @@ steps:
       sonar.cpp.file.suffixes=-
       sonar.objc.file.suffixes=-
 
-- task: UseGitVersion@5
-  inputs:
-    versionSpec: '5.x'
-    includePrerelease: true
-    useConfigFile: true
-    configFilePath: 'GitVersion.yml'
-
 - task: DotNetCoreCLI@2
   name: dotnetBuild
   displayName: "Build projects"
   inputs:
     command: 'build'
-    arguments: '-p:Version=$(GitVersion.SemVer)'
-    verbosityPack: 'Minimal'
-    configuration: '$(buildConfiguration)'
+    arguments: '--no-restore --nologo --configuration $(buildConfiguration) /p:AssemblyVersion=$(GitVersion.AssemblySemVer) /p:Version=$(GitVersion.SemVer) /p:SourceLinkCreate=true'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'GitVersion.AssemblySemVer'
+
+- task: PublishSymbols@2
+  displayName: "Publish symbols to Azure Devops artifacts"
+  inputs:
+    DetailedLog: true
+    SearchPattern: '**/bin/**/*.pdb'
+    IndexSources: false
+    SymbolServerType: 'TeamServices'
 
 - script: |
     dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ $(testProject)
   displayName: 'Runs tests'
-
 
 - task: SonarCloudAnalyze@1
   displayName: "Performs SonarCloud Analysis"
@@ -93,9 +102,18 @@ steps:
   displayName: "Packages new nugets"
   inputs:
     command: 'pack'
+    arguments: '--nologo --no-restore'
+    nobuild: true
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'GitVersion.SemVer'
-    verbosityPack: 'Minimal'
+    verbosityPack: 'Normal'
+
+- task: CopyFiles@2
+  enabled: false
+  displayName: "Copy everything in artifacts staging directory"
+  inputs:
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   name: publishToFeed
