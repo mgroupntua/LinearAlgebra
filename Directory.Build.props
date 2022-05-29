@@ -21,8 +21,15 @@
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	
 	<PropertyGroup Label="Package">
 		<PackageId></PackageId>
+		<PackageProjectUrl>https://github.com/mgroupntua/LinearAlgebra</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/mgroupntua/LinearAlgebra</RepositoryUrl>
+		<Authors>Serafeim Bakalakos, George Stavroulakis</Authors>
 		<Company>MGroup</Company>
 		<!-- Optional: Include PDB in the built .nupkg to enable debugging -->
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
