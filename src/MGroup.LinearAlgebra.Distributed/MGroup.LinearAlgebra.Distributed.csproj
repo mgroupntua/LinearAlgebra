@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Serafeim Bakalakos, George Stavroulakis</Authors>
+    <Description>Library that provides specific distributed primitives for linear algebra operations</Description>
+    <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mgroupntua/LinearAlgebra</RepositoryUrl>
+    <PackageIconUrl>https://github.com/mgroupntua/LinearAlgebra/raw/develop/LinearAlgebraDistributed.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>
