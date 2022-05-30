@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MGroup.Environments" Version="0.2.0-unstable.5" />
+    <PackageReference Include="MGroup.MSolve.Core" Version="0.2.0-unstable.33" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MGroup.LinearAlgebra\MGroup.LinearAlgebra.csproj" />
+  </ItemGroup>
+
+</Project>
