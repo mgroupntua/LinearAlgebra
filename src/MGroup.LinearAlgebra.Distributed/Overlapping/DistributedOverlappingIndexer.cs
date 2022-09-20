@@ -68,7 +68,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		{
 			if (matrix is DistributedOverlappingMatrix<TMatrix> distributedMatrix)
 			{
-				if (distributedMatrix.Indexer == this)
+				if (matrix.CheckForCompatibility == false || distributedMatrix.Indexer == this)
 				{
 					return distributedMatrix;
 				}
@@ -82,7 +82,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		{
 			if (vector is DistributedOverlappingVector distributedVector)
 			{
-				if (distributedVector.Indexer == this)
+				if (vector.CheckForCompatibility == false || distributedVector.Indexer == this)
 				{
 					return distributedVector;
 				}

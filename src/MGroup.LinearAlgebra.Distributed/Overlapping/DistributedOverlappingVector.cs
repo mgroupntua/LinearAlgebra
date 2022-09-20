@@ -59,6 +59,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public IDictionary<int, Vector> LocalVectors { get; }
 
+		public bool CheckForCompatibility { get; set; }
+
 		public void AxpyIntoThis(IGlobalVector otherVector, double otherCoefficient)
 		{
 			DistributedOverlappingVector otherDistributed = Indexer.CheckCompatibleVector(otherVector);

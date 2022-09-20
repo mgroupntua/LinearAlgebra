@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,6 +27,7 @@ namespace MGroup.Solvers.DDM.LinearSystem
 		public DistributedOverlappingIndexer Indexer { get; }
 
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
+		public bool CheckForCompatibility { get; set; }
 
 		public void AxpyIntoThis(IGlobalMatrix otherMatrix, double otherCoefficient)
 		{
