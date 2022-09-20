@@ -27,7 +27,7 @@ namespace MGroup.Solvers.DDM.LinearSystem
 		public DistributedOverlappingIndexer Indexer { get; }
 
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
-		public bool CheckForCompatibility { get; set; }
+		public bool CheckForCompatibility { get; set; } = true;
 
 		public void AxpyIntoThis(IGlobalMatrix otherMatrix, double otherCoefficient)
 		{

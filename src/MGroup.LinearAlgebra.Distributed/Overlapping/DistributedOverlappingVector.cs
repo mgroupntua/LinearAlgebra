@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public IDictionary<int, Vector> LocalVectors { get; }
 
-		public bool CheckForCompatibility { get; set; }
+		public bool CheckForCompatibility { get; set; } = true;
 
 		public void AxpyIntoThis(IGlobalVector otherVector, double otherCoefficient)
 		{
