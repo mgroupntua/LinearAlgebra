@@ -691,19 +691,35 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
-		public Matrix Invert()
+		public Matrix Invert() => Invert(AnalyticFormulas.determinantTolerance);
+
+		/// <summary>
+		/// Calculates the inverse matrix and returns it in a new <see cref="Matrix"/> instance. This only works if this 
+		/// <see cref="Matrix"/> is square and invertible. If the determinant matrix is also needed, use 
+		/// <see cref="InvertAndDeterminant"/> instead.
+		/// </summary>
+		/// <param name="tolerance">
+		/// Matrix determinant value under which the matrix is considered singular (valid ONLY for 2x2 and 3x3 matrices)
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
+		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
+		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
+		public Matrix Invert(double tolerance)
 		{
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
 				return new Matrix(inverse, 2, 2);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
 				return new Matrix(inverse, 3, 3);
 			}
-			else return FactorLU(false).Invert(true);
+			else
+			{
+				return FactorLU(false).Invert(true);
+			}
 		}
 
 		/// <summary>
@@ -713,17 +729,29 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
-		public void InvertInPlace() //TODO: This needs redesign. A new object should be returned and this should be disabled.
+		public void InvertInPlace() => InvertInPlace(AnalyticFormulas.determinantTolerance);
+
+		/// <summary>
+		/// Calculates the inverse matrix and writes it over the entries of this object, in order to conserve memory 
+		/// and possibly time.
+		/// </summary>
+		/// <param name="tolerance">
+		/// Matrix determinant value under which the matrix is considered singular (valid ONLY for 2x2 and 3x3 matrices)
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
+		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
+		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
+		public void InvertInPlace(double tolerance) //TODO: This needs redesign. A new object should be returned and this should be disabled.
 		{
 			//TODO: implement efficient 2x2 and 3x3 inplace operations to avoid copying. 
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
 				Array.Copy(inverse, data, 4);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
 				Array.Copy(inverse, data, 9);
 			}
 			else
@@ -740,16 +768,28 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
-		public (Matrix inverse, double determinant) InvertAndDeterminant()
+		public (Matrix inverse, double determinant) InvertAndDeterminant() => InvertAndDeterminant(AnalyticFormulas.determinantTolerance);
+
+		/// <summary>
+		/// Calculates the determinant and the inverse matrix and returns the latter in a new <see cref="Matrix"/> instance. 
+		/// This only works if this <see cref="Matrix"/> is square and invertible.
+		/// </summary>
+		/// <param name="tolerance">
+		/// Matrix determinant value under which the matrix is considered singular (valid ONLY for 2x2 and 3x3 matrices)
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
+		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
+		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
+		public (Matrix inverse, double determinant) InvertAndDeterminant(double tolerance)
 		{
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
 				return (new Matrix(inverse, 2, 2), det);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
 				return (new Matrix(inverse, 3, 3), det);
 			}
 			else

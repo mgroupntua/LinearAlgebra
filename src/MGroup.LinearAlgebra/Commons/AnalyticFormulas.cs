@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Exceptions;
 
 namespace MGroup.LinearAlgebra.Commons
@@ -20,16 +20,18 @@ namespace MGroup.LinearAlgebra.Commons
             return matrix[0] * matrix[3] - matrix[1] * matrix[2];
         }
 
-        internal static (double[] inverse, double determinant) Matrix2x2ColMajorInvert(double[] matrix)
+		internal static (double[] inverse, double determinant) Matrix2x2ColMajorInvert(double[] matrix) => Matrix2x2ColMajorInvert(matrix, determinantTolerance);
+
+		internal static (double[] inverse, double determinant) Matrix2x2ColMajorInvert(double[] matrix, double tolerance)
         {
             // a00 = matrix[0], a01 = matrix[2]
             // a10 = matrix[1], a11 = matrix[3]
 
             // Leibniz formula:
             double det = matrix[0] * matrix[3] - matrix[1] * matrix[2];
-            if (Math.Abs(det) < determinantTolerance)
+            if (Math.Abs(det) < tolerance)
             {
-                throw new SingularMatrixException($"Determinant == {det}");
+                throw new SingularMatrixException($"Determinant == {det}, Tolerance == {tolerance}");
             }
 
             // Cramer's rule: inverse = 1/det * [a11 -a01; -a10 a00]
@@ -55,7 +57,9 @@ namespace MGroup.LinearAlgebra.Commons
                 + matrix[6] * (matrix[1] * matrix[5] - matrix[4] * matrix[2]);
         }
 
-        internal static (double[] inverse, double determinant) Matrix3x3ColMajorInvert(double[] matrix)
+		internal static (double[] inverse, double determinant) Matrix3x3ColMajorInvert(double[] matrix) => Matrix3x3ColMajorInvert(matrix, determinantTolerance);
+
+		internal static (double[] inverse, double determinant) Matrix3x3ColMajorInvert(double[] matrix, double tolerance)
         {
             // a00 = matrix[0], a01 = matrix[3], a02 = matrix[6]
             // a10 = matrix[1], a11 = matrix[4], a12 = matrix[7]
@@ -66,13 +70,13 @@ namespace MGroup.LinearAlgebra.Commons
             double c01 = -matrix[1] * matrix[8] + matrix[7] * matrix[2];    // c01 = - a10*a22 + a12*a20
             double c02 = matrix[1] * matrix[5] - matrix[4] * matrix[2];     // c02 = + a10*a21 - a11*a20
             double det = matrix[0] * c00 + matrix[3] * c01 + matrix[6] * c02; // Laplace: det = a00*c00 + a01*c01 + a02*c02 
-            if (Math.Abs(det) < determinantTolerance)
+            if (Math.Abs(det) < tolerance)
             {
-                throw new SingularMatrixException($"Determinant == {det}");
-            }
+				throw new SingularMatrixException($"Determinant == {det}, Tolerance == {tolerance}");
+			}
 
-            // Cramer's rule: inverse = 1/det * transpose(C), C = matrix of minors
-            double[] inverse = new double[9];
+			// Cramer's rule: inverse = 1/det * transpose(C), C = matrix of minors
+			double[] inverse = new double[9];
             inverse[0] = c00 / det; // inv[0,0]: c10
             inverse[1] = c01 / det; // inv[1,0]: c01
             inverse[2] = c02 / det; // inv[2,0]: c02
