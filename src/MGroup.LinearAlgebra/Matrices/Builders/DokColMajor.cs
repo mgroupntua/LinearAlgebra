@@ -33,7 +33,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// <summary>
 		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
 		/// </summary>
-		MatrixSymmetry MatrixSymmetry { get; set; }
+		public MatrixSymmetry MatrixSymmetry { get; set; }
 
 		/// <summary>
 		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
