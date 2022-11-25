@@ -108,6 +108,24 @@ namespace MGroup.LinearAlgebra.Providers
 		EigenvaluesAndEigenVectors
 	}
 
+	public enum MatrixSymmetry
+	{
+		/// <summary>
+		/// Matrix is not known if is symmetric or non-symmetric
+		/// </summary>
+		Unknown,
+
+		/// <summary>
+		/// Matrix is symmetric
+		/// </summary>
+		Symmetric,
+
+		/// <summary>
+		/// Matrix is NOT symmetric
+		/// </summary>
+		NonSymmetric,
+	}
+
 	/// <summary>
 	/// Extension methods to convert BLAS & LAPACK oriented enums into the strings expected by the actual BLAS & LAPACK 
 	/// methods.

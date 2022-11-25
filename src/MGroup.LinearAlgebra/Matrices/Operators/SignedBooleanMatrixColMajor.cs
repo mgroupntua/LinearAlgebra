@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Matrices.Operators
@@ -30,10 +31,15 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             this.data = new Dictionary<int, Dictionary<int, int>>();
         }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// Matrix symmetry properties (i.e.: symmetric, not-symmetric or unknown).
+		/// </summary>
+		public MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of rows of the matrix.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Use MKL vector math function vdMul(), vdInv(). See: 
@@ -25,10 +26,15 @@ namespace MGroup.LinearAlgebra.Matrices
             this.NumColumns = this.NumRows = diagonal.Length;
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.NumColumns"/>.
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.NumColumns"/>.
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// See <see cref="IIndexable2D.NumRows"/>.

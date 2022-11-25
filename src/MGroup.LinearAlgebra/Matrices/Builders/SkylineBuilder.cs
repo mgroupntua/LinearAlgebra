@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Providers;
 
 //TODO: Should the AddSubmatrix...() methods checks that the submatrix respects the pattern? 
 namespace MGroup.LinearAlgebra.Matrices.Builders
@@ -29,10 +30,15 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             this.diagOffsets = diagOffsets;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix.
-        /// </summary>
-        public int NumColumns { get => order; }
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		public MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// The number of columns of the matrix.
+		/// </summary>
+		public int NumColumns { get => order; }
 
         /// <summary>
         /// The number of rows of the matrix.

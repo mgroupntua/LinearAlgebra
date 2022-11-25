@@ -4,6 +4,7 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Triangulation
@@ -23,10 +24,15 @@ namespace MGroup.LinearAlgebra.Triangulation
             this.diagOffsets = diagOffsets;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns => Order;
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		public MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns => Order;
 
         /// <summary>
         /// The number of rows of the matrix.

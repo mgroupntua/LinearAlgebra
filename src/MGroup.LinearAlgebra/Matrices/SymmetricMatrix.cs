@@ -37,6 +37,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+
+		/// <summary>
 		/// Used to query if the matrix is positive definite etc. Usually this is not known beforehand, which corresponds to
 		/// <see cref="DefiniteProperty.Unknown"/>. Cholesky factorization reveals this and sets this property to
 		/// <see cref="DefiniteProperty.PositiveDefinite"/> or <see cref="DefiniteProperty.Indefinite"/>. Mutating the matrix 

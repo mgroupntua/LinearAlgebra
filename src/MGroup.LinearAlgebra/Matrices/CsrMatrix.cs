@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
@@ -43,10 +44,20 @@ namespace MGroup.LinearAlgebra.Matrices
             this.NumColumns = numCols;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of non zero entries of the matrix.

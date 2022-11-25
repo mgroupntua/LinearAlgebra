@@ -29,10 +29,15 @@ namespace MGroup.LinearAlgebra.Matrices
             this.Order = order;
         }
 
-        /// <summary>
-        /// The number of columns of the square matrix.
-        /// </summary>
-        public int NumColumns { get { return Order; } }
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// The number of columns of the square matrix.
+		/// </summary>
+		public int NumColumns { get { return Order; } }
 
         /// <summary>
         /// The number of rows of the square matrix.

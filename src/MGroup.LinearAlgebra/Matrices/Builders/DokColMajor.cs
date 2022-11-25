@@ -4,6 +4,7 @@ using System.Linq;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Matrices.Builders
@@ -29,10 +30,20 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             this.NumColumns = numCols;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix.
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+		
+		/// <summary>
+		/// The number of columns of the matrix.
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of rows of the matrix.

@@ -12,6 +12,7 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using System.Linq;
 using MGroup.LinearAlgebra.Reordering;
+using MGroup.LinearAlgebra.Providers;
 
 //TODO: Also linear combinations with other matrix types may be useful, e.g. Skyline (K) with diagonal (M), but I think 
 //      that for global matrices, this should be done through concrete class to use DoEntrywiseIntoThis methods. 
@@ -51,10 +52,15 @@ namespace MGroup.LinearAlgebra.Matrices
             this.NumColumns = order;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		public MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of rows of the matrix.

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -24,10 +25,20 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public bool IsSquare { get { return true; } }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get { return 2; } }
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+		
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get { return 2; } }
 
         /// <summary>
         /// The number of rows of the matrix.

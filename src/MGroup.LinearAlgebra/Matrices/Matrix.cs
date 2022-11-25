@@ -42,6 +42,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		public bool IsSquare { get { return NumRows == NumColumns; } }
 
 		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+
+		/// <summary>
 		/// The number of columns of the matrix. 
 		/// </summary>
 		public int NumColumns { get; }

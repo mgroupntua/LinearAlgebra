@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Add a create from dense method to facilitate testing.
@@ -45,10 +46,15 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             this.order = order;
         }
 
-        /// <summary>
-        /// The number of columns of the matrix.
-        /// </summary>
-        public int NumColumns { get => order; }
+		/// <summary>
+		/// Matrix symmetry properties (by default symmetric).
+		/// </summary>
+		public MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		/// <summary>
+		/// The number of columns of the matrix.
+		/// </summary>
+		public int NumColumns { get => order; }
 
         /// <summary>
         /// The number of rows of the matrix.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Investigate if you can store this in COO like format: rowsPlus, colsPlus, rowsMinus, colsMinus.
@@ -47,10 +48,20 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             this.data = new Dictionary<int, Dictionary<int, int>>();
         }
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+		
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of rows of the matrix.

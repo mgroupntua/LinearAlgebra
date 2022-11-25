@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Output.Formatting;
+using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
@@ -18,34 +19,44 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 //TODO: The implementations of this class should call transposed operations on a backing CSR matrix.
 namespace MGroup.LinearAlgebra.Matrices
 {
-    /// <summary>
-    /// Sparse matrix stored in Compressed Sparse Columns format (3-array version). The CSR format is optimized for matrix-vector 
-    /// and matrix-matrix multiplications, where the CSC matrix is on the left transposed or on the right untransposed. The other
-    /// multiplicationss are more efficient using <see cref="CsrMatrix"/>. To build a <see cref="CscMatrix"/> conveniently, 
-    /// use <see cref="Builders.DokColMajor"/>.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public class CscMatrix: IMatrix, ISparseMatrix
-    {
-        private const int zeroEntryOffset = -1;
+	/// <summary>
+	/// Sparse matrix stored in Compressed Sparse Columns format (3-array version). The CSR format is optimized for matrix-vector 
+	/// and matrix-matrix multiplications, where the CSC matrix is on the left transposed or on the right untransposed. The other
+	/// multiplicationss are more efficient using <see cref="CsrMatrix"/>. To build a <see cref="CscMatrix"/> conveniently, 
+	/// use <see cref="Builders.DokColMajor"/>.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	public class CscMatrix : IMatrix, ISparseMatrix
+	{
+		private const int zeroEntryOffset = -1;
 
-        private readonly double[] values;
-        private readonly int[] rowIndices;
-        private readonly int[] colOffsets;
+		private readonly double[] values;
+		private readonly int[] rowIndices;
+		private readonly int[] colOffsets;
 
-        private CscMatrix(int numRows, int numCols, double[] values, int[] rowIndices, int[] colOffsets)
-        {
-            this.values = values;
-            this.rowIndices = rowIndices;
-            this.colOffsets = colOffsets;
-            this.NumRows = numRows;
-            this.NumColumns = numCols;
-        }
+		private CscMatrix(int numRows, int numCols, double[] values, int[] rowIndices, int[] colOffsets)
+		{
+			this.values = values;
+			this.rowIndices = rowIndices;
+			this.colOffsets = colOffsets;
+			this.NumRows = numRows;
+			this.NumColumns = numCols;
+		}
 
-        /// <summary>
-        /// The number of columns of the matrix. 
-        /// </summary>
-        public int NumColumns { get; }
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry MatrixSymmetry { get; set; }
+
+		/// <summary>
+		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
+		/// </summary>
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+
+		/// <summary>
+		/// The number of columns of the matrix. 
+		/// </summary>
+		public int NumColumns { get; }
 
         /// <summary>
         /// The number of non zero entries of the matrix.
