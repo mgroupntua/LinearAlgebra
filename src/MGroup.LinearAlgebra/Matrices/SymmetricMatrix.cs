@@ -39,12 +39,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
 		/// </summary>
-		public MatrixSymmetry MatrixSymmetry { get; set; }
-
-		/// <summary>
-		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
-		/// </summary>
-		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
 
 		/// <summary>
 		/// Used to query if the matrix is positive definite etc. Usually this is not known beforehand, which corresponds to

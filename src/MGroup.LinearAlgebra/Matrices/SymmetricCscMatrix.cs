@@ -47,12 +47,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
 		/// </summary>
-		public MatrixSymmetry MatrixSymmetry { get; set; }
-
-		/// <summary>
-		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
-		/// </summary>
-		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
+		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
 
 		/// <summary>
 		/// The internal array that stores the non-zero entries of the upper triangle. The non-zero entries of each 
