@@ -7,6 +7,7 @@ using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
+using DotNumerics.FortranLibrary;
 
 //TODO: Should this be removed? I need it to provide analyzers with a matrix.
 namespace MGroup.LinearAlgebra.Matrices
@@ -152,22 +153,37 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
         {
-            if ((otherMatrix is SymmetricCscMatrix otherCSC) && HaveSameIndexArrays(otherCSC))
-            {
-                // Unneeded if the indexers are identical, but worth it
-                Preconditions.CheckSameMatrixDimensions(this, otherMatrix); 
+			if (otherMatrix is SymmetricCscMatrix otherCSC)
+			{
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, copiedValues, this.rowIndices, this.colOffsets);
+				}
 
-                //TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-                double[] resultValues = new double[values.Length];
-                Array.Copy(this.values, resultValues, values.Length);
+				if (HaveSameIndexArrays(otherCSC))
+				{
+					// Unneeded if the indexers are identical, but worth it
+					Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 
-                Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
+					//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
+					double[] resultValues = new double[values.Length];
+					Array.Copy(this.values, resultValues, values.Length);
 
-                // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
-            }
-            else return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
-        }
+					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
+
+					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
+					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
+				}
+
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
+			}
+			else
+			{
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
+			}
+		}
 
         /// <summary>
         /// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
@@ -175,12 +191,23 @@ namespace MGroup.LinearAlgebra.Matrices
         public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-            if ((otherMatrix is SymmetricCscMatrix otherCSC) && HaveSameIndexArrays(otherCSC))
-            {
-                Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
-            }
-            else throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-        }
+			if (otherMatrix is SymmetricCscMatrix otherCSC)
+			{
+				if (otherCSC.values.Length == 0)
+				{
+					return;
+				}
+
+				if (HaveSameIndexArrays(otherCSC))
+				{
+					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
+				}
+			}
+			else
+			{
+				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
+			}
+		}
 
         /// <summary>
         /// See <see cref="IMatrix.Clear"/>.
@@ -246,7 +273,14 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckSameMatrixDimensions(this, other);
             if (other is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
-                if (HaveSameIndexArrays(otherCSC))
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, copiedValues, rowIndices, colOffsets);
+				}
+
+				if (HaveSameIndexArrays(otherCSC))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     var resultValues = new double[values.Length];
@@ -254,6 +288,7 @@ namespace MGroup.LinearAlgebra.Matrices
                     {
                         resultValues[i] = binaryOperation(this.values[i], otherCSC.values[i]);
                     }
+
                     return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, resultValues, rowIndices, colOffsets);
                 }
             }
@@ -267,6 +302,7 @@ namespace MGroup.LinearAlgebra.Matrices
                     result[i, j] = binaryOperation(this[i, j], other[i, j]);
                 }
             }
+
             return result;
         }
 
@@ -276,12 +312,24 @@ namespace MGroup.LinearAlgebra.Matrices
         public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
         {
             Preconditions.CheckSameMatrixDimensions(this, matrix); // Unneeded if they have the same indexers, but worth it
-            if ((matrix is SymmetricCscMatrix otherCSC) && HaveSameIndexArrays(otherCSC))
-            {
-                for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], otherCSC.values[i]);
-            }
-            else throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-        }
+
+			if (matrix is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
+			{
+				if (otherCSC.values.Length == 0)
+				{
+					return;
+				}
+
+				if (HaveSameIndexArrays(otherCSC))
+				{
+					for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], otherCSC.values[i]);
+				}
+			}
+			else
+			{
+				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
+			}
+		}
 
         /// <summary>
         /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
@@ -353,37 +401,51 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
         {
-            if ((otherMatrix is SymmetricCscMatrix otherCSC) && HaveSameIndexArrays(otherCSC))
-            {
-                // Unneeded if the indexers are identical, but worth it
-                Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+			if (otherMatrix is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
+			{
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, copiedValues, this.rowIndices, this.colOffsets);
+				}
 
-                //TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-                double[] resultValues = new double[values.Length];
+				if (HaveSameIndexArrays(otherCSC))
+				{
+					// Unneeded if the indexers are identical, but worth it
+					Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 
-                if (thisCoefficient == 1.0)
-                {
-                    Array.Copy(this.values, resultValues, values.Length);
-                    Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
-                }
-                else if (otherCoefficient == 1.0)
-                {
-                    Array.Copy(otherCSC.values, resultValues, values.Length);
-                    Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
-                }
-                else
-                {
-                    Array.Copy(this.values, resultValues, values.Length);
-                    BlasExtensions.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
-                        thisCoefficient, resultValues, 0, 1);
-                }
+					//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
+					double[] resultValues = new double[values.Length];
 
-                // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
-            }
-            else return DoEntrywise(otherMatrix, 
-                (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
-        }
+					if (thisCoefficient == 1.0)
+					{
+						Array.Copy(this.values, resultValues, values.Length);
+						Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
+					}
+					else if (otherCoefficient == 1.0)
+					{
+						Array.Copy(otherCSC.values, resultValues, values.Length);
+						Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
+					}
+					else
+					{
+						Array.Copy(this.values, resultValues, values.Length);
+						BlasExtensions.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
+							thisCoefficient, resultValues, 0, 1);
+					}
+
+					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
+					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
+				}
+
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
+			}
+			else
+			{
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
+			}
+		}
 
         /// <summary>
         /// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
@@ -391,12 +453,23 @@ namespace MGroup.LinearAlgebra.Matrices
         public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-            if ((otherMatrix is SymmetricCscMatrix otherCSC) && HaveSameIndexArrays(otherCSC))
-            {
-                Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
-            }
-            else throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-        }
+            if (otherMatrix is SymmetricCscMatrix otherCSC)
+			{
+				if (otherCSC.values.Length == 0)
+				{
+					return;
+				}
+
+				if (HaveSameIndexArrays(otherCSC))
+				{
+					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
+				}
+			}
+            else
+			{
+				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
+			}
+		}
 
         /// <summary>
         /// See <see cref="IMatrixView.MultiplyLeft(IMatrixView, bool, bool)"/>.

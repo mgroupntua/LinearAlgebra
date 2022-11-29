@@ -271,7 +271,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (otherMatrix is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherSKY))
+				if (otherSKY.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SkylineMatrix(NumColumns, copiedValues, this.diagOffsets);
+				}
+
+				if (HasSameIndexer(otherSKY))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -296,8 +303,15 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     indexing array than this instance.</exception>
         public SkylineMatrix Axpy(SkylineMatrix otherMatrix, double otherCoefficient)
         {
-            // Conceptually it is not wrong to so this, even if the indexers are different, but how would I implement it.
-            if (!HasSameIndexer(otherMatrix))
+			if (otherMatrix.values.Length == 0)
+			{
+				double[] copiedValues = new double[values.Length];
+				Array.Copy(this.values, copiedValues, values.Length);
+				return new SkylineMatrix(NumColumns, copiedValues, this.diagOffsets);
+			}
+
+			// Conceptually it is not wrong to so this, even if the indexers are different, but how would I implement it.
+			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
             }
@@ -332,7 +346,13 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     than this <see cref="SkylineMatrix"/> instance.</exception>
         public void AxpyIntoThis(SkylineMatrix otherMatrix, double otherCoefficient)
         {
-            if (HasSameIndexer(otherMatrix)) // no need to check dimensions if the indexing arrays are the same
+			if (otherMatrix.values.Length == 0)
+			{
+				Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+				return;
+			}
+			
+			if (HasSameIndexer(otherMatrix)) // no need to check dimensions if the indexing arrays are the same
             {
                 Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
             }
@@ -445,7 +465,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (other is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherSKY))
+				if (otherSKY.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SkylineMatrix(NumColumns, copiedValues, this.diagOffsets);
+				}
+				
+				if (HasSameIndexer(otherSKY))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -468,7 +495,12 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (other is SkylineMatrix sky)
             {
-                if (HasSameIndexer(sky)) // no need to check dimensions if the indexing arrays are the same
+				if (sky.values.Length == 0)
+				{
+					return;
+				}
+				
+				if (HasSameIndexer(sky)) // no need to check dimensions if the indexing arrays are the same
                 {
                     for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], sky.values[i]);
                 }
@@ -854,7 +886,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (otherMatrix is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherSKY))
+				if (otherSKY.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new SkylineMatrix(NumColumns, copiedValues, this.diagOffsets);
+				}
+				
+				if (HasSameIndexer(otherSKY))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -906,6 +945,12 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     than this <see cref="SkylineMatrix"/> instance.</exception>
         public void LinearCombinationIntoThis(double thisCoefficient, SkylineMatrix otherMatrix, double otherCoefficient)
         {
+			if (otherMatrix.values.Length == 0)
+			{
+				Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+				return;
+			}
+
             if (HasSameIndexer(otherMatrix)) // no need to check dimensions if the indexing arrays are the same
             {
                 if (thisCoefficient == 1.0)

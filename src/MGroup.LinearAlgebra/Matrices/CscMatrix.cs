@@ -174,7 +174,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (otherMatrix is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherCSC))
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new CscMatrix(NumRows, NumColumns, copiedValues, this.rowIndices, this.colOffsets);
+				}
+
+				if (HasSameIndexer(otherCSC))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -200,8 +207,15 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     <see cref="NumRows"/> or <see cref="NumColumns"/> than this instance.</exception>
         public CscMatrix Axpy(CscMatrix otherMatrix, double otherCoefficient)
         {
-            // Conceptually it is not wrong to so this, even if the indexers are different, but how would I implement it.
-            if (!HasSameIndexer(otherMatrix))
+			if (otherMatrix.values.Length == 0)
+			{
+				double[] copiedValues = new double[values.Length];
+				Array.Copy(this.values, copiedValues, values.Length);
+				return new CscMatrix(NumRows, NumColumns, copiedValues, this.rowIndices, this.colOffsets);
+			}
+
+			// Conceptually it is not wrong to so this, even if the indexers are different, but how would I implement it.
+			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
             }
@@ -234,8 +248,14 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     indexing arrays than this instance.</exception>
         public void AxpyIntoThis(CscMatrix otherMatrix, double otherCoefficient)
         {
-            //Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
-            if (!HasSameIndexer(otherMatrix))
+			if (otherMatrix.values.Length == 0)
+			{
+				Preconditions.CheckSameMatrixDimensions(this, otherMatrix); // no need if the indexing arrays are the same
+				return;
+			}
+
+			//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
             }
@@ -305,7 +325,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (other is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherCSC))
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new CscMatrix(NumRows, NumColumns, copiedValues, this.rowIndices, this.colOffsets);
+				}
+
+				if (HasSameIndexer(otherCSC))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -328,8 +355,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (other is CscMatrix casted)
             {
-                //Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
-                if (!HasSameIndexer(casted))
+				if (casted.values.Length == 0)
+				{
+					Preconditions.CheckSameMatrixDimensions(this, casted); // no need if the indexing arrays are the same
+					return;
+				}
+
+				//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+				if (!HasSameIndexer(casted))
                 {
                     throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
                 }
@@ -478,7 +511,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (otherMatrix is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
-                if (HasSameIndexer(otherCSC))
+				if (otherCSC.values.Length == 0)
+				{
+					double[] copiedValues = new double[values.Length];
+					Array.Copy(this.values, copiedValues, values.Length);
+					return new CscMatrix(NumRows, NumColumns, copiedValues, this.rowIndices, this.colOffsets);
+				}
+
+				if (HasSameIndexer(otherCSC))
                 {
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
@@ -529,8 +569,14 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     indexing arrays than this instance.</exception>
         public void LinearCombinationIntoThis(double thisCoefficient, CscMatrix otherMatrix, double otherCoefficient)
         {
-            //Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
-            if (!HasSameIndexer(otherMatrix))
+			if (otherMatrix.values.Length == 0)
+			{
+				Preconditions.CheckSameMatrixDimensions(this, otherMatrix); // no need if the indexing arrays are the same
+				return;
+			}
+
+			//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
             }
