@@ -1046,6 +1046,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
+			if (this.values.Length == 0)
+			{
+				return;
+			}
+
             if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {
                 MultiplyIntoResult(lhsDense, rhsDense);
@@ -1077,7 +1082,12 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
             Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
-            ManagedSparseBlasProvider.UniqueInstance.Dskymv(
+			if (this.values.Length == 0)
+			{
+				return;
+			}
+
+			ManagedSparseBlasProvider.UniqueInstance.Dskymv(
                 NumColumns, values, diagOffsets, lhsVector.RawData, rhsVector.RawData);
         }
 

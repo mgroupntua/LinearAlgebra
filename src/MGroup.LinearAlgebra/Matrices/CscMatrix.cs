@@ -755,7 +755,14 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
-            if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			if (this.values.Length == 0)
+			{
+				Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
+				return;
+			}
+
+			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {
                 MultiplyIntoResult(lhsDense, rhsDense, transposeThis);
             }
@@ -797,17 +804,24 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </exception>
         public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
         {
-            if (transposeThis)
+			if (this.values.Length == 0)
+			{
+				Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
+				return;
+			}
+
+			if (transposeThis)
             {
                 Preconditions.CheckMultiplicationDimensions(NumRows, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumColumns, rhsVector.Length);
-                
             }
             else
             {
                 Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
             }
+
             SparseBlas.Dcscgemv(transposeThis, NumRows, NumColumns, values, colOffsets, rowIndices,
                     lhsVector.RawData, 0, rhsVector.RawData, 0);
         }

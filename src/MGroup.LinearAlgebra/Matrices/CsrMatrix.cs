@@ -756,7 +756,14 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
-            if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			if (this.values.Length == 0)
+			{
+				Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
+				return;
+			}
+
+			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {
                 MultiplyIntoResult(lhsDense, rhsDense, transposeThis);
             }
@@ -798,7 +805,14 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </exception>
         public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
         {
-            if (transposeThis)
+			if (this.values.Length == 0)
+			{
+				Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
+				return;
+			}
+
+			if (transposeThis)
             {
                 Preconditions.CheckMultiplicationDimensions(NumRows, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumColumns, rhsVector.Length);
@@ -808,6 +822,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
             }
+
             SparseBlas.Dcsrgemv(transposeThis, NumRows, NumColumns, values, rowOffsets, colIndices, 
                 lhsVector.RawData, 0, rhsVector.RawData, 0);
         }
@@ -833,7 +848,12 @@ namespace MGroup.LinearAlgebra.Matrices
         public void MultiplyVectorSection(IVectorView vectorRight, int vectorStart, Vector result, int resultStart)
         {
             Preconditions.CheckMultiplicationDimensionsSection(this, vectorRight, vectorStart, result, resultStart);
-            for (int i = 0; i < NumRows; ++i)
+			if (this.values.Length == 0)
+			{
+				return;
+			}
+
+			for (int i = 0; i < NumRows; ++i)
             {
                 double dot = 0.0;
                 int rowStart = rowOffsets[i]; //inclusive
