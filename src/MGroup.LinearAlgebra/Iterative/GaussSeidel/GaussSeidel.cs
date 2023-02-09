@@ -1,5 +1,5 @@
 using System;
-using MGroup.LinearAlgebra.Commons;
+
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Iterative
     /// </summary>
     public class GaussSeidel
     {
-        private const string name = "Gauss-Seidel Method";
+        private const string name = "Gauss-Seidel";
         private readonly IMaxIterationsProvider maxIterationsProvider;
         private readonly double residualTolerance;
 
@@ -102,7 +102,7 @@ namespace MGroup.LinearAlgebra.Iterative
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-        IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution)
+         public IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution)
         {
             throw new NotImplementedException();
             /*
@@ -135,27 +135,13 @@ namespace MGroup.LinearAlgebra.Iterative
         public class Builder
         {
             /// <summary>
-            /// Specifies how to calculate the maximum iterations that the CG algorithm will run for.
+            /// Specifies how to calculate the maximum iterations that the GS algorithm will run for.
             /// </summary>
             public IMaxIterationsProvider MaxIterationsProvider { get; set; } = new PercentageMaxIterationsProvider(1.0);
-
-            /// <summary>
-            /// Specifies how the CG algorithm will check that convergence has been reached.
-            /// </summary>
-
-            /// <summary>
-            /// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
-            /// </summary>
-
-            /// <summary>
-            /// Normally the CG will converge when norm2(r) / norm2(r0) &lt;= <paramref name="ResidualTolerance"/>, 
-            /// where r = A*x is the current residual vector and r0 = A*x0 the initial residual vector. Depending on 
-            /// <see cref="ResidualConvergence"/>, some other criterion might be used.
-            /// </summary>
             public double ResidualTolerance { get; set; } = 1E-10;
 
 			/// <summary>
-			/// Creates a new instance of <see cref="CGAlgorithm"/>.
+			/// Creates a new instance of <see cref="GaussSeidel"/>.
 			/// </summary>
 			public GaussSeidel Build()
                 => new GaussSeidel(ResidualTolerance, MaxIterationsProvider);
