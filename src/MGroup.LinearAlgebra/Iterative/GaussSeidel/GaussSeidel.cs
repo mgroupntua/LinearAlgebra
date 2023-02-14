@@ -4,9 +4,11 @@ using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Commons;
 
 namespace MGroup.LinearAlgebra.Iterative
 {
+	using Reduction;
 
 	/// <summary>
     /// Implements the Gauss-Seidel algorithm for solving linear systems.
@@ -14,21 +16,20 @@ namespace MGroup.LinearAlgebra.Iterative
     /// Might converge in general matrix systems, as well, but with no guarantee.
     /// Authors: Constantinos Atzarakis
     /// </summary>
-    public class GaussSeidel
+	public class GaussSeidel
     {
         private const string name = "Gauss-Seidel";
         private readonly IMaxIterationsProvider maxIterationsProvider;
         private readonly double residualTolerance;
 
-        private double resDotRes;
         private IVector residual;
         private IVector solution;
 
-        private GaussSeidel(double residualTolerance, IMaxIterationsProvider maxIterationsProvider)
+		public GaussSeidel(double residualTolerance, IMaxIterationsProvider maxIterationsProvider)
         {
-            this.residualTolerance = residualTolerance;
-            this.maxIterationsProvider = maxIterationsProvider;
-        }
+			this.maxIterationsProvider = maxIterationsProvider;
+			this.residualTolerance = residualTolerance;
+		}
 
 
         /// <summary>
@@ -41,13 +42,7 @@ namespace MGroup.LinearAlgebra.Iterative
         /// </summary>
         public ILinearTransformation Matrix { get; private set; }
 
-
-        /// <summary>
-        /// The dot product <see cref="Residual"/> * <see cref="Residual"/>.
-        /// </summary>
-        public double ResDotRes => resDotRes;
-
-        /// <summary>
+		/// <summary>
         /// The residual vector r = b - A * x.
         /// </summary>
         public IVectorView Residual => residual;
@@ -67,17 +62,12 @@ namespace MGroup.LinearAlgebra.Iterative
         /// </summary>
         public void Clear()
         {
-	        throw new NotImplementedException();
-	        /*
+	        // throw new NotImplementedException();
 	        Matrix = null;
 	        Rhs = null;
 	        solution = null;
 	        residual = null;
-	        direction = null;
-	        matrixTimesDirection = null;
-	        resDotRes = 0.0;
 	        Iteration = -1;
-	    */
         }
 
         public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution)
@@ -102,35 +92,36 @@ namespace MGroup.LinearAlgebra.Iterative
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-         public IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution)
+        public IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution)
         {
-            throw new NotImplementedException();
-            /*
-            //TODO: these will also be checked by the matrix vector multiplication.
-            Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
-            Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
+            // throw new NotImplementedException();
+             //TODO: these will also be checked by the matrix vector multiplication.
+             Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
+             Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
-            this.Matrix = matrix;
-            this.Rhs = rhs;
-            this.solution = solution;
+             this.Matrix = matrix;
+             this.Rhs = rhs;
+             this.solution = solution;
 
-            // r = b - A * x
-            residual = ExactResidual.Calculate(matrix, rhs, solution);
+             // r = b - A * x
+             residual = ExactResidual.Calculate(matrix, rhs, solution);
 
-            return SolveInternal(maxIterationsProvider.GetMaxIterations(matrix.NumColumns));
-        */
+             return SolveInternal(maxIterationsProvider.GetMaxIterations(matrix.NumColumns));
         }
 
-        // continue from h
+        /// <summary>
+        /// Main body of Gauss-Seidel algorithm <see cref="GaussSeidel"/>
+        /// Author: Constantinos Atzarakis
+        /// </summary>
         private IterativeStatistics SolveInternal(int maxIterations)
         {
-	        throw new NotImplementedException();
-        }
+			throw new NotImplementedException();
+		}
 
         /// <summary>
         /// Constructs <see cref="GaussSeidel"/> instances, allows the user to specify some or all of the required parameters and 
         /// provides defaults for the rest.
-        /// Author: Serafeim Bakalakos
+        /// Author: Constantinos Atzarakis
         /// </summary>
         public class Builder
         {
@@ -138,12 +129,13 @@ namespace MGroup.LinearAlgebra.Iterative
             /// Specifies how to calculate the maximum iterations that the GS algorithm will run for.
             /// </summary>
             public IMaxIterationsProvider MaxIterationsProvider { get; set; } = new PercentageMaxIterationsProvider(1.0);
+
             public double ResidualTolerance { get; set; } = 1E-10;
 
 			/// <summary>
 			/// Creates a new instance of <see cref="GaussSeidel"/>.
 			/// </summary>
-			public GaussSeidel Build()
+            public GaussSeidel Build()
                 => new GaussSeidel(ResidualTolerance, MaxIterationsProvider);
         }
     }
