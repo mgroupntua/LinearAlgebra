@@ -1,7 +1,7 @@
 using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.MultiGrid;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -11,9 +11,11 @@ using Xunit;
 
 namespace MGroup.LinearAlgebra.Tests.Iterative
 {
-    /// <summary>
-    /// Tests for <see cref="PcgAlgorithm"/>.
-    /// Authors: Serafeim Bakalakos
+	using LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+
+	/// <summary>
+    /// Tests for <see cref="AlgebraicMultiGrid"/>.
+    /// Authors: Gerasimos Sotiropoulos 
     /// </summary>
     public static class AMGTests
 	{

@@ -281,8 +281,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid
 			/// <summary>
 			/// Creates a new instance of <see cref="AlgebraicMultiGrid"/>.
 			/// </summary>
-			// public AlgebraicMultiGrid Build()
-			// 	=> new AlgebraicMultiGrid(ResidualTolerance, MaxIterationsProvider, SmoothingSolver);
+			public AlgebraicMultiGrid Build()
+				=> throw new NotImplementedException(); // AlgebraicMultiGrid(ResidualTolerance, MaxIterationsProvider, SmoothingSolver);
 		}
 	}
 }

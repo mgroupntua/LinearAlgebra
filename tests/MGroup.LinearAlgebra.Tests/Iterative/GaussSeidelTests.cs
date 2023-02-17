@@ -1,7 +1,7 @@
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.MultiGrid;
+using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -12,8 +12,8 @@ using Xunit;
 namespace MGroup.LinearAlgebra.Tests.Iterative
 {
     /// <summary>
-    /// Tests for <see cref="PcgAlgorithm"/>.
-    /// Authors: Serafeim Bakalakos
+    /// Tests for <see cref="GaussSeidel"/>.
+    /// Authors: Gerasimos Sotiropoulos 
     /// </summary>
     public static class GaussSeidelTests
 	{
@@ -33,9 +33,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 var builder = new GaussSeidel.Builder();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-                var cg = builder.Build();
+                var gs = builder.Build();
                 var xComputed = Vector.CreateZero(A.NumRows);
-                IterativeStatistics stats = cg.Solve(A, b, xComputed);
+                IterativeStatistics stats = gs.Solve(A, b, xComputed);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }
