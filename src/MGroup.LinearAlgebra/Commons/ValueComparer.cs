@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MGroup.LinearAlgebra.Commons
 {
@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Commons
 
         public bool AreEqual(double val1, double val2)
         {
-            if ((val1 == double.NaN) || (val2 == double.NaN)) return false;
+            if (double.IsNaN(val1) || double.IsNaN(val2)) return false;
             if (Math.Abs(val2) <= tolerance) // Can't divide with expected ~= 0. 
             {
                 if (Math.Abs(val1) <= tolerance) return true;
