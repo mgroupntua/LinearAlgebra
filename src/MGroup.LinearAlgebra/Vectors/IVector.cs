@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 //TODO: perhaps some of these methods should only belong to a few concrete classes.
 //TODO: perhaps the NonContiguously where one of the two vectors is contiguous, must be bidirectional by setting a flag.
@@ -55,6 +55,23 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Thrown if <paramref name="thisIndices"/> violates the described constraints.
         /// </exception>
         void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector);
+
+		/// <summary>
+		/// Similar to <see cref="Set(int, double)"/>, but will add <paramref name="value"/> to the existing entry at <paramref name="index"/>. 
+		/// Will work as expected for general dense vectors. For sparse vectors it will throw a 
+		/// <see cref="Exceptions.SparsityPatternModifiedException"/>, if a structural zero entry is written to.
+		/// </summary>
+		/// <param name="index">
+		/// The index of the entry to add to. Constraints: 0 &lt;= <paramref name="index"/> &lt; <see cref="IIndexable1D.Length"/>.
+		/// </param>
+		/// <param name="value">The value to add to this[<paramref name="index"/>].</param>
+		/// <exception cref="IndexOutOfRangeException">
+		/// Thrown if <paramref name="index"/> violates the described constraints.
+		/// </exception>
+		/// <exception cref="Exceptions.SparsityPatternModifiedException"> 
+		/// Thrown if a structural zero entry of a sparse vector format is written to.
+		/// </exception>
+		void AddToIndex(int index, double value);
 
         /// <summary>
         /// Performs the following operation for all i:

@@ -43,7 +43,44 @@ namespace MGroup.LinearAlgebra.Commons
             return true;
         }
 
-        public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
+		/// <summary>
+		/// <paramref name="rhsVector"/> = <paramref name="rhsVector"/> + oper(<paramref name="matrix"/>) * <paramref name="lhsVector"/>,
+		/// where oper(<paramref name="matrix"/>) = <paramref name="matrix"/> or transpose(<paramref name="matrix"/>), depending on <paramref name="transposeMatrix"/>
+		/// </summary>
+		/// <param name="matrix"></param>
+		/// <param name="lhsVector"></param>
+		/// <param name="rhsVector"></param>
+		/// <param name="transposeMatrix"></param>
+		public static void AxpyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector,
+			bool transposeMatrix)
+		{
+			if (transposeMatrix)
+			{
+				Preconditions.CheckMultiplicationDimensions(matrix.NumRows, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(matrix.NumColumns, rhsVector.Length);
+				for (int i = 0; i < rhsVector.Length; ++i)
+				{
+					for (int j = 0; j < lhsVector.Length; ++j)
+					{
+						rhsVector.Set(i, rhsVector[i] + matrix[j, i] * lhsVector[j]);
+					}
+				}
+			}
+			else
+			{
+				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhsVector.Length);
+				for (int i = 0; i < rhsVector.Length; ++i)
+				{
+					for (int j = 0; j < lhsVector.Length; ++j)
+					{
+						rhsVector.Set(i, rhsVector[i] + matrix[i, j] * lhsVector[j]);
+					}
+				}
+			}
+		}
+
+		public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
         {
             for (int i = 0; i < thisVector.Length; ++i) thisVector.Set(i, otherVector[otherIndices[i]]);
         }
@@ -313,6 +350,7 @@ namespace MGroup.LinearAlgebra.Commons
         public static void MultiplyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector, 
             bool transposeMatrix)
         {
+			rhsVector.Clear();
             if (transposeMatrix)
             {
                 Preconditions.CheckMultiplicationDimensions(matrix.NumRows, lhsVector.Length);
@@ -321,7 +359,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < lhsVector.Length; ++j)
                     {
-                        rhsVector.Set(i, rhsVector[i] + matrix[j, i] * lhsVector[j]);
+                        rhsVector.AddToIndex(i, matrix[j, i] * lhsVector[j]);
                     }
                 }
             }
@@ -333,7 +371,7 @@ namespace MGroup.LinearAlgebra.Commons
                 {
                     for (int j = 0; j < lhsVector.Length; ++j)
                     {
-                        rhsVector.Set(i, rhsVector[i] + matrix[i, j] * lhsVector[j]);
+                        rhsVector.AddToIndex(i, matrix[i, j] * lhsVector[j]);
                     }
                 }
             }

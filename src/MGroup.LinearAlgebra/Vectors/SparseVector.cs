@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSparse.Double.Factorization;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Reduction;
@@ -236,10 +238,20 @@ namespace MGroup.LinearAlgebra.Vectors
         public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
-        /// <summary>
-        /// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
-        /// </summary>
-        public IVector Axpy(IVectorView otherVector, double otherCoefficient)
+		/// <summary>
+		/// See <see cref="IVector.AddToIndex(int, double)"/>.
+		/// </summary>
+		public void AddToIndex(int index, double value)
+		{
+			int sparseIdx = FindSparseIndexOf(index);
+			CheckMutatedIndex(index, sparseIdx);
+			values[sparseIdx] = value;
+		}
+
+		/// <summary>
+		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
+		/// </summary>
+		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
         {
             Preconditions.CheckVectorDimensions(this, otherVector);
             if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
@@ -651,10 +663,9 @@ namespace MGroup.LinearAlgebra.Vectors
         public void Set(int index, double value)
         {
             int sparseIdx = FindSparseIndexOf(index);
-            if (sparseIdx < 0) throw new SparsityPatternModifiedException(
-                $"The entry at index = {index} is zero and not stored explicilty, therefore it cannot be modified.");
-            else values[sparseIdx] = value;
-        }
+			CheckMutatedIndex(index, sparseIdx);
+			values[sparseIdx] = value;
+		}
 
         /// <summary>
         /// Returns the index into <see cref="values"/> of the entry this[<paramref name="denseIdx"/>]. If this entry is a 
@@ -671,5 +682,11 @@ namespace MGroup.LinearAlgebra.Vectors
         {
             return this.indices == other.indices;
         }
+
+		private void CheckMutatedIndex(int index, int sparseIdx)
+		{
+			if (sparseIdx < 0) throw new SparsityPatternModifiedException(
+				$"The entry at index = {index} is zero and not stored explicilty, therefore it cannot be modified.");
+		}
     }
 }
