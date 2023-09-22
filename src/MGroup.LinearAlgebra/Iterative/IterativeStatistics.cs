@@ -40,7 +40,9 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// may be used to check convergence, e.g. PCG uses norm2(r^T*inv(M)*r)/norm(r0^T*inv(M)*r0). Those methods report the
 		/// ratio that is checked.
 		/// </summary>
-		public double ResidualNormRatioEstimation { get; set; }
+		public double ResidualNormRatioEstimation { get; set; } = double.NaN;
+
+		public (string, double) ConvergenceMetric { get; set; } = ("No convergence metric", double.NaN);
 
 		/// <summary>
 		/// Reports the accumulated data of this <see cref="CGStatistics"/> instance. 
