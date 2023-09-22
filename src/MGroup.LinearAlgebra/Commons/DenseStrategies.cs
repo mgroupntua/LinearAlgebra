@@ -43,7 +43,44 @@ namespace MGroup.LinearAlgebra.Commons
             return true;
         }
 
-        public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
+		/// <summary>
+		/// <paramref name="rhsVector"/> = <paramref name="rhsVector"/> + oper(<paramref name="matrix"/>) * <paramref name="lhsVector"/>,
+		/// where oper(<paramref name="matrix"/>) = <paramref name="matrix"/> or transpose(<paramref name="matrix"/>), depending on <paramref name="transposeMatrix"/>
+		/// </summary>
+		/// <param name="matrix"></param>
+		/// <param name="lhsVector"></param>
+		/// <param name="rhsVector"></param>
+		/// <param name="transposeMatrix"></param>
+		public static void AxpyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector,
+			bool transposeMatrix)
+		{
+			if (transposeMatrix)
+			{
+				Preconditions.CheckMultiplicationDimensions(matrix.NumRows, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(matrix.NumColumns, rhsVector.Length);
+				for (int i = 0; i < rhsVector.Length; ++i)
+				{
+					for (int j = 0; j < lhsVector.Length; ++j)
+					{
+						rhsVector.Set(i, rhsVector[i] + matrix[j, i] * lhsVector[j]);
+					}
+				}
+			}
+			else
+			{
+				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, lhsVector.Length);
+				Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhsVector.Length);
+				for (int i = 0; i < rhsVector.Length; ++i)
+				{
+					for (int j = 0; j < lhsVector.Length; ++j)
+					{
+						rhsVector.Set(i, rhsVector[i] + matrix[i, j] * lhsVector[j]);
+					}
+				}
+			}
+		}
+
+		public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
         {
             for (int i = 0; i < thisVector.Length; ++i) thisVector.Set(i, otherVector[otherIndices[i]]);
         }
@@ -106,6 +143,54 @@ namespace MGroup.LinearAlgebra.Commons
             }
             return result;
         }
+
+		public static void GaussSeidelBackwardIteration(IIndexable2D matrix, IVectorView rhs, IVector lhs)
+		{
+			Preconditions.CheckSquareLinearSystemDimensions(matrix, lhs, rhs);
+			int n = matrix.NumRows;
+			for (int i = n-1; i >= 0; --i)
+			{
+				double sum = rhs[i];
+				int j;
+				for (j = n - 1; j > i; --j)
+				{
+					sum -= matrix[i, j] * lhs[j];
+				}
+
+				double diagEntry = matrix[i, i];
+
+				for (j = i - 1; j >= 0; --j)
+				{
+					sum -= matrix[i, j] * lhs[j];
+				}
+
+				lhs.Set(i, sum / diagEntry);
+			}
+		}
+
+		public static void GaussSeidelForwardIteration(IIndexable2D matrix, IVectorView rhs, IVector lhs)
+		{
+			Preconditions.CheckSquareLinearSystemDimensions(matrix, lhs, rhs);
+			int n = matrix.NumRows;
+			for (int i = 0; i < n; ++i)
+			{
+				double sum = rhs[i];
+				int j;
+				for (j = 0; j < i; ++j)
+				{
+					sum -= matrix[i, j] * lhs[j];
+				}
+
+				double diagEntry = matrix[i, i];
+
+				for (j = i + 1; j < n; ++j)
+				{
+					sum -= matrix[i, j] * lhs[j];
+				}
+
+				lhs.Set(i, sum / diagEntry);
+			}
+		}
 
         public static Vector GetColumn(IIndexable2D matrix, int colIdx)
         {
@@ -310,8 +395,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void MultiplyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector, 
-            bool transposeMatrix)
+        public static void MultiplyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector, bool transposeMatrix)
         {
             if (transposeMatrix)
             {
@@ -319,22 +403,26 @@ namespace MGroup.LinearAlgebra.Commons
                 Preconditions.CheckSystemSolutionDimensions(matrix.NumColumns, rhsVector.Length);
                 for (int i = 0; i < rhsVector.Length; ++i)
                 {
+					double sum = 0;
                     for (int j = 0; j < lhsVector.Length; ++j)
-                    {
-                        rhsVector.Set(i, rhsVector[i] + matrix[j, i] * lhsVector[j]);
-                    }
-                }
-            }
+					{
+                        sum += matrix[j, i] * lhsVector[j];
+					}
+					rhsVector.Set(i, sum);
+				}
+			}
             else
             {
                 Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhsVector.Length);
                 for (int i = 0; i < rhsVector.Length; ++i)
                 {
+					double sum = 0;
                     for (int j = 0; j < lhsVector.Length; ++j)
                     {
-                        rhsVector.Set(i, rhsVector[i] + matrix[i, j] * lhsVector[j]);
+                        sum += matrix[i, j] * lhsVector[j];
                     }
+					rhsVector.Set(i, sum);
                 }
             }
         }

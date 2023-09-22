@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Reduction;
@@ -147,10 +147,18 @@ namespace MGroup.LinearAlgebra.Vectors
         public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
-        /// <summary>
-        /// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
-        /// </summary>
-        public IVector Axpy(IVectorView otherVector, double otherCoefficient)
+		/// <summary>
+		/// See <see cref="IVector.AddToIndex(int, double)"/>
+		/// </summary>
+		public void AddToIndex(int index, double value)
+		{
+			data[index] += value;
+		}
+
+		/// <summary>
+		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
+		/// </summary>
+		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
         {
             if (otherVector is Vector2 casted) return Axpy(casted, otherCoefficient);
             else
