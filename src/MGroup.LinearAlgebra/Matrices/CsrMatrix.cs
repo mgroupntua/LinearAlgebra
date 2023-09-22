@@ -153,18 +153,63 @@ namespace MGroup.LinearAlgebra.Matrices
             return new CsrMatrix(numRows, numCols, values, colIndices, rowOffsets);
         }
 
-        #region operators (use extension operators when they become available)
-        /// <summary>
-        /// Performs the matrix-vector multiplication: result = <paramref name="matrixLeft"/> * <paramref name="vectorRight"/>.
-        /// If <paramref name="matrixLeft"/> is m1-by-n1 and <paramref name="vectorRight"/> has length = n2, then n1 must be 
-        /// equal to n2. The result will be a vector with length = m1, written to a new <see cref="Vector"/> instance.
-        /// </summary>
-        /// <param name="matrixLeft">The <see cref="CsrMatrix"/> operand on the left.</param>
-        /// <param name="vectorRight">The <see cref="Vector"/> operand on the right. It can be considered as a column 
-        ///     vector.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrixLeft"/>.<see cref="NumColumns"/> is 
-        ///     different than <paramref name="vectorRight"/>.<see cref="Vector.Length"/>.</exception>
-        public static Vector operator *(CsrMatrix matrixLeft, Vector vectorRight)
+		/// <summary>
+		/// Creates a CSR matrix with the non-zero entries of <paramref name="denseMatrix"/>. An entry must be exactly == 0, to be considered zero.
+		/// </summary>
+		/// <param name="denseMatrix"></param>
+		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix)
+		{
+			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
+			int m = denseMatrix.NumRows;
+			int n = denseMatrix.NumColumns;
+			int nnz = 0;
+			for (int i = 0; i < m; i++)
+			{
+				for (int j = 0; j < n; ++j)
+				{
+					if (denseMatrix[i, j] != 0)
+					{
+						++nnz;
+					}
+				}
+			}
+
+			var values = new double[nnz];
+			var colIndices = new int[nnz];
+			var rowOffsets = new int[m + 1];
+			rowOffsets[m] = nnz;
+
+			int k = 0;
+			for (int i = 0; i < m; i++)
+			{
+				rowOffsets[i] = k;
+				for (int j = 0; j < n; ++j)
+				{
+					double val = denseMatrix[i, j];
+					if (val != 0)
+					{
+						values[k] = val;
+						colIndices[k] = j;
+						++k;
+					}
+				}
+			}
+
+			return CsrMatrix.CreateFromArrays(m, n, values, colIndices, rowOffsets, false);
+		}
+
+		#region operators (use extension operators when they become available)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: result = <paramref name="matrixLeft"/> * <paramref name="vectorRight"/>.
+		/// If <paramref name="matrixLeft"/> is m1-by-n1 and <paramref name="vectorRight"/> has length = n2, then n1 must be 
+		/// equal to n2. The result will be a vector with length = m1, written to a new <see cref="Vector"/> instance.
+		/// </summary>
+		/// <param name="matrixLeft">The <see cref="CsrMatrix"/> operand on the left.</param>
+		/// <param name="vectorRight">The <see cref="Vector"/> operand on the right. It can be considered as a column 
+		///     vector.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrixLeft"/>.<see cref="NumColumns"/> is 
+		///     different than <paramref name="vectorRight"/>.<see cref="Vector.Length"/>.</exception>
+		public static Vector operator *(CsrMatrix matrixLeft, Vector vectorRight)
             => matrixLeft.Multiply(vectorRight, false);
         #endregion
 

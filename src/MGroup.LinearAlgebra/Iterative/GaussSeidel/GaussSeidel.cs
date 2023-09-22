@@ -20,15 +20,16 @@ namespace MGroup.LinearAlgebra.Iterative
 	{
 		private const string name = "Gauss-Seidel";
 		private readonly IMaxIterationsProvider maxIterationsProvider;
-		private readonly double errorTolerance;
+		private readonly double convergenceTolerance;
 
 		private readonly bool forwardGaussSeidel;
-		private readonly string convergenceMetricTitle = "norm2(x - x_previous) < tolerance";
+		private readonly string convergenceMetricTitle;
 
-		public GaussSeidel(double errorTolerance, IMaxIterationsProvider maxIterationsProvider, bool forwardGaussSeidel)
+		public GaussSeidel(double convergenceTolerance, IMaxIterationsProvider maxIterationsProvider, bool forwardGaussSeidel)
 		{
 			this.maxIterationsProvider = maxIterationsProvider;
-			this.errorTolerance = errorTolerance;
+			this.convergenceTolerance = convergenceTolerance;
+			this.convergenceMetricTitle = "norm2(x - x_previous) < " + convergenceTolerance;
 			this.forwardGaussSeidel = forwardGaussSeidel;
 		}
 
@@ -77,7 +78,7 @@ namespace MGroup.LinearAlgebra.Iterative
 				}
 				previousSolution.SubtractIntoThis(solution);
 				convergenceMetric = previousSolution.Norm2();
-				if (convergenceMetric < errorTolerance)
+				if (convergenceMetric < convergenceTolerance)
 				{
 					break;
 				}
@@ -104,7 +105,7 @@ namespace MGroup.LinearAlgebra.Iterative
 			/// </summary>
 			public IMaxIterationsProvider MaxIterationsProvider { get; set; } = new PercentageMaxIterationsProvider(1.0);
 
-			public double ErrorTolerance { get; set; } = 1E-10;
+			public double ConvergenceTolerance { get; set; } = 1E-10;
 
 			public bool ForwardGaussSeidel { get; set; } = true;
 
@@ -112,7 +113,7 @@ namespace MGroup.LinearAlgebra.Iterative
 			/// Creates a new instance of <see cref="GaussSeidel"/>.
 			/// </summary>
 			public GaussSeidel Build()
-				=> new GaussSeidel(ErrorTolerance, MaxIterationsProvider, ForwardGaussSeidel);
+				=> new GaussSeidel(ConvergenceTolerance, MaxIterationsProvider, ForwardGaussSeidel);
 		}
 	}
 }
