@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
@@ -181,7 +181,21 @@ namespace MGroup.LinearAlgebra.Commons
                 $"The matrix must be square, but was {numRows}-by-{numColumns}");
         }
 
-        public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
+		public static void CheckSquareLinearSystemDimensions(IIndexable2D matrix, IIndexable1D lhsVector, IIndexable1D rhsVector)
+		{
+			CheckSquareLinearSystemDimensions(matrix.NumRows, matrix.NumColumns, lhsVector.Length, rhsVector.Length);
+		}
+
+		public static void CheckSquareLinearSystemDimensions(int numMatrixRows, int numMatrixColumns, int lhsLength, int rhsLength)
+		{
+			bool compatible = numMatrixRows == numMatrixColumns;
+			compatible &= numMatrixColumns == lhsLength;
+			compatible &= numMatrixRows == rhsLength;
+			if (!compatible) throw new NonMatchingDimensionsException(
+				$"The matrix rows ({numMatrixRows}), matrix columns ({numMatrixColumns}), left-hand-side vector length ({lhsLength}) and right-hand-side vector length ({rhsLength}) must be the same");
+		}
+
+		public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
         {
             if (startIndex + subvectorLength > vector.Length) throw new NonMatchingDimensionsException(
                 "The entries to access exceed the vector's length");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
@@ -157,25 +157,79 @@ namespace MGroup.LinearAlgebra.Commons
             //}
         }
 
-        internal static void MatrixTimesCsr(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+		internal static void GaussSeidelBackwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			double[] lhs, double[] rhs)
+		{
+			int n = matrixOrder;
+			for (int i = n - 1; i >= 0; --i)
+			{
+				double sum = rhs[i];
+				double diagEntry = 0;
+
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				for (int k = rowEnd - 1; k >= rowStart; --k)
+				{
+					int j = csrColIndices[k];
+					if (j == i)
+					{
+						diagEntry = csrValues[k];
+					}
+					else
+					{
+						sum -= csrValues[k] * lhs[j];
+					}
+				}
+				lhs[i] = sum / diagEntry;
+			}
+		}
+
+        internal static void GaussSeidelForwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			double[] lhs, double[] rhs)
+		{
+			int n = matrixOrder;
+			for (int i = 0; i < n; ++i)
+			{
+				double sum = rhs[i];
+				double diagEntry = 0;
+
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				for (int k = rowStart; k < rowEnd; ++k)
+				{
+					int j = csrColIndices[k];
+					if (j == i)
+					{
+						diagEntry = csrValues[k];
+					}
+					else
+					{
+						sum -= csrValues[k] * lhs[j];
+					}
+				}
+				lhs[i] = sum / diagEntry;
+			}
+		}
+
+		internal static void MatrixTimesCsr(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
             IMatrixView other, Matrix result)
         {
             for (int r = 0; r < result.NumRows; ++r) // Compute one output row at a time.
             {
-                // x * A = linear combination of rows of A with the entries of x as coefficients,
-                // where x is row r of the other matrix.
-                for (int i = 0; i < numCsrRows; ++i)
+				// x * A = linear combination of rows of A with the entries of x as coefficients,
+				// where x is row r of the other matrix.
+				for (int i = 0; i < numCsrRows; ++i)
                 {
                     double scalar = other[r, i];
-                    int csrRowStart = csrRowOffsets[i]; //inclusive
-                    int csrRowEnd = csrRowOffsets[i + 1]; //exclusive
-                    for (int k = csrRowStart; k < csrRowEnd; ++k) // sum(other[r,i] * csr.row[i]))
+                    int csrRowStart = csrRowOffsets[i]; // inclusive
+					int csrRowEnd = csrRowOffsets[i + 1]; // exclusive
+					for (int k = csrRowStart; k < csrRowEnd; ++k) // sum(other[r,i] * csr.row[i]))
                     {
-                        result[r, csrColIndices[k]] += scalar * csrValues[k];
+						result[r, csrColIndices[k]] += scalar * csrValues[k];
                     }
                 }
             }
-        }
+		}
 
         internal static void MatrixTimesCsrTrans(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
             IMatrixView other, Matrix result)
