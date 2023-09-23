@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// </summary>
 		public double ResidualNormRatioEstimation { get; set; } = double.NaN;
 
-		public (string title, double value) ConvergenceMetric { get; set; } = ("No convergence metric", double.NaN);
+		public (string title, double value) ConvergenceCriterion { get; set; } = ("No convergence criterion", double.NaN);
 
 		/// <summary>
 		/// Reports the accumulated data of this <see cref="CGStatistics"/> instance. 

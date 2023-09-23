@@ -1,8 +1,6 @@
 using System.Text;
 
 using MGroup.LinearAlgebra.Iterative;
-using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Output;
@@ -29,6 +27,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
 			var builder = new GaussSeidel.Builder();
+			//builder.ConvergenceCriterion = new SolutionNeverConvergesCriterion(); // We would use this, but to test we need to track the convergence rate.
+			builder.ConvergenceCriterion = new AbsoluteSolutionConvergenceCriterion();
 			builder.ConvergenceTolerance = 0.0;
 			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(numIterations);
 			builder.ForwardGaussSeidel = forwardGaussSeidel;
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 
 			IterativeStatistics stats = gs.Solve(A, b, xComputed);
 			Assert.Equal(numIterations, stats.NumIterationsRequired);
-			Assert.InRange(stats.ConvergenceMetric.value, 0.0, gsConvergenceTolerance);
+			Assert.InRange(stats.ConvergenceCriterion.value, 0.0, gsConvergenceTolerance);
 
 			var comparer = new MatrixComparer(entrywiseTolerance);
 			comparer.AssertEqual(xExpected, xComputed);

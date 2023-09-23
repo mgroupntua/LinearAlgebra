@@ -19,18 +19,17 @@ namespace MGroup.LinearAlgebra.Iterative
 	public class GaussSeidel
 	{
 		private const string name = "Gauss-Seidel";
-		private readonly IMaxIterationsProvider maxIterationsProvider;
+		private readonly ISolutionConvergenceCriterion convergenceCriterion;
 		private readonly double convergenceTolerance;
-
 		private readonly bool forwardGaussSeidel;
-		private readonly string convergenceMetricTitle;
+		private readonly IMaxIterationsProvider maxIterationsProvider;
 
-		public GaussSeidel(double convergenceTolerance, IMaxIterationsProvider maxIterationsProvider, bool forwardGaussSeidel)
+		public GaussSeidel(ISolutionConvergenceCriterion convergenceCriterion, double convergenceTolerance, bool forwardGaussSeidel, IMaxIterationsProvider maxIterationsProvider)
 		{
-			this.maxIterationsProvider = maxIterationsProvider;
+			this.convergenceCriterion = convergenceCriterion;
 			this.convergenceTolerance = convergenceTolerance;
-			this.convergenceMetricTitle = "norm2(x - x_previous) < " + convergenceTolerance;
 			this.forwardGaussSeidel = forwardGaussSeidel;
+			this.maxIterationsProvider = maxIterationsProvider;
 		}
 
 		/// <summary>
@@ -78,8 +77,7 @@ namespace MGroup.LinearAlgebra.Iterative
 				}
 				++iter; // Each algorithm iteration corresponds to one matrix-vector multiplication or, in this case, GS iteration
 
-				previousSolution.SubtractIntoThis(solution);
-				convergenceMetric = previousSolution.Norm2();
+				convergenceMetric = convergenceCriterion.CalculateConvergenceMetric(solution, previousSolution);
 				if (convergenceMetric < convergenceTolerance)
 				{
 					break;
@@ -91,7 +89,7 @@ namespace MGroup.LinearAlgebra.Iterative
 				AlgorithmName = name,
 				HasConverged = iter < maxIterations,
 				NumIterationsRequired = iter,
-				ConvergenceMetric = (convergenceMetricTitle, convergenceMetric),
+				ConvergenceCriterion = (convergenceCriterion.DescribeConvergenceCriterion(convergenceTolerance), convergenceMetric),
 			};
 		}
 
@@ -102,20 +100,24 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// </summary>
 		public class Builder
 		{
+			public ISolutionConvergenceCriterion ConvergenceCriterion { get; set; } = new AbsoluteSolutionConvergenceCriterion();
+
+			public double ConvergenceTolerance { get; set; } = 1E-10;
+
+
+			public bool ForwardGaussSeidel { get; set; } = true;
+
 			/// <summary>
 			/// Specifies how to calculate the maximum iterations that the GS algorithm will run for.
 			/// </summary>
 			public IMaxIterationsProvider MaxIterationsProvider { get; set; } = new PercentageMaxIterationsProvider(1.0);
 
-			public double ConvergenceTolerance { get; set; } = 1E-10;
-
-			public bool ForwardGaussSeidel { get; set; } = true;
 
 			/// <summary>
 			/// Creates a new instance of <see cref="GaussSeidel"/>.
 			/// </summary>
 			public GaussSeidel Build()
-				=> new GaussSeidel(ConvergenceTolerance, MaxIterationsProvider, ForwardGaussSeidel);
+				=> new GaussSeidel(ConvergenceCriterion, ConvergenceTolerance, ForwardGaussSeidel, MaxIterationsProvider);
 		}
 	}
 }
