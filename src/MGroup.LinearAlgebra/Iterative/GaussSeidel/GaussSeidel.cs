@@ -14,7 +14,7 @@ namespace MGroup.LinearAlgebra.Iterative
 	/// Implements the Gauss-Seidel algorithm for solving linear systems.
 	/// Convergence is guaranteed only for strictly diagonally dominant or positive definite (symmetric) matrices.
 	/// Might converge in general matrix systems, as well, but with no guarantee.
-	/// Authors: Constantinos Atzarakis
+	/// Authors: Constantinos Atzarakis, Serafeim Bakalakos
 	/// </summary>
 	public class GaussSeidel
 	{
@@ -55,13 +55,13 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(CsrMatrix matrix, Vector rhs, Vector solution, bool initialGuessIsZero = false)
+		public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution, bool initialGuessIsZero = false)
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
 
 			int n = matrix.NumColumns;
 			int maxIterations = maxIterationsProvider.GetMaxIterations(n);
-			var previousSolution = Vector.CreateZero(n);
+			var previousSolution = solution.CreateZeroVectorWithSameFormat();
 			double convergenceMetric = double.MaxValue;
 			int iter = 0;
 			while (iter < maxIterations)
@@ -69,11 +69,11 @@ namespace MGroup.LinearAlgebra.Iterative
 				previousSolution.CopyFrom(solution);
 				if (forwardGaussSeidel)
 				{
-					CsrMultiplications.GaussSeidelForwardIteration(n, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, solution.RawData, rhs.RawData);
+					matrix.GaussSeidelForwardIteration(rhs, solution);
 				}
 				else
 				{
-					CsrMultiplications.GaussSeidelBackwardIteration(n, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, solution.RawData, rhs.RawData);
+					matrix.GaussSeidelBackwardIteration(rhs, solution);
 				}
 				++iter; // Each algorithm iteration corresponds to one matrix-vector multiplication or, in this case, GS iteration
 

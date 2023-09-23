@@ -61,7 +61,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// The number of non zero entries of the matrix.
         /// </summary>
-        public int NumNonZeros => colOffsets[colOffsets.Length - 1];
+        public int NumNonZeros => rowIndices.Length;
 
         /// <summary>
         /// The number of rows of the matrix.

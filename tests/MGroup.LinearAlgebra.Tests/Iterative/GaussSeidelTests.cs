@@ -18,11 +18,22 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 	public static class GaussSeidelTests
 	{
 		[Theory]
-		[InlineData(true, 10, 1E-9, 1E-5)]
-		[InlineData(false, 10, 1E-8, 1E-5)]
-		private static void TestSparseSystem(bool forwardGaussSeidel, int numIterations, double gsConvergenceTolerance, double entrywiseTolerance)
+		[InlineData(true, 10, 1E-9, 1E-5, true)]
+		[InlineData(false, 10, 1E-8, 1E-5, true)]
+		[InlineData(true, 10, 1E-9, 1E-5, false)]
+		[InlineData(false, 10, 1E-8, 1E-5, false)]
+		private static void TestSparseSystem(bool forwardGaussSeidel, int numIterations, double gsConvergenceTolerance, double entrywiseTolerance, bool csrFormat)
 		{
-			var A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
+			IMatrixView A;
+			if (csrFormat)
+			{
+				A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
+			}
+			else
+			{
+				A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
+			}
+
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 

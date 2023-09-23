@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// The number of non zero entries of the matrix.
         /// </summary>
-        public int NumNonZeros => rowOffsets[rowOffsets.Length - 1];
+        public int NumNonZeros => colIndices.Length;
 
         /// <summary>
         /// The number of rows of the matrix.
@@ -499,10 +499,46 @@ namespace MGroup.LinearAlgebra.Matrices
             return true; //At this point all entries have been checked and are equal
         }
 
-        /// <summary>
-        /// See <see cref="ISliceable2D.GetColumn(int)"/>.
-        /// </summary>
-        public Vector GetColumn(int colIndex)
+		/// <summary>
+		/// See <see cref="IGaussSeidelOperable.GaussSeidelBackwardIteration(IVectorView, IVector)"/>
+		/// </summary>
+		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
+		{
+			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			{
+				CsrMultiplications.GaussSeidelBackwardIteration(NumRows, values, rowOffsets, colIndices, rhsDense.RawData, lhsDense.RawData);
+			}
+			else
+			{
+				double[] lhs = lhsVector.CopyToArray();
+				double[] rhs = rhsVector.CopyToArray();
+				CsrMultiplications.GaussSeidelBackwardIteration(NumRows, values, rowOffsets, colIndices, rhs, lhs);
+				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
+			}
+		}
+
+		/// <summary>
+		/// See <see cref="IGaussSeidelOperable.GaussSeidelForwardIteration(IVectorView, IVector)"/>
+		/// </summary>
+		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
+		{
+			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			{
+				CsrMultiplications.GaussSeidelForwardIteration(NumRows, values, rowOffsets, colIndices, rhsDense.RawData, lhsDense.RawData);
+			}
+			else
+			{
+				double[] lhs = lhsVector.CopyToArray();
+				double[] rhs = rhsVector.CopyToArray();
+				CsrMultiplications.GaussSeidelForwardIteration(NumRows, values, rowOffsets, colIndices, rhs, lhs);
+				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
+			}
+		}
+
+		/// <summary>
+		/// See <see cref="ISliceable2D.GetColumn(int)"/>.
+		/// </summary>
+		public Vector GetColumn(int colIndex)
         {
             Preconditions.CheckIndexCol(this, colIndex);
             double[] colVector = new double[NumRows];

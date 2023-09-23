@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void GaussSeidelBackwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			double[] lhs, double[] rhs)
+			double[] rhs, double[] lhs)
 		{
 			int n = matrixOrder;
 			for (int i = n - 1; i >= 0; --i)
@@ -182,7 +182,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void GaussSeidelForwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			double[] lhs, double[] rhs)
+			double[] rhs, double[] lhs)
 		{
 			int n = matrixOrder;
 			for (int i = 0; i < n; ++i)
