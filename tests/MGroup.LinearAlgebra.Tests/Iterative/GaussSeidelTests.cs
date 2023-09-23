@@ -19,26 +19,27 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 	/// </summary>
 	public static class GaussSeidelTests
 	{
-		private static readonly MatrixComparer comparer = new MatrixComparer(1E-5);
-
-
 		[Theory]
-		[InlineData(true)]
-		[InlineData(false)]
-		private static void TestSparseSystem(bool forwardGaussSeidel)
+		[InlineData(true, 10, 1E-9, 1E-5)]
+		[InlineData(false, 10, 1E-8, 1E-5)]
+		private static void TestSparseSystem(bool forwardGaussSeidel, int numIterations, double gsConvergenceTolerance, double entrywiseTolerance)
 		{
 			var A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
 			var builder = new GaussSeidel.Builder();
-			builder.ConvergenceTolerance = 1E-7;
-			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(100);
-			builder.ForwardGaussSeidel = true;
+			builder.ConvergenceTolerance = 0.0;
+			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(numIterations);
+			builder.ForwardGaussSeidel = forwardGaussSeidel;
 			var gs = builder.Build();
 			var xComputed = Vector.CreateZero(A.NumRows);
 
 			IterativeStatistics stats = gs.Solve(A, b, xComputed);
+			Assert.Equal(numIterations, stats.NumIterationsRequired);
+			Assert.InRange(stats.ConvergenceMetric.value, 0.0, gsConvergenceTolerance);
+
+			var comparer = new MatrixComparer(entrywiseTolerance);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 	}

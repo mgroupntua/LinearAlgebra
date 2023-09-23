@@ -65,7 +65,7 @@ namespace MGroup.LinearAlgebra.Iterative
 			var previousSolution = Vector.CreateZero(n);
 			double convergenceMetric = double.MaxValue;
 			int iter = 0;
-			for (; iter < maxIterations; ++iter)
+			while (iter < maxIterations)
 			{
 				previousSolution.CopyFrom(solution);
 				if (forwardGaussSeidel)
@@ -76,6 +76,8 @@ namespace MGroup.LinearAlgebra.Iterative
 				{
 					CsrMultiplications.GaussSeidelBackwardIteration(n, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, solution.RawData, rhs.RawData);
 				}
+				++iter; // Each algorithm iteration corresponds to one matrix-vector multiplication or, in this case, GS iteration
+
 				previousSolution.SubtractIntoThis(solution);
 				convergenceMetric = previousSolution.Norm2();
 				if (convergenceMetric < convergenceTolerance)
