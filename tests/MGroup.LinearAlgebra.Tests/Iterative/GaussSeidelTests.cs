@@ -51,11 +51,15 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var xComputed = Vector.CreateZero(b.Length);
 
 			IterativeStatistics stats = gs.Solve(gsIteration, b, xComputed);
+			gsIteration.Dispose();
+
 			Assert.Equal(numIterations, stats.NumIterationsRequired);
 			Assert.InRange(stats.ConvergenceCriterion.value, 0.0, gsConvergenceTolerance);
 
 			var comparer = new MatrixComparer(entrywiseTolerance);
 			comparer.AssertEqual(xExpected, xComputed);
+
+
 		}
 	}
 }

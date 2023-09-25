@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Vectors;
+
 namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
-	using MGroup.LinearAlgebra.Commons;
-	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Vectors;
-
 	public class GaussSeidelIterationGeneral : IGaussSeidelIteration
 	{
 		private readonly IMatrixView matrix;
@@ -33,14 +33,14 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			{
 				double sum = b[i];
 				int j;
-				for (j = n - 1; j > i; --j)
+				for (j = 0; j < i; ++j)
 				{
 					sum -= matrix[i, j] * x[j];
 				}
 
 				double diagEntry = matrix[i, i];
 
-				for (j = i - 1; j >= 0; --j)
+				for (j = i + 1; j < n; ++j)
 				{
 					sum -= matrix[i, j] * x[j];
 				}

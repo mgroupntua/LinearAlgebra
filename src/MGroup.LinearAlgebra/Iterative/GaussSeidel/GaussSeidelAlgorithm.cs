@@ -61,6 +61,8 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			Preconditions.CheckSquareLinearSystemDimensions(gsIteration.SystemSize, gsIteration.SystemSize, solution.Length, 
 				rhs.Length);
 
+			gsIteration.Initialize();
+
 			int n = gsIteration.SystemSize;
 			int maxIterations = maxIterationsProvider.GetMaxIterations(n);
 			var previousSolution = solution.CreateZeroVectorWithSameFormat();
