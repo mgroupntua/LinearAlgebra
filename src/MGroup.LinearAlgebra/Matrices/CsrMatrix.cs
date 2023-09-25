@@ -500,42 +500,6 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
 		/// <summary>
-		/// See <see cref="IGaussSeidelOperable.GaussSeidelBackwardIteration(IVectorView, IVector)"/>
-		/// </summary>
-		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
-		{
-			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
-			{
-				CsrMultiplications.GaussSeidelBackwardIteration(NumRows, values, rowOffsets, colIndices, rhsDense.RawData, lhsDense.RawData);
-			}
-			else
-			{
-				double[] lhs = lhsVector.CopyToArray();
-				double[] rhs = rhsVector.CopyToArray();
-				CsrMultiplications.GaussSeidelBackwardIteration(NumRows, values, rowOffsets, colIndices, rhs, lhs);
-				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IGaussSeidelOperable.GaussSeidelForwardIteration(IVectorView, IVector)"/>
-		/// </summary>
-		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
-		{
-			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
-			{
-				CsrMultiplications.GaussSeidelForwardIteration(NumRows, values, rowOffsets, colIndices, rhsDense.RawData, lhsDense.RawData);
-			}
-			else
-			{
-				double[] lhs = lhsVector.CopyToArray();
-				double[] rhs = rhsVector.CopyToArray();
-				CsrMultiplications.GaussSeidelForwardIteration(NumRows, values, rowOffsets, colIndices, rhs, lhs);
-				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
-			}
-		}
-
-		/// <summary>
 		/// See <see cref="ISliceable2D.GetColumn(int)"/>.
 		/// </summary>
 		public Vector GetColumn(int colIndex)

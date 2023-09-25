@@ -6,17 +6,15 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.LinearAlgebra.Commons;
 
-namespace MGroup.LinearAlgebra.Iterative
+namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 {
-	using Reduction;
-
 	/// <summary>
 	/// Implements the Gauss-Seidel algorithm for solving linear systems.
 	/// Convergence is guaranteed only for strictly diagonally dominant or positive definite (symmetric) matrices.
 	/// Might converge in general matrix systems, as well, but with no guarantee.
 	/// Authors: Constantinos Atzarakis, Serafeim Bakalakos
 	/// </summary>
-	public class GaussSeidel
+	public class GaussSeidelAlgorithm
 	{
 		private const string name = "Gauss-Seidel";
 		private readonly ISolutionConvergenceCriterion convergenceCriterion;
@@ -24,7 +22,7 @@ namespace MGroup.LinearAlgebra.Iterative
 		private readonly bool forwardGaussSeidel;
 		private readonly IMaxIterationsProvider maxIterationsProvider;
 
-		public GaussSeidel(ISolutionConvergenceCriterion convergenceCriterion, double convergenceTolerance, bool forwardGaussSeidel, IMaxIterationsProvider maxIterationsProvider)
+		public GaussSeidelAlgorithm(ISolutionConvergenceCriterion convergenceCriterion, double convergenceTolerance, bool forwardGaussSeidel, IMaxIterationsProvider maxIterationsProvider)
 		{
 			this.convergenceCriterion = convergenceCriterion;
 			this.convergenceTolerance = convergenceTolerance;
@@ -36,8 +34,10 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
 		/// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
 		/// </summary>
-		/// <param name="matrix">The matrix A of the linear system A * x = b. It must be symmetric positive definite
-		/// or strictly diagonally dominant for ensured convergence.</param>
+		/// <param name="gsIteration">
+		/// The strategy for performing Gauss-Seidel iterations with the matrix A of the linear system
+		/// A * x = b. The matrix A must be symmetric positive definite or strictly diagonally dominant for ensured convergence.
+		/// </param>
 		/// <param name="rhs">
 		/// The right hand side vector b of the linear system A * x = b. Constraints:
 		/// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
@@ -55,11 +55,13 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution, bool initialGuessIsZero = false)
+		public IterativeStatistics Solve(IGaussSeidelIteration gsIteration, IVectorView rhs, IVector solution, 
+			bool initialGuessIsZero = false)
 		{
-			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
+			Preconditions.CheckSquareLinearSystemDimensions(gsIteration.SystemSize, gsIteration.SystemSize, solution.Length, 
+				rhs.Length);
 
-			int n = matrix.NumColumns;
+			int n = gsIteration.SystemSize;
 			int maxIterations = maxIterationsProvider.GetMaxIterations(n);
 			var previousSolution = solution.CreateZeroVectorWithSameFormat();
 			double convergenceMetric = double.MaxValue;
@@ -69,11 +71,11 @@ namespace MGroup.LinearAlgebra.Iterative
 				previousSolution.CopyFrom(solution);
 				if (forwardGaussSeidel)
 				{
-					matrix.GaussSeidelForwardIteration(rhs, solution);
+					gsIteration.GaussSeidelForwardIteration(rhs, solution);
 				}
 				else
 				{
-					matrix.GaussSeidelBackwardIteration(rhs, solution);
+					gsIteration.GaussSeidelBackwardIteration(rhs, solution);
 				}
 				++iter; // Each algorithm iteration corresponds to one matrix-vector multiplication or, in this case, GS iteration
 
@@ -94,7 +96,7 @@ namespace MGroup.LinearAlgebra.Iterative
 		}
 
 		/// <summary>
-		/// Constructs <see cref="GaussSeidel"/> instances, allows the user to specify some or all of the required parameters and 
+		/// Constructs <see cref="GaussSeidelAlgorithm"/> instances, allows the user to specify some or all of the required parameters and 
 		/// provides defaults for the rest.
 		/// Author: Constantinos Atzarakis
 		/// </summary>
@@ -114,10 +116,10 @@ namespace MGroup.LinearAlgebra.Iterative
 
 
 			/// <summary>
-			/// Creates a new instance of <see cref="GaussSeidel"/>.
+			/// Creates a new instance of <see cref="GaussSeidelAlgorithm"/>.
 			/// </summary>
-			public GaussSeidel Build()
-				=> new GaussSeidel(ConvergenceCriterion, ConvergenceTolerance, ForwardGaussSeidel, MaxIterationsProvider);
+			public GaussSeidelAlgorithm Build()
+				=> new GaussSeidelAlgorithm(ConvergenceCriterion, ConvergenceTolerance, ForwardGaussSeidel, MaxIterationsProvider);
 		}
 	}
 }

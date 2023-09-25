@@ -154,60 +154,6 @@ namespace MGroup.LinearAlgebra.Commons
 			//}
 		}
 
-		internal static void GaussSeidelBackwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			double[] rhs, double[] lhs)
-		{
-			int n = matrixOrder;
-			for (int i = n - 1; i >= 0; --i)
-			{
-				double sum = rhs[i];
-				double diagEntry = 0;
-
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				for (int k = rowEnd - 1; k >= rowStart; --k)
-				{
-					int j = csrColIndices[k];
-					if (j == i)
-					{
-						diagEntry = csrValues[k];
-					}
-					else
-					{
-						sum -= csrValues[k] * lhs[j];
-					}
-				}
-				lhs[i] = sum / diagEntry;
-			}
-		}
-
-		internal static void GaussSeidelForwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			double[] rhs, double[] lhs)
-		{
-			int n = matrixOrder;
-			for (int i = 0; i < n; ++i)
-			{
-				double sum = rhs[i];
-				double diagEntry = 0;
-
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				for (int k = rowStart; k < rowEnd; ++k)
-				{
-					int j = csrColIndices[k];
-					if (j == i)
-					{
-						diagEntry = csrValues[k];
-					}
-					else
-					{
-						sum -= csrValues[k] * lhs[j];
-					}
-				}
-				lhs[i] = sum / diagEntry;
-			}
-		}
-
 		internal static void MatrixTimesCsr(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			IMatrixView other, Matrix result)
 		{

@@ -1,6 +1,7 @@
 using System.Text;
 
 using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Output;
@@ -24,29 +25,32 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 		[InlineData(false, 10, 1E-8, 1E-5, false)]
 		private static void TestSparseSystem(bool forwardGaussSeidel, int numIterations, double gsConvergenceTolerance, double entrywiseTolerance, bool csrFormat)
 		{
-			IMatrixView A;
+			IGaussSeidelIteration gsIteration;
 			if (csrFormat)
 			{
-				A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
+				var A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, 
+					SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
+				gsIteration = new GaussSeidelIterationCsrSerial(A);
 			}
 			else
 			{
-				A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
+				var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
+				gsIteration = new GaussSeidelIterationGeneral(A);
 			}
 
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
-			var builder = new GaussSeidel.Builder();
+			var builder = new GaussSeidelAlgorithm.Builder();
 			//builder.ConvergenceCriterion = new SolutionNeverConvergesCriterion(); // We would use this, but to test we need to track the convergence rate.
 			builder.ConvergenceCriterion = new AbsoluteSolutionConvergenceCriterion();
 			builder.ConvergenceTolerance = 0.0;
 			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(numIterations);
 			builder.ForwardGaussSeidel = forwardGaussSeidel;
 			var gs = builder.Build();
-			var xComputed = Vector.CreateZero(A.NumRows);
+			var xComputed = Vector.CreateZero(b.Length);
 
-			IterativeStatistics stats = gs.Solve(A, b, xComputed);
+			IterativeStatistics stats = gs.Solve(gsIteration, b, xComputed);
 			Assert.Equal(numIterations, stats.NumIterationsRequired);
 			Assert.InRange(stats.ConvergenceCriterion.value, 0.0, gsConvergenceTolerance);
 
