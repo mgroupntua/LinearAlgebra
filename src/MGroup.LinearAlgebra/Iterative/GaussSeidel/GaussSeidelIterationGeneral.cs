@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using MGroup.LinearAlgebra.Commons;
@@ -10,21 +11,24 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 {
 	public class GaussSeidelIterationGeneral : IGaussSeidelIteration
 	{
-		private readonly IMatrixView matrix;
+		private IMatrixView matrix;
+		private bool inactive = true;
 
-		public GaussSeidelIterationGeneral(IMatrixView matrix)
+		public GaussSeidelIterationGeneral()
 		{
-			Preconditions.CheckSquare(matrix);
-			this.matrix = matrix;
-			this.SystemSize = matrix.NumRows;
 		}
 
-		public int SystemSize { get; }
 
-		public void Dispose() { }
+		public void Dispose() 
+		{
+			this.matrix = null;
+			this.inactive = true;
+		}
 
 		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
+			CheckActive();
+
 			IVector x = lhsVector;
 			IVectorView b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
@@ -51,6 +55,8 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 
 		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
+			CheckActive();
+
 			IVector x = lhsVector;
 			IVectorView b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
@@ -75,6 +81,25 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		public void Initialize() { }
+		public void Initialize(IMatrixView matrix) 
+		{
+			Preconditions.CheckSquare(matrix);
+			this.matrix = matrix;
+			this.inactive = false;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void CheckActive()
+		{
+			if (inactive)
+			{
+				throw new ObjectDisposedException(this.GetType().Name);
+			}
+		}
+
+		public class Builder : IGaussSeidelIterationBuilder
+		{
+			public IGaussSeidelIteration Create() => new GaussSeidelIterationGeneral();
+		}
 	}
 }

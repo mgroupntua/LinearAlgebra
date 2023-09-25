@@ -25,17 +25,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 		[InlineData(false, 10, 1E-8, 1E-5, false)]
 		private static void TestSparseSystem(bool forwardGaussSeidel, int numIterations, double gsConvergenceTolerance, double entrywiseTolerance, bool csrFormat)
 		{
+			IMatrixView matrix;
 			IGaussSeidelIteration gsIteration;
 			if (csrFormat)
 			{
-				var A = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, 
+				matrix = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order, SparsePosDef10by10.CsrValues, 
 					SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
-				gsIteration = new GaussSeidelIterationCsrSerial(A);
+				gsIteration = new GaussSeidelIterationCsrSerial();
 			}
 			else
 			{
-				var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
-				gsIteration = new GaussSeidelIterationGeneral(A);
+				matrix = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
+				gsIteration = new GaussSeidelIterationGeneral();
 			}
 
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
@@ -47,11 +48,10 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.ConvergenceTolerance = 0.0;
 			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(numIterations);
 			builder.ForwardGaussSeidel = forwardGaussSeidel;
-			var gs = builder.Build();
+			var gs = builder.Build(gsIteration);
 			var xComputed = Vector.CreateZero(b.Length);
 
-			IterativeStatistics stats = gs.Solve(gsIteration, b, xComputed);
-			gsIteration.Dispose();
+			IterativeStatistics stats = gs.Solve(matrix, b, xComputed);
 
 			Assert.Equal(numIterations, stats.NumIterationsRequired);
 			Assert.InRange(stats.ConvergenceCriterion.value, 0.0, gsConvergenceTolerance);

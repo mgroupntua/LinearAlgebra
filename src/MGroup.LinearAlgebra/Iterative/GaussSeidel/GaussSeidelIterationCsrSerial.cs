@@ -12,28 +12,23 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 {
 	public class GaussSeidelIterationCsrSerial : IGaussSeidelIteration
 	{
-		private readonly CsrMatrix matrix;
+		private CsrMatrix matrix;
 		private int[] diagonalOffsets;
-		private bool disposed = false;
+		private bool inactive = false;
 
-		public int SystemSize { get; }
-
-		public GaussSeidelIterationCsrSerial(CsrMatrix matrix)
+		public GaussSeidelIterationCsrSerial()
 		{
-			Preconditions.CheckSquare(matrix);
-			this.matrix = matrix;
-			this.SystemSize = matrix.NumRows;
 		}
 
 		public void Dispose() 
 		{
 			this.diagonalOffsets = null;
-			disposed = true;
+			inactive = true;
 		}
 
 		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
-			CheckDisposed();
+			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -52,7 +47,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 
 		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
-			CheckDisposed();
+			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -69,37 +64,19 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		public void Initialize() 
+		public void Initialize(IMatrixView matrix) 
 		{
-			CheckDisposed();
-
-			int n = matrix.NumRows;
-			int[] rowOffets = matrix.RawRowOffsets;
-			int[] colIndices = matrix.RawColIndices;
-			diagonalOffsets = new int[n];
-			for (int i = 0; i < n; ++i)
+			if (matrix is CsrMatrix csrMatrix)
 			{
-				int rowStart = rowOffets[i]; // inclusive
-				int rowEnd = rowOffets[i + 1]; // exclusive
-
-				//TODO: optimizations: bisection, start from the end of the row if row > n/2, etc.
-				bool isDiagonalZero = true;
-				for (int k = rowStart; k < rowEnd; ++k) 
-				{ 
-					int j = colIndices[k];
-					if (j == i)
-					{
-						diagonalOffsets[i] = k;
-						isDiagonalZero = false;
-						break;
-					}
-				}
-
-				if (isDiagonalZero)
-				{
-					throw new InvalidSparsityPatternException(
-						$"Found diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
-				}
+				Preconditions.CheckSquare(csrMatrix);
+				this.matrix = csrMatrix;
+				this.diagonalOffsets = LocateDiagonalOffsets(matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
+				this.inactive = false;
+			}
+			else
+			{
+				throw new InvalidSparsityPatternException(this.GetType().Name + " can be used only for matrices in CSR format." +
+					"Consider using the general " + typeof(GaussSeidelIterationGeneral).Name + " or another implementation.");
 			}
 		}
 
@@ -211,13 +188,49 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void CheckDisposed()
+		private static int[] LocateDiagonalOffsets(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
 		{
-			if (disposed)
+			var diagonalOffsets = new int[matrixOrder];
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+
+				//TODO: optimizations: bisection, start from the end of the row if row > n/2, etc.
+				bool isDiagonalZero = true;
+				for (int k = rowStart; k < rowEnd; ++k)
+				{
+					int j = csrColIndices[k];
+					if (j == i)
+					{
+						diagonalOffsets[i] = k;
+						isDiagonalZero = false;
+						break;
+					}
+				}
+
+				if (isDiagonalZero)
+				{
+					throw new InvalidSparsityPatternException(
+						$"Found diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
+				}
+			}
+
+			return diagonalOffsets;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void CheckActive()
+		{
+			if (inactive)
 			{
 				throw new ObjectDisposedException(this.GetType().Name);
 			}
+		}
+
+		public class Builder : IGaussSeidelIterationBuilder
+		{
+			public IGaussSeidelIteration Create() => new GaussSeidelIterationCsrSerial();
 		}
 	}
 }
