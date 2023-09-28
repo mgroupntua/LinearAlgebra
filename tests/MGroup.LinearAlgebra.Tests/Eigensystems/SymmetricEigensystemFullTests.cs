@@ -14,6 +14,28 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 	{
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-10);
 
+		[Fact]
+		private static void TestFullEigendecomposition()
+		{
+			double tol = 1E-10;
+			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
+
+			(Vector lambda, Matrix X) = SpectralUtilities.SortSingularValues(
+				Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues),
+				Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors),
+				descending: true);
+			var decompExpected = new SpectralDecomposition(lambda, X, tol);
+
+			var eig = SymmetricEigensystemFull.Create(A.NumColumns, A.Copy().RawData, true);
+			var decompComputed = new SpectralDecomposition(eig.EigenvaluesReal, eig.EigenvectorsRight, tol);
+
+			Assert.True(decompExpected.IsEquivalent(decompComputed));
+			Assert.True(decompComputed.CanRecomposeOriginalMatrix(A));
+
+			// Very low chance that a libray outputs eigenvectors normalized with a constistent sign
+			//Assert.True(decompExpected.IsIdentical(decompComputed)); 
+		}
+
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
 		private static void TestEigenvaluesAndEigenvectors(LinearAlgebraProviderChoice providers)
