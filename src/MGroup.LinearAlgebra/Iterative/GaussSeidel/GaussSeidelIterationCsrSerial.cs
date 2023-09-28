@@ -70,7 +70,8 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			{
 				Preconditions.CheckSquare(csrMatrix);
 				this.matrix = csrMatrix;
-				this.diagonalOffsets = LocateDiagonalOffsets(matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
+				this.diagonalOffsets = SparseArrays.LocateDiagonalOffsets(
+					matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
 				this.inactive = false;
 			}
 			else
@@ -186,37 +187,6 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 				}
 				lhs[i] = sum / diagEntry;
 			}
-		}
-
-		private static int[] LocateDiagonalOffsets(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
-		{
-			var diagonalOffsets = new int[matrixOrder];
-			for (int i = 0; i < matrixOrder; ++i)
-			{
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-
-				//TODO: optimizations: bisection, start from the end of the row if row > n/2, etc.
-				bool isDiagonalZero = true;
-				for (int k = rowStart; k < rowEnd; ++k)
-				{
-					int j = csrColIndices[k];
-					if (j == i)
-					{
-						diagonalOffsets[i] = k;
-						isDiagonalZero = false;
-						break;
-					}
-				}
-
-				if (isDiagonalZero)
-				{
-					throw new InvalidSparsityPatternException(
-						$"Found diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
-				}
-			}
-
-			return diagonalOffsets;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
