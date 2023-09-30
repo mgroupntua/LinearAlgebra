@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.Termination
+namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
 	using System;
 	using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination
 	{
 		public double CalculateConvergenceMetric(IVectorView currentSolution, IVectorView previousSolution) => double.MaxValue;
 
-		public string DescribeConvergenceCriterion(double tolerance) 
+		public string DescribeConvergenceCriterion(double tolerance)
 			=> "No convergence criterion specified. Iterative solution algorithm stops, when max iterations are reached.";
 	}
 }

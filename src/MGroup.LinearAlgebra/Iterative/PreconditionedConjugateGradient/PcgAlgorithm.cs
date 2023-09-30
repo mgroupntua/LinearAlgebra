@@ -1,7 +1,8 @@
 using System;
 using System.Diagnostics;
+
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Needs Builder pattern

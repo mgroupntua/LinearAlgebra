@@ -2,7 +2,8 @@ using System.Text;
 
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.GaussSeidel;
-using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Output;
 using MGroup.LinearAlgebra.Tests.TestData;

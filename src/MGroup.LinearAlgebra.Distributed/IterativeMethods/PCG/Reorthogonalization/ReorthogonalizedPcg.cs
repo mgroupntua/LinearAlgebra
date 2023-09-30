@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
 using MGroup.LinearAlgebra.Iterative;
-using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.MSolve.Solution.LinearSystem;
 

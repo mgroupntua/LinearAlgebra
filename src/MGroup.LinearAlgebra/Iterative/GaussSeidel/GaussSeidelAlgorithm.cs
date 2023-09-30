@@ -1,10 +1,11 @@
 using System;
 
 using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 
 namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 {

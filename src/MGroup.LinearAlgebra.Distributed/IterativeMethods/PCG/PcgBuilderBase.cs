@@ -1,5 +1,6 @@
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {

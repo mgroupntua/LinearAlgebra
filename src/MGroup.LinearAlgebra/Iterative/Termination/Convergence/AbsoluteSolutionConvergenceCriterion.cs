@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.Termination
+namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
 	using System;
 	using System.Collections.Generic;

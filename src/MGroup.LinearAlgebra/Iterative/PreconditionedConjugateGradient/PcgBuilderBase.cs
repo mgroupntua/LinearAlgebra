@@ -1,8 +1,9 @@
 ﻿using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
-    public abstract class PcgBuilderBase
+	public abstract class PcgBuilderBase
     {
         /// <summary>
         /// Specifies how to calculate the maximum iterations that the PCG algorithm will run for.

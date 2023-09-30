@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
 using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 //TODOMPI: common IIterativeMethod interface for PCG, MINRES, GMRES. It is necessary so that the user of a DDM can choose the 
 //  correct algorithm for his problem. 
