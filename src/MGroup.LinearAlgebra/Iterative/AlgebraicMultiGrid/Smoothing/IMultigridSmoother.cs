@@ -4,6 +4,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
@@ -15,5 +16,10 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 		void Initialize(IMatrixView matrix);
 
 		void Smooth(IVectorView rhs, IVector lhs);
+	}
+
+	public interface IMultigridSmootherBuilder
+	{
+		IMultigridSmoother Create();
 	}
 }

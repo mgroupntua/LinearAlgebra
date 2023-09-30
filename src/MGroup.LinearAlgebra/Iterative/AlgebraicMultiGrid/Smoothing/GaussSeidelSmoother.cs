@@ -60,5 +60,26 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid
 				throw new ObjectDisposedException(this.GetType().Name);
 			}
 		}
+
+		public class Builder : IMultigridSmootherBuilder
+		{
+			private readonly IGaussSeidelIterationBuilder _gaussSeidelIterationBuilder;
+			private readonly GaussSeidelSweepDirection _sweep;
+			private readonly int _numIterations;
+
+			public Builder(IGaussSeidelIterationBuilder gaussSeidelIterationBuilder, GaussSeidelSweepDirection sweep, 
+				int numIterations)
+			{
+				this._gaussSeidelIterationBuilder = gaussSeidelIterationBuilder;
+				this._sweep = sweep;
+				this._numIterations = numIterations;
+			}
+
+			public IMultigridSmoother Create()
+			{
+				IGaussSeidelIteration gsIter = _gaussSeidelIterationBuilder.Create();
+				return new GaussSeidelSmoother(gsIter, _sweep, _numIterations);
+			}
+		}
 	}
 }

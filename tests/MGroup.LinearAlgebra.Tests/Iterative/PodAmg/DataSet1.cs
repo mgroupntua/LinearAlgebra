@@ -148,5 +148,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			{ -49.489727956630425, -0.000000000000056, -0.000000000000327, -0.000000000000094, -0.000000000000053, -0.000000000000151, -0.000000000000060, 0.000000000000193 }
 		// This was created by U * singularVectors(U^T * U), which may not be correct
 		};
+
+		internal static int NumPodAmgCycles = 30;
 	}
 }
