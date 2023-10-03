@@ -26,6 +26,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		private readonly IMultigridSmoother _smoother;
 
 		//TODO: encapsulate these. They are POD inputs.
+		private readonly bool _keepOnlyNonZeroPrincipalComponents;
 		private readonly int _numPrincipalComponents;
 		private readonly Matrix _sampleVectors;
 
@@ -35,14 +36,15 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		// Restriction is the transpose of this
 		private Matrix _prolongation; 
 
-		private PodAmgAlgorithm(Matrix sampleVectors, int numPrincipalComponents, IMultigridSmoother smoother,
-			double convergenceTolerance, ISolutionConvergenceCriterion convergenceCriterion, 
+		private PodAmgAlgorithm(Matrix sampleVectors, bool keepOnlyNonZeroPrincipalComponents, int numPrincipalComponents, 
+			IMultigridSmoother smoother, double convergenceTolerance, ISolutionConvergenceCriterion convergenceCriterion, 
 			IMaxIterationsProvider maxIterationsProvider) 
 		{
+			_keepOnlyNonZeroPrincipalComponents = keepOnlyNonZeroPrincipalComponents;
 			_sampleVectors = sampleVectors;
 			_numPrincipalComponents = numPrincipalComponents;
 			_smoother = smoother;
-			this._convergenceTolerance = convergenceTolerance;
+			_convergenceTolerance = convergenceTolerance;
 			_convergenceCriterion = convergenceCriterion;
 			_maxIterationsProvider = maxIterationsProvider;
 		}
@@ -56,7 +58,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		{
 			if (_prolongation == null) // It may have been created in previous system solutions
 			{
-				var pod = new ProperOrthogonalDecomposition();
+				var pod = new ProperOrthogonalDecomposition(_keepOnlyNonZeroPrincipalComponents);
 				_prolongation = pod.CalculatePrincipalComponents(_sampleVectors.NumColumns, _sampleVectors, _numPrincipalComponents);
 			}
 
@@ -149,6 +151,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		{
 			public Builder()
 			{
+				KeepOnlyNonZeroPrincipalComponents = true;
+
 				// Defaults are taken from PyAMG
 				ConvergenceCriterion = new AbsoluteSolutionConvergenceCriterion();
 				ConvergenceTolerance = 1E-5;
@@ -163,6 +167,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 
 			public double ConvergenceTolerance { get; set; }
 
+			public bool KeepOnlyNonZeroPrincipalComponents { get; set; }
+
 			/// <summary>
 			/// Specifies how to calculate the maximum iterations that the algorithm will run for.
 			/// </summary>
@@ -172,8 +178,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 
 			public PodAmgAlgorithm Create(Matrix sampleVectors, int numPrincipalComponents)
 			{
-				return new PodAmgAlgorithm(sampleVectors, numPrincipalComponents, SmootherBuilder.Create(), 
-					ConvergenceTolerance, ConvergenceCriterion, MaxIterationsProvider);
+				return new PodAmgAlgorithm(sampleVectors, KeepOnlyNonZeroPrincipalComponents, numPrincipalComponents, 
+					SmootherBuilder.Create(), ConvergenceTolerance, ConvergenceCriterion, MaxIterationsProvider);
 			}
 		}
 

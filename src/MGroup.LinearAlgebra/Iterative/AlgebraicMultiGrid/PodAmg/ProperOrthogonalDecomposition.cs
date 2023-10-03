@@ -6,11 +6,18 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 
 	using MGroup.LinearAlgebra.Eigensystems;
 	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Vectors;
 
 	public class ProperOrthogonalDecomposition
 	{
-		public ProperOrthogonalDecomposition() 
-		{ }
+		private readonly bool _keepOnlyNonZeroEigenvalues;
+		private readonly double _zeroEigenvalueTolerance;
+
+		public ProperOrthogonalDecomposition(bool keepOnlyNonZeroEigenvalues, double zeroEigenvalueTolerance=1E-10)
+		{
+			_keepOnlyNonZeroEigenvalues = keepOnlyNonZeroEigenvalues;
+			_zeroEigenvalueTolerance = zeroEigenvalueTolerance;
+		}
 
 		/// <summary>
 		/// Performs POD analysis and returns the principal components of a samples set
@@ -22,7 +29,10 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		/// A (d x n) matrix, which contains n vectors of length d. Each of these n vectors corresponds to one sample, time-step, 
 		/// etc. In general n &lt; d, which is used here for increased performance.
 		/// </param>
-		/// <param name="numPrincipalComponents">How many principal components to keep.</param>
+		/// <param name="numPrincipalComponents">
+		/// How many principal components to keep. Depending on the configuration of this object, if some eigenvectors 
+		/// correspond to zero eigenvalues, they will be discarded and fewer total eigenvectors will be returned.
+		/// </param>
 		/// <returns></returns>
 		public Matrix CalculatePrincipalComponents(int numSampleVectors, Matrix sampleVectors, int numPrincipalComponents) 
 		{ 
@@ -47,8 +57,10 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			{
 				Matrix correlation = sampleVectors.MultiplyRight(sampleVectors, transposeThis: true, transposeOther: false);
 				var svd = SingularValueDecomposition.Calculate(correlation);
+
+				int numComponentsToKeep = CountPrincipalComponentsToKeep(numPrincipalComponents, svd.SingularValues);
 				Matrix principalComponents = sampleVectors * svd.SingularVectors;
-				return principalComponents.GetSubmatrix(0, principalComponents.NumRows, 0, numPrincipalComponents); //TODO: discard the unneeded vectors earlier.
+				return principalComponents.GetSubmatrix(0, principalComponents.NumRows, 0, numComponentsToKeep); //TODO: discard the unneeded vectors earlier.
 			}
 			else
 			{
@@ -57,6 +69,27 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 				//var svd = SingularValueDecomposition.Calculate(correlation);
 				//Matrix principalComponents = svd.SingularVectors;
 				//return principalComponents.GetSubmatrix(0, principalComponents.NumRows, 0, numPrincipalComponents); //TODO: discard the unneeded vectors earlier.
+			}
+		}
+
+		private int CountPrincipalComponentsToKeep(int numComponentsRequested, Vector eigenvaluesDescending)
+		{
+			if (_keepOnlyNonZeroEigenvalues)
+			{
+				int numComponentsToKeep = 0;
+				for (int i = 0; i < numComponentsRequested; ++i)
+				{
+					if (Math.Abs(eigenvaluesDescending[i]) <= _zeroEigenvalueTolerance) // Only keep eigenvectors of non-zero eigenvalues
+					{
+						break;
+					}
+					++numComponentsToKeep;
+				}
+				return numComponentsToKeep;
+			}
+			else
+			{
+				return numComponentsRequested;
 			}
 		}
 	}

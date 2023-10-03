@@ -22,13 +22,13 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 		[Fact]
 		public static void TestPodAMG()
 		{
-			var matrix = Matrix.CreateFromArray(DataSet1.Matrix);
+			var matrix = Matrix.CreateFromArray(DataSet2.Matrix);
 			var csr = CsrMatrix.CreateFromDense(matrix);
-			var rhs = Vector.CreateFromArray(DataSet1.Rhs);
-			var solutionExpected = Vector.CreateFromArray(DataSet1.Solution);
-			var samples = Matrix.CreateFromArray(DataSet1.Samples);
-			int numPrincipalComponents = DataSet1.PrincipalComponents.GetLength(1);
-			int numPodAmgCyclesExpected = DataSet1.NumPodAmgCycles;
+			var rhs = Vector.CreateFromArray(DataSet2.Rhs);
+			var solutionExpected = Vector.CreateFromArray(DataSet2.Solution);
+			var samples = Matrix.CreateFromArray(DataSet2.Samples);
+			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
+			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
 
 			var solverBuilder = new PodAmgAlgorithm.Builder();
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(30000);
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			solver.Initialize(csr);
 			IterativeStatistics stats = solver.Solve(rhs, solutionComputed);
 
-			var comparer = new MatrixComparer(1E-6);
+			var comparer = new MatrixComparer(1E-12);
 			comparer.AssertEqual(solutionExpected, solutionComputed);
 			Assert.InRange(stats.NumIterationsRequired, 0, numPodAmgCyclesExpected);
 		}
