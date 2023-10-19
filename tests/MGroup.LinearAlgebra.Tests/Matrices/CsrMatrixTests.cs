@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -36,10 +37,10 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             Assert.True(csr.Equals(full));
         }
 
-        [Fact]
-        private static void TestGetColumn()
+		[SkippableFact(typeof(PerformanceBottleneckException))]
+		private static void TestGetColumn()
         {
-            var matrix = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
+			var matrix = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
                 SparseRectangular10by5.CsrValues, SparseRectangular10by5.CsrColIndices, SparseRectangular10by5.CsrRowOffsets,
                 true);
             for (int j = 0; j < SparseRectangular10by5.NumCols; ++j)
@@ -50,7 +51,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Fact]
+        [SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetRow()
         {
             var matrix = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,

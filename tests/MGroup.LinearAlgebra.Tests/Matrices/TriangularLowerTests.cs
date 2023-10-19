@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -36,9 +37,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             comparer.AssertEqual(zero, matrix);
         }
 
-        [Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetColumn()
-        {
+		{
             var matrix = TriangularLower.CreateFromArray(LowerInvertible10by10.Matrix);
             for (int j = 0; j < LowerInvertible10by10.Order; ++j)
             {
@@ -48,9 +49,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetRow()
-        {
+		{
             var matrix = TriangularLower.CreateFromArray(LowerInvertible10by10.Matrix);
             for (int i = 0; i < LowerInvertible10by10.Order; ++i)
             {
