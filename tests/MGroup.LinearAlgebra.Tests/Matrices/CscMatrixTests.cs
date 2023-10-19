@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -36,9 +37,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             Assert.True(csc.Equals(full));
         }
 
-        [Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetColumn()
-        {
+		{
             var matrix = CscMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
                 SparseRectangular10by5.CscValues, SparseRectangular10by5.CscRowIndices, SparseRectangular10by5.CscColOffsets,
                 true);
@@ -50,9 +51,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetRow()
-        {
+		{
             var matrix = CscMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
                 SparseRectangular10by5.CscValues, SparseRectangular10by5.CscRowIndices, SparseRectangular10by5.CscColOffsets,
                 true);

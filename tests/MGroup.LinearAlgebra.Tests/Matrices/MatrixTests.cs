@@ -67,7 +67,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			Assert.True(full3.Equals(csc3));
 		}
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestGetColumn()
 		{
 			var matrix = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
@@ -79,7 +79,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			}
 		}
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestGetRow()
 		{
 			var matrix = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);

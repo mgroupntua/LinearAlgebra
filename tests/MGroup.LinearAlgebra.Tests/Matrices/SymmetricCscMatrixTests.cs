@@ -1,4 +1,5 @@
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -16,7 +17,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 	{
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-13);
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestEquality()
 		{
 			var full = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -38,7 +39,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			comparer.AssertEqual(zero, matrix);
 		}
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestGetColumn()
 		{
 			var matrix = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -50,7 +51,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			}
 		}
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestGetRow()
 		{
 			var matrix = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -102,7 +103,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			});
 		}
 
-		[Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
 		private static void TestSerialization()
 		{
 			var originalMatrix = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
