@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -32,7 +31,7 @@ namespace MGroup.LinearAlgebra.Commons
 						dot += csrValues[k] * other[csrColIndices[k], c];
 					}
 
-					result[i, c] = dot;
+          result[i, c] = dot;
 				}
 			}
 		}

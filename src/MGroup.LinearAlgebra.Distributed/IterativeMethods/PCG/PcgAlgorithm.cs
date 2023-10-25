@@ -1,10 +1,10 @@
 using System;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Iterative;
-using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.LinearAlgebra.Distributed.Exceptions;
 using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 //TODO: In regular CG, there is a check to prevent premature convergence, by correcting the residual. Can this be done for PCG 
 //      as well? Would the preconditioned residual be updated as well?

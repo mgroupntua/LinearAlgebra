@@ -224,6 +224,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
+		/// See <see cref="IVector.AddToIndex(int, double)"/>.
+		/// </summary>
+		public void AddToIndex(int index, double value) => data[index] += value;
+
+		/// <summary>
 		/// Creates a new <see cref="Vector"/> that contains all entries of this followed by all entries of 
 		/// <paramref name="last"/>.
 		/// </summary>

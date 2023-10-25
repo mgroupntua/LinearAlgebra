@@ -1,7 +1,6 @@
-﻿using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;

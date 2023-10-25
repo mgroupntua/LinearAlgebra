@@ -1,8 +1,10 @@
 using System;
 using System.Diagnostics;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
-using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: I would rather implement reorthogonalization as an alternative strategy, rather than a different class.

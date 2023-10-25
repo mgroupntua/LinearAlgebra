@@ -7,6 +7,8 @@
     <PackageProjectUrl>http://mgroup.ntua.gr</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mgroupntua/LinearAlgebra</RepositoryUrl>
     <PackageIconUrl>https://github.com/mgroupntua/LinearAlgebra/raw/develop/LinearAlgebraDistributed.png</PackageIconUrl>
+    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
   <ItemGroup>

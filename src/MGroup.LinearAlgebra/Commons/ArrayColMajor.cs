@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 //TODO: These should be delegated to C .dlls or to MKL if possible.
@@ -10,22 +10,42 @@ namespace MGroup.LinearAlgebra.Commons
     /// </summary>
     internal static class ArrayColMajor
     {
-        /// <summary>
-        /// result = [<paramref name="matrixLeft"/>, <paramref name="matrixRight"/>] (Matlab notation). Dimensions of result:
-        /// (<paramref name="numRowsLeft"/>=<paramref name="numRowsRight"/>)-by-
-        /// (<paramref name="numColsLeft"/>+<paramref name="numColsRight"/>.
-        /// Input checking is the responsibility of the caller.
-        /// </summary>
-        /// <param name="numRowsLeft">The number of rows of <paramref name="matrixLeft"/>. Constraint:
-        ///     <paramref name="numRowsLeft"/> == <paramref name="numRowsRight"/>.</param>
-        /// <param name="numColsLeft">The number of columns of <paramref name="matrixLeft"/>.</param>
-        /// <param name="matrixLeft">The entries of the left matrix in column major layout. It will not be modified.</param>
-        /// <param name="numRowsRight">The number of rows of <paramref name="matrixRight"/>. Constraint:
-        ///     <paramref name="numRowsLeft"/> == <paramref name="numRowsRight"/>.</param>
-        /// <param name="numColsRight">The number of columns of <paramref name="matrixRight"/>.</param>
-        /// <param name="matrixRight">The entries of the right matrix in column major layout. It will not be modified.</param>
-        /// <returns></returns>
-        internal static double[] JoinHorizontally(int numRowsLeft, int numColsLeft, double[] matrixLeft,
+		internal static double[] DiagonalGet(int m, int n, double[] matrix)
+		{
+			int d = Math.Min(m, n);
+			double[] diag = new double[d];
+			for (int i = 0; i < d; ++i)
+			{
+				diag[i] = matrix[i * m + i];
+			}
+			return diag;
+		}
+
+		internal static void DiagonalSet(int m, int n, double[] matrix, double[] diagonal)
+		{
+			int d = Math.Min(m, n);
+			for (int i = 0; i < d; ++i)
+			{
+				matrix[i * m + i] = diagonal[i];
+			}
+		}
+
+		/// <summary>
+		/// result = [<paramref name="matrixLeft"/>, <paramref name="matrixRight"/>] (Matlab notation). Dimensions of result:
+		/// (<paramref name="numRowsLeft"/>=<paramref name="numRowsRight"/>)-by-
+		/// (<paramref name="numColsLeft"/>+<paramref name="numColsRight"/>.
+		/// Input checking is the responsibility of the caller.
+		/// </summary>
+		/// <param name="numRowsLeft">The number of rows of <paramref name="matrixLeft"/>. Constraint:
+		///     <paramref name="numRowsLeft"/> == <paramref name="numRowsRight"/>.</param>
+		/// <param name="numColsLeft">The number of columns of <paramref name="matrixLeft"/>.</param>
+		/// <param name="matrixLeft">The entries of the left matrix in column major layout. It will not be modified.</param>
+		/// <param name="numRowsRight">The number of rows of <paramref name="matrixRight"/>. Constraint:
+		///     <paramref name="numRowsLeft"/> == <paramref name="numRowsRight"/>.</param>
+		/// <param name="numColsRight">The number of columns of <paramref name="matrixRight"/>.</param>
+		/// <param name="matrixRight">The entries of the right matrix in column major layout. It will not be modified.</param>
+		/// <returns></returns>
+		internal static double[] JoinHorizontally(int numRowsLeft, int numColsLeft, double[] matrixLeft,
             int numRowsRight, int numColsRight, double[] matrixRight)
         {
             double[] result = new double[matrixLeft.Length + matrixRight.Length];
@@ -88,16 +108,38 @@ namespace MGroup.LinearAlgebra.Commons
             return result;
         }
 
-        /// <summary>
-        /// Exchanges the rows and columns of a square matrix, according to the provided permutation.
-        /// Input checking is the responsibility of the caller.
-        /// </summary>
-        /// <param name="order">The number of rows = number of columns of <paramref name="matrix"/>.</param>
-        /// <param name="matrix">The matrix in full column major layout.</param>
-        /// <param name="permutation">A map between the old and new indices: 
-        ///     newIndex = <paramref name="permutation"/>[oldIndex].</param>
-        /// <returns></returns>
-        public static double[] ReorderOldToNew(int order, double[] matrix, IReadOnlyList<int> permutation)
+		internal static double[] ReorderColumnsNewToOld(int m, int n, double[] matrix, IReadOnlyList<int> permutation)
+		{
+			double[] reordered = new double[matrix.Length];
+			for (int newCol = 0; newCol < n; ++newCol)
+			{
+                int oldCol = permutation[newCol];
+				Array.Copy(matrix, oldCol * m, reordered, newCol * m, m);
+			}
+			return reordered;
+		}
+
+		internal static double[] ReorderColumnsOldToNew(int m, int n, double[] matrix, IReadOnlyList<int> permutation)
+		{
+			double[] reordered = new double[matrix.Length];
+			for (int oldCol = 0; oldCol < n; ++oldCol)
+			{
+				int newCol = permutation[oldCol];
+				Array.Copy(matrix, oldCol * m, reordered, newCol * m, m);
+			}
+			return reordered;
+		}
+
+		/// <summary>
+		/// Exchanges the rows and columns of a square matrix, according to the provided permutation.
+		/// Input checking is the responsibility of the caller.
+		/// </summary>
+		/// <param name="order">The number of rows = number of columns of <paramref name="matrix"/>.</param>
+		/// <param name="matrix">The matrix in full column major layout.</param>
+		/// <param name="permutation">A map between the old and new indices: 
+		///     newIndex = <paramref name="permutation"/>[oldIndex].</param>
+		/// <returns></returns>
+		internal static double[] ReorderOldToNew(int order, double[] matrix, IReadOnlyList<int> permutation)
         {
             double[] reordered = new double[matrix.Length];
             for (int j = 0; j < order; ++j)
@@ -108,16 +150,16 @@ namespace MGroup.LinearAlgebra.Commons
             return reordered;
         }
 
-        /// <summary>
-        /// Exchanges the rows and columns of a square matrix, according to the provided permutation.
-        /// Input checking is the responsibility of the caller.
-        /// </summary>
-        /// <param name="order">The number of rows = number of columns of <paramref name="matrix"/>.</param>
-        /// <param name="matrix">The matrix in full column major layout.</param>
-        /// <param name="permutation">A map between the old and new indices: 
-        ///     oldIndex = <paramref name="permutation"/>[newIndex].</param>
-        /// <returns></returns>
-        public static double[] ReorderNewToOld(int order, double[] matrix, IReadOnlyList<int> permutation)
+		/// <summary>
+		/// Exchanges the rows and columns of a square matrix, according to the provided permutation.
+		/// Input checking is the responsibility of the caller.
+		/// </summary>
+		/// <param name="order">The number of rows = number of columns of <paramref name="matrix"/>.</param>
+		/// <param name="matrix">The matrix in full column major layout.</param>
+		/// <param name="permutation">A map between the old and new indices: 
+		///     oldIndex = <paramref name="permutation"/>[newIndex].</param>
+		/// <returns></returns>
+		internal static double[] ReorderNewToOld(int order, double[] matrix, IReadOnlyList<int> permutation)
         {
             double[] reordered = new double[matrix.Length];
             for (int j = 0; j < order; ++j)
@@ -216,7 +258,7 @@ namespace MGroup.LinearAlgebra.Commons
             {
                 for (int j = 0; j < numColsSub; ++j)
                 {
-                    // The numRowsSub entries of column j are contigous.
+                    // The numRowsSub entries of column oldCol are contigous.
                     Array.Copy(matrixSub, j * numRowsSub, matrixBig, (colStartBig + j) * numRowsBig + rowStartBig, numRowsSub);
                     // TODO: if the rows of submatrix are very few, the overhead of Array.Copy() may be worse than directly 
                     // setting the entries.

@@ -56,12 +56,12 @@ namespace MGroup.LinearAlgebra.Eigensystems
 		/// </summary>
 		/// <param name="order">The number of rows/columns of the original symmetric matrix.</param>
 		/// <param name="matrix">
-		/// The original matrix in full column major format. Will be overwritten.
+		/// The original matrix in full column major format. Will be overwritten if <paramref name="calcEigenvectors"/>==true.
 		/// </param>
 		/// <param name="calcEigenvectors">
 		/// If true, both eigenvalues and eigenvectors will be computed. Else only eigenvalues will be computed.
 		/// </param>
-		/// <returns>An object holding the eigensystem of the matrix.</returns>
+		/// <returns>An object holding the eigendecomposition of the matrix.</returns>
 		public static SymmetricEigensystemFull Create(int order, double[] matrix, bool calcEigenvectors)
 		{
 			EigensystemJob job = calcEigenvectors ? EigensystemJob.EigenvaluesAndEigenVectors : EigensystemJob.OnlyEigenvalues;

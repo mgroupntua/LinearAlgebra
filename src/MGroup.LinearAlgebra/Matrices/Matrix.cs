@@ -124,6 +124,25 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// Initializes a new instance of <see cref="Matrix"/> with the entries of <paramref name="diagonal"/> on its main 
+		/// diagonal.
+		/// </summary>
+		/// <param name="numRows">The number of rows of the new matrix.</param>
+		/// <param name="numColumns">The number of columns of the new matrix.</param>
+		/// <param name="diagonal">
+		/// An array containing the entries of the main diagonal of the new matrix. Its length must be equal to 
+		/// min(<paramref name="numRows"/>, <paramref name="numColumns"/>).
+		/// </param>
+		/// <returns></returns>
+		public static Matrix CreateFromDiagonal(int numRows, int numColumns, double[] diagonal)
+		{
+			Preconditions.CheckVectorDimensions(Math.Min(numRows, numColumns), diagonal.Length);
+			double[] data = new double[numRows * numColumns];
+			ArrayColMajor.DiagonalSet(numRows, numColumns, data, diagonal);
+			return new Matrix(data, numRows, numColumns);
+		}
+
+		/// <summary>
 		/// Initializes a new instance of <see cref="Matrix"/> that is equal to the identity matrix, namely a square matrix with 
 		/// non-diagonal entries being equal to 0 and diagonal entries being equal to 1.
 		/// </summary>
@@ -635,10 +654,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public double[] GetDiagonalAsArray()
 		{
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
-			Preconditions.CheckSquare(this);
-			double[] diag = new double[NumRows];
-			for (int i = 0; i < NumRows; ++i) diag[i] = data[i * NumRows + i];
-			return diag;
+			return ArrayColMajor.DiagonalGet(NumRows, NumColumns, data);
 		}
 
 		/// <summary>
@@ -1115,14 +1131,47 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// Creates a new <see cref="Matrix"/> that contains the columns of this <see cref="Matrix"/> with a different order,
+		/// which is specified by the provided <paramref name="permutation"/> and <paramref name="oldToNew"/>.
+		/// </summary>
+		/// <param name="permutation">
+		/// An array that contains the row/column indices of this <see cref="Matrix"/> in a different order.
+		/// </param>
+		/// <param name="oldToNew">
+		/// If true, reordered[i, <paramref name="permutation"/>[j]] =  original[i, j]. 
+		/// If false, reordered[i, j] = original[i, <paramref name="permutation"/>[j]].
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// If <paramref name="permutation"/>.Length is different than the number of columns of this matrix.
+		/// </exception>
+		public Matrix ReorderColumns(IReadOnlyList<int> permutation, bool oldToNew)
+		{
+			if (permutation.Count != NumColumns) throw new NonMatchingDimensionsException(
+				$"This matrix has {NumColumns} columns, while the permutation vector has {permutation.Count} entries.");
+			if (oldToNew)
+			{
+				return new Matrix(ArrayColMajor.ReorderColumnsOldToNew(NumRows, NumColumns, data, permutation), NumRows, NumRows);
+			}
+			else
+			{
+				return new Matrix(ArrayColMajor.ReorderColumnsNewToOld(NumRows, NumColumns, data, permutation), NumRows, NumRows);
+			}
+		}
+
+		/// <summary>
 		/// Creates a new <see cref="Matrix"/> that contains the entries of this <see cref="Matrix"/> with a different order,
 		/// which is specified by the provided <paramref name="permutation"/> and <paramref name="oldToNew"/>.
 		/// </summary>
-		/// <param name="permutation">An array that contains the row/column indices of this <see cref="Matrix"/> in a 
-		///     different order.</param>
-		/// <param name="oldToNew">If true, 
-		///     reordered[<paramref name="permutation"/>[i], <paramref name="permutation"/>[j]] =  original[i, j]. If false, 
-		///     reordered[i, j] = original[<paramref name="permutation"/>[i], <paramref name="permutation"/>[j]].</param>
+		/// <param name="permutation">
+		/// An array that contains the row/column indices of this <see cref="Matrix"/> in a different order.
+		/// </param>
+		/// <param name="oldToNew">
+		/// If true, reordered[<paramref name="permutation"/>[i], <paramref name="permutation"/>[j]] =  original[i, j]. 
+		/// If false, reordered[i, j] = original[<paramref name="permutation"/>[i], <paramref name="permutation"/>[j]].
+		/// </param>
+		/// /// <exception cref="NonMatchingDimensionsException">
+		/// If this matrix is not square or its number of rows/columns if different than <paramref name="permutation"/>.Length.
+		/// </exception>
 		public Matrix Reorder(IReadOnlyList<int> permutation, bool oldToNew)
 		{
 			Preconditions.CheckSquare(this);
@@ -1257,10 +1306,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// Calculates the Singular Value Decomposition of a matrix.
+		/// Calculates the Singular Value Decomposition of a symmetric matrix.
 		/// </summary>
-		/// <param name="w"></param>
-		/// <param name="v"></param>
+		/// <param name="w">Vector with singular values</param>
+		/// <param name="v">Matrix with orthonormal vectors as columns</param>
 		public void SVD(double[] w, double[,] v)
 		{
 			DenseStrategies.SVD(this, w, v);

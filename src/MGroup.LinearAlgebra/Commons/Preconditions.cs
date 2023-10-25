@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
@@ -181,7 +181,21 @@ namespace MGroup.LinearAlgebra.Commons
                 $"The matrix must be square, but was {numRows}-by-{numColumns}");
         }
 
-        public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
+		public static void CheckSquareLinearSystemDimensions(IIndexable2D matrix, IIndexable1D lhsVector, IIndexable1D rhsVector)
+		{
+			CheckSquareLinearSystemDimensions(matrix.NumRows, matrix.NumColumns, lhsVector.Length, rhsVector.Length);
+		}
+
+		public static void CheckSquareLinearSystemDimensions(int numMatrixRows, int numMatrixColumns, int lhsLength, int rhsLength)
+		{
+			bool compatible = numMatrixRows == numMatrixColumns;
+			compatible &= numMatrixColumns == lhsLength;
+			compatible &= numMatrixRows == rhsLength;
+			if (!compatible) throw new NonMatchingDimensionsException(
+				$"The matrix rows ({numMatrixRows}), matrix columns ({numMatrixColumns}), left-hand-side vector length ({lhsLength}) and right-hand-side vector length ({rhsLength}) must be the same");
+		}
+
+		public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
         {
             if (startIndex + subvectorLength > vector.Length) throw new NonMatchingDimensionsException(
                 "The entries to access exceed the vector's length");
@@ -208,7 +222,17 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckVectorDimensions(double[] vector1, double[] vector2)
+		public static void CheckVectorDimensions(int vector1Length, int vector2Length)
+		{
+			if (vector1Length != vector2Length)
+			{
+				string message = string.Format("Vector1 has length of {0}, while vector2 has length of {1}",
+					vector1Length, vector2Length);
+				throw new NonMatchingDimensionsException(message);
+			}
+		}
+
+		public static void CheckVectorDimensions(double[] vector1, double[] vector2)
         {
             if (vector1.Length != vector2.Length)
             {

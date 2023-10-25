@@ -1,16 +1,18 @@
 ﻿using System;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 {
-    /// <summary>
-    /// Based on Restarted GMRES implementation provided in https://people.sc.fsu.edu/~jburkardt/m_src/mgmres/mgmres.html
-    /// </summary>
-    public class GmresAlgorithm
+	/// <summary>
+	/// Based on Restarted GMRES implementation provided in https://people.sc.fsu.edu/~jburkardt/m_src/mgmres/mgmres.html
+	/// </summary>
+	public class GmresAlgorithm
     {
         private const string name = "Restarted Generalized minimal residual method";
 

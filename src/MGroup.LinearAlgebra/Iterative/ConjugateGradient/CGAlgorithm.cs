@@ -1,7 +1,9 @@
 ﻿using System;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Iterative.Termination;
+using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -11,13 +13,13 @@ using MGroup.LinearAlgebra.Vectors;
 //      initialized when the strategies will access them?
 namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
 {
-    /// <summary>
-    /// Implements the Conjugate Gradient algorithm for solving linear systems with a positive definite matrix.
-    /// The implementation is based on the algorithm presented in section B2 of 
-    /// "An Introduction to the Conjugate Gradient Method Without the Agonizing Pain", Jonathan Richard Shewchuk, 1994
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public class CGAlgorithm
+	/// <summary>
+	/// Implements the Conjugate Gradient algorithm for solving linear systems with a positive definite matrix.
+	/// The implementation is based on the algorithm presented in section B2 of 
+	/// "An Introduction to the Conjugate Gradient Method Without the Agonizing Pain", Jonathan Richard Shewchuk, 1994
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	public class CGAlgorithm
     {
         private const string name = "Conjugate Gradient";
         private readonly IMaxIterationsProvider maxIterationsProvider;
