@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -62,9 +63,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             Assert.True(skyline.Equals(full));
         }
 
-        [Fact]
+		[SkippableFact(typeof(PerformanceBottleneckException))]
         private static void TestGetColumn()
-        {
+		{
             var matrix = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,
                 SparsePosDef10by10.SkylineValues, SparsePosDef10by10.SkylineDiagOffsets, true, true);
             for (int j = 0; j < SparsePosDef10by10.Order; ++j)
@@ -75,8 +76,8 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Fact]
-        private static void TestGetRow()
+		[SkippableFact(typeof(PerformanceBottleneckException))]
+		private static void TestGetRow()
         {
             var matrix = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,
                 SparsePosDef10by10.SkylineValues, SparsePosDef10by10.SkylineDiagOffsets, true, true);

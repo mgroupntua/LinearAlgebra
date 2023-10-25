@@ -92,9 +92,11 @@ namespace MGroup.LinearAlgebra
 			}
 		}
 
+		public static bool ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds { get; set; } = true;
+
 		internal static IBlasProvider Blas { get; private set; }
 
-		internal static IBlasExtensionsProvider BlasExtensions { get; private set; } 
+		internal static IBlasExtensionsProvider BlasExtensions { get; private set; }
 
 		internal static ISparseBlasProvider SparseBlas { get; private set; }
 
