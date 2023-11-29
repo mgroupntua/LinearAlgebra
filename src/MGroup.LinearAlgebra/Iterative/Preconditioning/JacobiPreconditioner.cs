@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -22,27 +22,45 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
     public class JacobiPreconditioner: IPreconditioner
     {
         public const double DefaultTolerance = 1e-10;
-        private readonly double[] inverseDiagonal;
+		private readonly bool isDiagonalInverted;
+        private readonly double[] diagonal;
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="JacobiPreconditioner"/> for the linear system's matrix whose main diagonal
-        /// is provided in <paramref name="diagonal"/>.
-        /// </summary>
-        /// <param name="diagonal">
-        /// The main diagonal of the original matrix of the linear system. Constraints: all its entries must be non-zero.
-        /// </param>
-        /// <param name="tolerance">The value under which a diagonal entry will be considered as zero.</param>
-        /// <exception cref="SingularMatrixException">If there is a zero diagonal entry.</exception>
-        public JacobiPreconditioner(double[] diagonal, double tolerance = DefaultTolerance)
+		/// <summary>
+		/// Initializes a new instance of <see cref="JacobiPreconditioner"/> for the linear system's matrix whose main diagonal
+		/// is provided in <paramref name="diagonal"/>.
+		/// </summary>
+		/// <param name="diagonal">
+		/// The main diagonal of the original matrix of the linear system. Constraints: all its entries must be non-zero.
+		/// </param>
+		/// <param name="preinvert">
+		/// If true, the diagonal will be be iverted at this point and <see cref="SolveLinearSystem(IVectorView, IVector)"/> will
+		/// multiply with the values of the inverse diagonal, which is faster overall. If false, 
+		/// <see cref="SolveLinearSystem(IVectorView, IVector)"/> will divide with the values of the original diagonal, which is
+		/// slower, but may be more stable numerically, when the values are very small.
+		/// </param>
+		/// <param name="tolerance">
+		/// The value under which a diagonal entry will be considered as zero. Will not be used if 
+		/// <paramref name="preinvert"/> == false.
+		/// </param>
+		/// <exception cref="SingularMatrixException">If there is a zero diagonal entry.</exception>
+		public JacobiPreconditioner(double[] diagonal, bool preinvert = true, double tolerance = DefaultTolerance)
         {
             Order = diagonal.Length;
-            inverseDiagonal = new double[Order];
-            for (int i = 0; i < Order; ++i)
-            {
-                double val = diagonal[i];
-                if (Math.Abs(val) <= tolerance) throw new SingularMatrixException($"Zero diagonal entry at index {i}");
-                inverseDiagonal[i] = 1.0 / val;
-            }
+            this.diagonal = new double[Order];
+			isDiagonalInverted = preinvert;
+			if (preinvert)
+			{
+				for (int i = 0; i < Order; ++i)
+				{
+					double val = diagonal[i];
+					if (Math.Abs(val) <= tolerance) throw new SingularMatrixException($"Zero diagonal entry at index {i}");
+					this.diagonal[i] = 1.0 / val;
+				}
+			}
+			else
+			{
+				this.diagonal = diagonal;
+			}
         }
 
         /// <summary>
@@ -56,7 +74,20 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
         {
             Preconditions.CheckSystemSolutionDimensions(Order, rhsVector.Length);
-            for (int i = 0; i < Order; ++i) lhsVector.Set(i, inverseDiagonal[i] * rhsVector[i]);
+			if (isDiagonalInverted)
+			{
+				for (int i = 0; i < Order; ++i)
+				{
+					lhsVector.Set(i, diagonal[i] * rhsVector[i]);
+				}
+			}
+            else
+			{
+				for (int i = 0; i < Order; ++i)
+				{
+					lhsVector.Set(i, rhsVector[i] / diagonal[i]);
+				}
+			}
         }
 
         /// <summary>
@@ -66,17 +97,31 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         {
             private readonly double tolerance;
 
-            /// <summary>
-            /// Initializes a new instance of <see cref="JacobiPreconditioner.Factory"/> with the specified settings.
-            /// </summary>
-            /// <param name="tolerance">The value under which a diagonal entry will be considered as zero.</param>
-            public Factory(double tolerance = JacobiPreconditioner.DefaultTolerance) => this.tolerance = tolerance;
+			/// <summary>
+			/// Initializes a new instance of <see cref="JacobiPreconditioner.Factory"/> with the specified settings.
+			/// </summary>
+			/// <param name="tolerance">The value under which a diagonal entry will be considered as zero.</param>
+			public Factory() { }
+
+			/// <summary>
+			/// The value under which a diagonal entry will be considered as zero. Will not be used if 
+			/// <see cref="PreInvert"/> == false.
+			/// </summary>
+			public double InversionTolerance { get; set; } = JacobiPreconditioner.DefaultTolerance;
+
+			/// <summary>
+			/// If true, the diagonal will be be iverted at this point and <see cref="SolveLinearSystem(IVectorView, IVector)"/> 
+			/// will multiply with the values of the inverse diagonal, which is faster overall. If false, 
+			/// <see cref="SolveLinearSystem(IVectorView, IVector)"/> will divide with the values of the original diagonal, 
+			/// which is slower, but may be more stable numerically, when the values are very small.
+			/// </summary>
+			public bool PreInvert { get; set; } = true;
 
             /// <summary>
             /// See <see cref="IPreconditionerFactory.CreatePreconditionerFor(IMatrixView)"/>.
             /// </summary>
             public IPreconditioner CreatePreconditionerFor(IMatrixView matrix) 
-                => new JacobiPreconditioner(matrix.GetDiagonalAsArray(), tolerance);
+                => new JacobiPreconditioner(matrix.GetDiagonalAsArray(), PreInvert, InversionTolerance);
         }
     }
 }

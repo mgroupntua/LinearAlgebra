@@ -514,6 +514,12 @@ namespace MGroup.LinearAlgebra.Matrices
             return Vector.CreateFromArray(colVector, false);
         }
 
+		public double[] GetDiagonalAsArray()
+		{
+			Preconditions.CheckSquare(this);
+			return SparseArrays.LocateCsrDiagonal(NumRows, rowOffsets, colIndices);
+		}
+
         /// <summary>
         /// See <see cref="ISliceable2D.GetRow(int)"/>.
         /// </summary>
