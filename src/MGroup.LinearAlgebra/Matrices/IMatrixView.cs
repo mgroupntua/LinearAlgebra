@@ -12,8 +12,9 @@ namespace MGroup.LinearAlgebra.Matrices
     /// around or allow acceess to it, consider using this interface instead of <see cref="Matrix"/> for extra safety.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public interface IMatrixView: IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D
-    {
+    public interface IMatrixView: 
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible
+	{
         /// <summary>
         /// Performs the following operation for all (i, j):
         /// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 

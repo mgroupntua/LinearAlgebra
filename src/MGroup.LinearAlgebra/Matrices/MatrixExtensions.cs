@@ -97,26 +97,6 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal.
-		/// </summary>
-		/// <param name="matrix">The matrix whose diagonal will be copied. It must be square.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public static Vector GetDiagonal(this IMatrixView matrix) => Vector.CreateFromArray(matrix.GetDiagonalAsArray(), false);
-
-		/// <summary>
-		/// Returns an array with the entries of the matrix's main diagonal.
-		/// </summary>
-		/// <param name="matrix">The matrix whose diagonal will be copied. It must be square.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public static double[] GetDiagonalAsArray(this IMatrixView matrix)
-		{
-			Preconditions.CheckSquare(matrix);
-			double[] diag = new double[matrix.NumRows];
-			for (int i = 0; i < matrix.NumRows; ++i) diag[i] = matrix[i, i];
-			return diag;
-		}
-
-		/// <summary>
 		/// Returns true if <paramref name="matrix"/>[i, j] and <paramref name="matrix"/>[j, i] are equal or at least within the 
 		/// specified <paramref name="tolerance"/> for all 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 
 		/// 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>. 

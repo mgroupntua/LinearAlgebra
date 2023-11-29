@@ -70,6 +70,30 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
+		internal static double[] LocateCsrDiagonal(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
+		{
+			var diagonal = new double[matrixOrder]; 
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+
+				//TODO: optimizations: bisection, start from the end of the row if row > n/2, etc.
+				for (int k = rowStart; k < rowEnd; ++k)
+				{
+					int j = csrColIndices[k];
+					if (j == i)
+					{
+						diagonal[i] = k;
+						break;
+					}
+					// If the diagonal entry is not explicitly stored, diagonal[i] will be 0, as it should.
+				}
+			}
+
+			return diagonal;
+		}
+
 		internal static int[] LocateDiagonalOffsets(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
 		{
 			var diagonalOffsets = new int[matrixOrder];
@@ -93,8 +117,10 @@ namespace MGroup.LinearAlgebra.Commons
 
 				if (isDiagonalZero)
 				{
+					//TODO: Should this be necessary for every caller? Or provide another similar method, that works with structural 0s in diagonal?
+					//		Are the offsets defined when there are structural 0s in the diagonal?
 					throw new InvalidSparsityPatternException(
-						$"Found diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
+						$"Found 0 diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
 				}
 			}
 
