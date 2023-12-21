@@ -33,6 +33,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
 		{
+			//CalculateAndPrintExactResidual();
+
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
 			precondResidual = zeroVectorInitializer();
@@ -67,6 +69,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 				// Normally the residual vector is updated as: r = r - α * q. However corrections might need to be applied.
 				residualUpdater.UpdateResidual(this, residual);
+
+				//CalculateAndPrintExactResidual();
 
 				// s = inv(M) * r
 				Preconditioner.SolveLinearSystem(residual, precondResidual);
@@ -109,6 +113,15 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				NumIterationsRequired = maxIterations,
 				ResidualNormRatioEstimation = residualNormRatio
 			};
+		}
+
+		private void CalculateAndPrintExactResidual()
+		{
+			var res = Vector.CreateZero(Rhs.Length);
+			Matrix.Multiply(solution, res);
+			res.SubtractIntoThis(Rhs);
+			double norm = res.Norm2();
+			Debug.WriteLine($"Iteration {iteration}: norm(r) = {norm}");
 		}
 
 		/// <summary>
