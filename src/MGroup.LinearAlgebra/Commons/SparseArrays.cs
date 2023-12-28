@@ -70,7 +70,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		internal static double[] LocateCsrDiagonal(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
+		internal static double[] LocateCsrDiagonal(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices)
 		{
 			var diagonal = new double[matrixOrder]; 
 			for (int i = 0; i < matrixOrder; ++i)
@@ -84,7 +84,7 @@ namespace MGroup.LinearAlgebra.Commons
 					int j = csrColIndices[k];
 					if (j == i)
 					{
-						diagonal[i] = k;
+						diagonal[i] = csrValues[k];
 						break;
 					}
 					// If the diagonal entry is not explicitly stored, diagonal[i] will be 0, as it should.

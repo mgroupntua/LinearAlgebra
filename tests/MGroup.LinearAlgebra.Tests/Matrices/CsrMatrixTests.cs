@@ -76,7 +76,19 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             }
         }
 
-        [Fact]
+		[Fact]
+		private static void TestGetDiagonal()
+		{
+			var denseMatrix = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
+			var csrMatrix = CsrMatrix.CreateFromDense(denseMatrix);
+			var diagonalExpected = Vector.CreateFromArray(SquareInvertible10by10.Diagonal, true);
+
+			var diagonalComputed = Vector.CreateFromArray(csrMatrix.GetDiagonalAsArray());
+			comparer.AssertEqual(diagonalExpected, diagonalComputed);
+
+		}
+
+		[Fact]
         private static void TestMatrixCopy()
         {
             var full = Matrix.CreateFromArray(SparseRectangular10by5.Matrix);
@@ -92,7 +104,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
         {
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
-                var matrix5x5 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix).GetSubmatrix(0, 5, 0, 5); //TODO: add a 5x5 matrix and its products
+                var matrix5x5 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix).GetSubmatrix(0, 5, 0, 5); //TODO: add a 5x5 denseMatrix and its products
                 var matrix10x10 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
                 var ATimesMatrix5x5 = Matrix.CreateFromArray(
                     MatrixOperations.MatrixTimesMatrix(SparseRectangular10by5.Matrix, matrix5x5.CopyToArray2D()));

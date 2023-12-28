@@ -517,7 +517,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public double[] GetDiagonalAsArray()
 		{
 			Preconditions.CheckSquare(this);
-			return SparseArrays.LocateCsrDiagonal(NumRows, rowOffsets, colIndices);
+			return SparseArrays.LocateCsrDiagonal(NumRows, values, rowOffsets, colIndices);
 		}
 
         /// <summary>
