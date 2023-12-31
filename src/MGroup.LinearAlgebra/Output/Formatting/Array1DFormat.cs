@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MGroup.LinearAlgebra.Output.Formatting
 {
@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Output.Formatting
 
         /// <summary>
         /// E.g. 
-        /// [ 1 2 3 ]
+        /// { 1, 2, 3 }
         /// </summary>
         public static readonly Array1DFormat CSharpArray = new Array1DFormat("{ ", " }", ", ");
 
