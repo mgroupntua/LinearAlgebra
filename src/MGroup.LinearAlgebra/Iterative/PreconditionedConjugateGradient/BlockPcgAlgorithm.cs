@@ -124,14 +124,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				sandwich[kernel2.Length + i - 1] = v.DotProduct(kernel1[i]);
 		}
 
-		/** Create all the information for the first block of algorithm.
- 		 * Normally this function must be run in parallel in multiple kernels.
- 		 * <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
- 		 * <param name="preconditioner">The preconditioner.</param>
- 		 * <param name="r">Vector r of CG.</param>
-		 * <param name="n">Number of vectors in Krylov subspace.</param>
- 		 * <return>The results of parallel processing.</return>
- 		 */
+		/// Create all the information for the first block of algorithm.
+ 		/// Normally this function must be run in parallel in multiple kernels.
+ 		/// <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
+ 		/// <param name="preconditioner">The preconditioner.</param>
+ 		/// <param name="r">Vector r of CG.</param>
+		/// <param name="n">Number of vectors in Krylov subspace.</param>
+ 		/// <return>The results of parallel processing.</return>
 		private void UpdateBlockInfoUsingResidualOnly()
 		{
 			EvaluateKernel(residual, directionKernels);
@@ -144,15 +143,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			Array.Copy(directionSandwiches, residualDirectionSandwiches, residualDirectionSandwiches.Length);
 		}
 
-		/** Create all the information for all the blocks of algorithm except first.
- 		 * Normally this function must be run in parallel in multiple kernels.
- 		 * <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
- 		 * <param name="preconditioner">The preconditioner.</param>
- 		 * <param name="r">Vector r of CG.</param>
- 		 * <param name="p">Vector p of CG.</param>
- 		 * <param name="n">Number of vectors in Krylov subspace.</param>
- 		 * <return>The results of parallel processing.</return>
-		 */
+		/// Create all the information for all the blocks of algorithm except first.
+ 		/// Normally this function must be run in parallel in multiple kernels.
+ 		/// <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
+ 		/// <param name="preconditioner">The preconditioner.</param>
+ 		/// <param name="r">Vector r of CG.</param>
+ 		/// <param name="p">Vector p of CG.</param>
+ 		/// <param name="n">Number of vectors in Krylov subspace.</param>
+ 		/// <return>The results of parallel processing.</return>
 		private void UpdateBlockInfo()
 		{
 			EvaluateKernel(residual, residualKernels);
@@ -267,9 +265,6 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				// This is the reason, why solution (x) needs multiplication with M after the block ends
 				direction = directionOperator.EvaluateVector(residualKernels, directionKernels);
 				// Evaluates residual (r).
-				// Because it updates residual which is by reference the residualKernel[0],
-				// we run this after evaluation of solution (x) and direction (p),
-				// otherwise evaluation will use destroyed residualKernel.
 				// It didn't multiplied with M, but it should be:
 				// We use direction (p) and residual (r) non-multiplied with M inside block
 				// This is the reason, why solution (x) needs multiplication with M after the block ends
