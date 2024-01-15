@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-using DotNumerics.Optimization.TN;
-
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
@@ -41,11 +39,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Block vector operator for calculating the residual of the current iteration
 		/// </summary>
 		internal BlockVectorOperator ResidualOperator { get => residualOperator; }
+  
 		/// <summary>
 		/// Krylov subspace of (A * M)^n * r
 		/// A is the matrix, M is inverse preconditioner matrix and r is the CG residual vector
 		/// </summary>
 		internal IVector[] ResidualKernels { get => residualKernels; }
+  
 		/// <summary>
 		/// Krylov subspace of (A * M)^n * p
 		/// A is the matrix, M is inverse preconditioner matrix and p is the CG conjugate direction vector
@@ -69,7 +69,6 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		/// <summary>
 		/// Creates Krylov subspace kernel using the linear system matrix and its preconditioner, and the vector provided. 
-		/// Normally this function must be run in parallel in multiple kernels.
 		/// </summary>
 		/// <param name="vector">
 		/// The vector to be used for calculating the Krylov subspace kernel.
@@ -77,6 +76,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <param name="kernel">
 		/// The array of vectors to which each kernel calculated will be stored at.
 		/// </param>
+		/// <remarks>
+		/// Normally this function must be run in parallel in multiple kernels.
+		/// </remarks>
 		private void EvaluateKernel(IVector vector, IVector[] kernel)
 		{
 			kernel[0].CopyFrom(vector);
@@ -89,29 +91,16 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// Creates preconditioned dot products with the vectors or 2 Krylov subspaces. 
-		/// Normally this function must be run in parallel in multiple kernels.
+		/// Computes preconditioned dot products with the vectors or 2 Krylov subspaces.
 		/// </summary>
-		/// <param name="vector">
-		/// The vector to be used for calculating the Krylov subspace kernel.
-		/// </param>
-		/// <param name="kernel">
-		/// The array of vectors to which each kernel calculated will be stored at.
-		/// </param>
-		/// <param name="size">
-		/// The power to which the kernel will be calculated
-		/// </param>
-
-		/// Creates preconditioned dot products with the vectors or 2 Krylov subspaces.
+		/// <param name="kernel1">The first kernel.</param>
+		/// <param name="kernel2">The second kernel.</param>
+		/// <param name="sandwich">The array to which the result is stored at.</param>
+  		/// <remarks>
 		/// Normally this function must be run in parallel in multiple kernels.
 		/// If R(i) is the a vector of R Krylov subspace and P(i) a vector of P Krylov subspace,
 		/// this function produces preconditioned dot products R(i) * M * P(i) where M is the inverse preconditioner matrix.
-		/// <param name="preconditioner">The preconditioner.</param>
-		/// <param name="krylov1">The krylov subspace R. A list of n vectors. First vector is vector (A * M)^0 * r
-		/// and last vector is (A * M)^(n-1) * r, where A is the matrix and M is the inverse preconditioner.</param>.
-		/// <param name="krylov2">The krylov subspace P. A list of n vectors. First vector is vector (A * M)^0 * p
-		/// and last vector is (A * M)^(n-1) * p, where A is the matrix and M is the inverse preconditioner.</param>.
-		/// <return>The result vector with the preconditioned dot products. This is the output of this function.</return>
+  		/// </remarks>
 		private void EvaluateSandwich(IVector[] kernel1, IVector[] kernel2, double[] sandwich)
 		{
 			var v = kernel1[0].CreateZeroVectorWithSameFormat();
@@ -124,14 +113,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				sandwich[kernel2.Length + i - 1] = v.DotProduct(kernel1[i]);
 		}
 
-		/// Create all the information for the first block of algorithm.
- 		/// Normally this function must be run in parallel in multiple kernels.
- 		/// <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
- 		/// <param name="preconditioner">The preconditioner.</param>
- 		/// <param name="r">Vector r of CG.</param>
-		/// <param name="n">Number of vectors in Krylov subspace.</param>
- 		/// <return>The results of parallel processing.</return>
-		private void UpdateBlockInfoUsingResidualOnly()
+		/// <summary>
+		/// Initializes information for the first block of algorithm.
+		/// </summary>
+  		/// <remarks>
+		/// Normally this function must be run in parallel in multiple kernels.
+  		/// </remarks>
+		private void InitializeBlockInfo()
 		{
 			EvaluateKernel(residual, directionKernels);
 			EvaluateSandwich(directionKernels, directionKernels, directionSandwiches);
@@ -143,14 +131,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			Array.Copy(directionSandwiches, residualDirectionSandwiches, residualDirectionSandwiches.Length);
 		}
 
-		/// Create all the information for all the blocks of algorithm except first.
- 		/// Normally this function must be run in parallel in multiple kernels.
- 		/// <param name="linearTransformation">A linear transformation (A * M) * vector where A is the matrix and M is the inverse preconditioner matrix.</param>
- 		/// <param name="preconditioner">The preconditioner.</param>
- 		/// <param name="r">Vector r of CG.</param>
- 		/// <param name="p">Vector p of CG.</param>
- 		/// <param name="n">Number of vectors in Krylov subspace.</param>
- 		/// <return>The results of parallel processing.</return>
+		/// <summary>
+		/// Updates information for the rest of the blocks of algorithm.
+		/// </summary>
+  		/// <remarks>
+		/// Normally this function must be run in parallel in multiple kernels.
+  		/// </remarks>
 		private void UpdateBlockInfo()
 		{
 			EvaluateKernel(residual, residualKernels);
@@ -160,7 +146,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			EvaluateSandwich(residualKernels, directionKernels, residualDirectionSandwiches);
 		}
 
-		private IVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
+		/// <summary>
+		/// Evaluates the solution vector using the supplied block vector linear combination coefficients.
+		/// </summary>
+		/// <param name="solutionCoefficients">The block vector linear combination coefficients to be used for the calculation of the solution vector.</param>
+  		private IVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
 		{
 			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
 			Preconditioner.SolveLinearSystem(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
@@ -180,7 +170,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			for (int i = 0; i < directionKernels.Length; i++)
 				directionKernels[i] = zeroVectorInitializer();
 
-			UpdateBlockInfoUsingResidualOnly();
+			InitializeBlockInfo();
 			resDotPrecondRes = residualSandwiches[0]; // rr = r * M * r
 			double initialResDotPrecondRes = resDotPrecondRes;
 
@@ -333,7 +323,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			public IPcgBetaParameterCalculation BetaCalculation { get; set; } = new FletcherReevesBeta();
 
 			/// <summary>
-			/// Creates a new instance of <see cref="PcgAlgorithm"/>.
+			/// Creates a new instance of <see cref="BlockPcgAlgorithm"/>.
 			/// </summary>
 			public BlockPcgAlgorithm Build()
 			{
