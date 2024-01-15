@@ -5,19 +5,28 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	using System.Text;
 	using MGroup.LinearAlgebra.Vectors;
 
-	/** The coefficients of a vector's linear combination.
-	 * They are the coefficients only from a linear combination.
-	 * The result vector is a linear combination of vectors of 2 Krylov subspaces R and P.
-	 * Coefficients of Krylov subspace R is in r list and for Krylov subspace P in p list.
-	 * Lists can have fewer (even zero) elements than Krylov subspace vectors. */
+	/// <summary>
+	/// This class handles linear combination calculation pertaining to the block operations of the Krylov subspaces R and P.
+	/// </summary>
 	internal class BlockVectorOperator
 	{
 		private readonly List<double> r;
 		private readonly List<double> p;
 
+		/// <summary>
+		/// This list contains the linear combination coefficients pertaining to subspace R.
+		/// </summary>
 		public List<double> R { get => r; }
+
+		/// <summary>
+		/// This list contains the linear combination coefficients pertaining to subspace P.
+		/// </summary>
 		public List<double> P { get => p; }
 
+		/// <summary>
+		/// This class handles linear combination calculation pertaining to the block operations of the Krylov subspaces R and P.
+		/// </summary>
+		/// <param name="n">The dimension of the Krylov subspace which coincides with the number of steps of the block CG algorithm</param>
 		public BlockVectorOperator(int n)
 		{
 			r = new List<double>(n);
@@ -28,13 +37,21 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			int to2 = p.Count, to1 = Math.Min(to2, x.Count);
 			for (var i = 0; i < to1; ++i)
+			{
 				x[i] += a * p[i];
+			}
+			
 			for (var i = to1; i < to2; ++i)
+			{
 				x.Add(a * p[i]);
+			}
 		}
 
-		/** It is the operation x += a * p.
-		 * x and p are coefficients of Krylov subspace vectors linear combination. */
+		/// <summary>
+		/// Calculates x += a * p with x and p being the coefficients of Krylov subspace vectors linear combination./>.
+		/// </summary>
+		/// <param name="a">The value of scalar a of the operation x += a * p.</param>
+		/// <param name="p">The p coefficients contained in a <see cref="BlockVectorOperator"/> object.</param>
 		public void UpdateX(double a, BlockVectorOperator p)
 		{
 			Xupdate(r, a, p.r);
@@ -45,14 +62,27 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			int to2 = p.Count, to1 = Math.Min(to2, r.Count - 1);
 			for (var i = 0; i < to1; ++i)
+			{
 				r[i + 1] -= a * p[i];
-			if (to1 == -1) { r.Add(0); ++to1; }
+			}
+			
+			if (to1 == -1) 
+			{ 
+				r.Add(0); 
+				++to1; 
+			}
+			
 			for (var i = to1; i < to2; ++i)
+			{
 				r.Add(-a * p[i]);
+			}
 		}
 
-		/** It is the operation r -= a * A * p.
-		 * x and p are coefficients of Krylov subspace vectors linear combination. */
+		/// <summary>
+		/// Calculates r -= a * A * p with a and p being the coefficients of Krylov subspace vectors linear combination./>.
+		/// </summary>
+		/// <param name="a">The value of scalar a of the operation r -= a * A * p.</param>
+		/// <param name="p">The r coefficients contained in a <see cref="BlockVectorOperator"/> object.</param>
 		public void UpdateR(double a, BlockVectorOperator p)
 		{
 			Rupdate(r, a, p.r);
@@ -64,33 +94,46 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			for (var i = 0; i < p.Count; ++i) p[i] *= a;
 			int to2 = r.Count, to1 = Math.Min(to2, p.Count);
 			for (var i = 0; i < to1; ++i)
+			{
 				p[i] += r[i];
+			}
+			
 			for (var i = to1; i < to2; ++i)
+			{
 				p.Add(r[i]);
+			}
 		}
 
-		/** It is the operation p = r + a * p.
-		 * r and p are coefficients of Krylov subspace vectors linear combination. */
+		/// <summary>
+		/// Calculates p = r + a * p with r and a being the coefficients of Krylov subspace vectors linear combination./>.
+		/// </summary>
+		/// <param name="r">The r coefficients contained in a <see cref="BlockVectorOperator"/> object.</param>
+		/// <param name="a">The value of scalar a of the operation p = r + a * p.</param>
 		public void UpdateP(BlockVectorOperator r, double a)
 		{
 			Pupdate(r.r, a, this.r);
 			Pupdate(r.p, a, p);
 		}
 
-
-		/** Calculates the linear combination of a vector.
-		 * The operation is x = p_coefficints * P + r_coefficients * R
-		 * <param name="inf">Block information with Krylov subspaces</param>
-		 * <param name="xc">Coefficients of Krylov subspaces vectors</param>
-		 * <return>The result vector</return>
-		 */
+		/// <summary>
+		/// Calculates x = p_coefficients * P + r_coefficients * R and returns the result of x/>.
+		/// </summary>
+		/// <param name="residualKernels">The r_coefficients.</param>
+		/// <param name="directionKernels">The p_coefficients.</param>
+		/// <returns>The result of x = p_coefficients * P + r_coefficients * R</returns>
 		public IVector EvaluateVector(IVector[] residualKernels, IVector[] directionKernels)
 		{
 			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
 			for (var i = 0; i < r.Count; ++i)
+			{
 				x.AxpyIntoThis(residualKernels[i], r[i]);
+			}
+			
 			for (var i = 0; i < p.Count; ++i)
+			{
 				x.AxpyIntoThis(directionKernels[i], p[i]);
+			}
+			
 			return x;
 		}
 
@@ -106,8 +149,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			double a = 0;
 			for (var i = 0; i < r.Count - 1; ++i)
+			{
 				for (var j = i + 1; j < r.Count; j++)
+				{
 					a += 2 * r[i] * r[j] * RR[i + j];
+				}
+			}
+			
 			return a;
 		}
 
@@ -115,19 +163,29 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			double a = 0;
 			for (var i = 0; i < r.Count; ++i)
+			{
 				for (var j = 0; j < p.Count; j++)
+				{
 					a += 2 * r[i] * p[j] * RP[i + j];
+				}
+			}
 			return a;
 		}
 
-		/** Gives the square of vector r.
-		 * Actually is not r * r but r * M * r where M is the inverse preconditioner matrix.
-		 * Vector r is a linear combination of vectors of Krylov subspace R and Krylov subspace P.
-		 * So r * M * r is the sum of a banch of dot products between vectors of Krylov subspace R, of Krylov subspace P and between them.
-		 * But we have already the dot products between vectors of Krylov subspaces in vectors RR, PP, and RP.
-		 * So we use coefficients of linear combination (described above), stored in vectors rr and rp
-		 * and the vectors RR, PP and RP.
-		 */
+		/// <summary>
+		/// Calculates r * M * r where M is the inverse preconditioner matrix. Vector r is a linear combination of vectors of Krylov subspace R and Krylov subspace P./>.
+		/// </summary>
+		/// <param name="residualSandwiches">The RR.</param>
+		/// <param name="directionSandwiches">The PP.</param>
+		/// <param name="residualDirectionSandwiches">The RP.</param>
+		/// <returns>The result of r * M * r</returns>
+		/// <remarks>
+		/// Vector r is a linear combination of vectors of Krylov subspace R and Krylov subspace P.
+		/// So r * M * r is the sum of a banch of dot products between vectors of Krylov subspace R, of Krylov subspace P and between them.
+		/// But we have already the dot products between vectors of Krylov subspaces in vectors RR, PP, and RP.
+		/// So we use coefficients of linear combination (described above), stored in vectors rr and rp
+		/// and the vectors RR, PP and RP.
+		/// </remarks>
 		public double Square(double[] residualSandwiches, double[] directionSandwiches, double[] residualDirectionSandwiches) =>
 			Square1(residualSandwiches, r) + Square1(directionSandwiches, p) + Square2(residualSandwiches, r) + Square2(directionSandwiches, p) + 
 			Square3(residualDirectionSandwiches, r, p);
@@ -136,7 +194,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			double a = 0;
 			for (var i = 0; i < r.Count; ++i)
+			{
 				a += r[i] * r[i] * RR[2 * i + 1];
+			}
+			
 			return a;
 		}
 
@@ -144,8 +205,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			double a = 0;
 			for (var i = 0; i < r.Count - 1; ++i)
+			{
 				for (var j = i + 1; j < r.Count; j++)
+				{
 					a += 2 * r[i] * r[j] * RR[i + j + 1];
+				}
+			}
+			
 			return a;
 		}
 
@@ -153,22 +219,32 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			double a = 0;
 			for (var i = 0; i < r.Count; ++i)
+			{
 				for (var j = 0; j < p.Count; j++)
+				{
 					a += 2 * r[i] * p[j] * RP[i + j + 1];
+				}
+			}
+			
 			return a;
 		}
 
-		/** Gives the sandwich product of matrix A and vector p.
-		 * Actually is not p * A * p but p * M * A * M * p where M is the inverse preconditioner matrix.
-		 * Vector p is a linear combination of vectors of Krylov subspace R and Krylov subspace P.
-		 * So p * M * A * M * p is the sum of a banch of dot products between vectors of Krylov subspace R, of Krylov subspace P and between them.
-		 * But we have already the dot products between vectors of Krylov subspaces in vectors RR, PP, and RP.
-		 * So we use coefficients of linear combination (described above), stored in vectors pr and pp
-		 * and the vectors RR, PP and RP.
-		 */
+		/// <summary>
+		/// Calculates p * M * A * M * p (sandwich product) where M is the inverse preconditioner matrix. Vector p is a linear combination of vectors of Krylov subspace R and Krylov subspace P./>.
+		/// </summary>
+		/// <param name="residualSandwiches">The RR.</param>
+		/// <param name="directionSandwiches">The PP.</param>
+		/// <param name="residualDirectionSandwiches">The RP.</param>
+		/// <returns>The result of r * M * r</returns>
+		/// <remarks>
+		/// Vector p is a linear combination of vectors of Krylov subspace R and Krylov subspace P.
+		/// So p * M * A * M * p is the sum of a banch of dot products between vectors of Krylov subspace R, of Krylov subspace P and between them.
+		/// But we have already the dot products between vectors of Krylov subspaces in vectors RR, PP, and RP.
+		/// So we use coefficients of linear combination (described above), stored in vectors pr and pp
+		/// and the vectors RR, PP and RP.
+		/// </remarks>		
 		public double Sandwich(double[] residualSandwiches, double[] directionSandwiches, double[] residualDirectionSandwiches) =>
 			Sandwich1(residualSandwiches, r) + Sandwich1(directionSandwiches, p) + Sandwich2(residualSandwiches, r) + Sandwich2(directionSandwiches, p) + 
 			Sandwich3(residualDirectionSandwiches, r, p);
 	}
-
 }
