@@ -196,6 +196,38 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		[Theory]
 		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
 		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
+		public static void TestBlockPcgManaged(EnvironmentChoice env) => TestBlockPcg(env.CreateEnvironment());
+
+		internal static void TestBlockPcg(IComputeEnvironment environment)
+		{
+			environment.Initialize(CreateNodeTopology());
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+
+			var distributedA = new DistributedOverlappingTransformation(indexer,
+				(n, x, y) => GetMatrixA(n).MultiplyIntoResult(x, y));
+
+			Dictionary<int, Vector> localAx = environment.CalcNodeData(n => GetAx(n));
+			var distributedAx = new DistributedOverlappingVector(indexer, localAx);
+
+			Dictionary<int, Vector> localXExpected = environment.CalcNodeData(n => GetX(n));
+			var distributedXExpected = new DistributedOverlappingVector(indexer, localXExpected);
+
+			var pcgBuilder = new BlockPcgAlgorithm.Builder();
+			int maxIterations = 12;
+			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(maxIterations);
+			pcgBuilder.ResidualTolerance = 1E-10;
+			BlockPcgAlgorithm pcg = pcgBuilder.Build();
+			var distributedX = new DistributedOverlappingVector(indexer);
+			IterativeStatistics stats = pcg.Solve(distributedA, new IdentityPreconditioner(), distributedAx, distributedX, true);
+
+			double tol = 1E-6;
+			Assert.True(stats.HasConverged);
+			Assert.True(distributedXExpected.Equals(distributedX, tol));
+		}
+
+		[Theory]
+		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
+		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
 		public static void TestScaleVectorManaged(EnvironmentChoice env) => TestScaleVector(env.CreateEnvironment());
 
 		internal static void TestScaleVector(IComputeEnvironment environment)
