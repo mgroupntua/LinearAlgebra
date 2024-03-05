@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
 		/// </summary>
-		virtual public IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
+		public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
 
 		/// <summary>
 		/// The PCG algorithm will converge when sqrt(r*inv(M)*r) / sqrt(r0*inv(M)*r0) &lt;= <paramref name="ResidualTolerance"/>,
