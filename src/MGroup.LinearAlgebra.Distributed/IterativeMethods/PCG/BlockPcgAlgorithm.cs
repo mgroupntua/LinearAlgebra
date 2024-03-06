@@ -4,18 +4,21 @@ using System.Diagnostics;
 using System.Linq;
 
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Distributed.Exceptions;
+using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.Solution.LinearSystem;
 
 //TODO: Needs Builder pattern
 //TODO: perhaps all quantities should be stored as mutable fields, exposed as readonly properties and the various strategies 
 //      should read them from a reference of CG/PCG/PCPG, instead of having them injected.
 //TODO: In regular CG, there is a check to perevent premature convergence, by correcting the residual. Can this be done for PCG 
 //      as well? Would the preconditioned residual be updated as well?
-namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
+namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
 	/// <summary>
 	/// Implements the block Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
@@ -29,8 +32,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private BlockVectorOperator residualOperator;
 		private int blockSize;
 
-		private IVector[] residualKernels;
-		private IVector[] directionKernels;
+		private IGlobalVector[] residualKernels;
+		private IGlobalVector[] directionKernels;
 		private double[] residualSandwiches;	// 2n+1 sandwich products (r_i * M * r_j) of n-vector Krylov subspace (A*M, r)
 		private double[] directionSandwiches;	// 2n+3 sandwich products (p_i * M * p_j) of n-vector Krylov subspace (A*M, p)
 		private double[] residualDirectionSandwiches; // 2n+2 sandwich products (r_i * M * p_j) of vector Krylov subspace (A*M, r) with Krylov subspace (A*M, p)
@@ -44,23 +47,23 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Krylov subspace of (A * M)^n * r
 		/// A is the matrix, M is inverse preconditioner matrix and r is the CG residual vector
 		/// </summary>
-		internal IVector[] ResidualKernels { get => residualKernels; }
+		internal IGlobalVector[] ResidualKernels { get => residualKernels; }
   
 		/// <summary>
 		/// Krylov subspace of (A * M)^n * p
 		/// A is the matrix, M is inverse preconditioner matrix and p is the CG conjugate direction vector
 		/// </summary>
-		internal IVector[] DirectionKernels { get => directionKernels; }
+		internal IGlobalVector[] DirectionKernels { get => directionKernels; }
 
 		private BlockPcgAlgorithm(int blockSize, double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence pcgConvergence, IBlockPcgResidualUpdater residualUpdater, 
+			IPcgResidualConvergence pcgConvergence, IBlockPcgResidualUpdater residualUpdater, bool throwIfNotConvergence,
 			IPcgBetaParameterCalculation betaCalculation) : 
-			base(residualTolerance, maxIterationsProvider, pcgConvergence, residualUpdater)
+			base(residualTolerance, maxIterationsProvider, pcgConvergence, residualUpdater, throwIfNotConvergence)
 		{
 			this.blockSize = blockSize;
 			this.betaCalculation = betaCalculation;
-			this.residualKernels = new IVector[blockSize];
-			this.directionKernels = new IVector[blockSize + 1];
+			this.residualKernels = new IGlobalVector[blockSize];
+			this.directionKernels = new IGlobalVector[blockSize + 1];
 			this.residualSandwiches = new double[2 * blockSize - 1];
 			this.directionSandwiches = new double[2 * blockSize + 1];
 			this.residualDirectionSandwiches = new double[2 * blockSize];
@@ -79,14 +82,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <remarks>
 		/// Normally this function must be run in parallel in multiple kernels.
 		/// </remarks>
-		private void EvaluateKernel(IVector vector, IVector[] kernel)
+		private void EvaluateKernel(IGlobalVector vector, IGlobalVector[] kernel)
 		{
 			kernel[0].CopyFrom(vector);
 			for (int i = 1; i < kernel.Length; ++i)
 			{
-				var v1 = vector.CreateZeroVectorWithSameFormat();
-				Preconditioner.SolveLinearSystem(kernel[i - 1], v1);
-				Matrix.Multiply(v1, kernel[i]);
+				var v1 = vector.CreateZero();
+				Preconditioner.Apply(kernel[i - 1], v1);
+				Matrix.MultiplyVector(v1, kernel[i]);
 			}
 		}
 
@@ -101,14 +104,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// If R(i) is the a vector of R Krylov subspace and P(i) a vector of P Krylov subspace,
 		/// this function produces preconditioned dot products R(i) * M * P(i) where M is the inverse preconditioner matrix.
   		/// </remarks>
-		private void EvaluateSandwich(IVector[] kernel1, IVector[] kernel2, double[] sandwich)
+		private void EvaluateSandwich(IGlobalVector[] kernel1, IGlobalVector[] kernel2, double[] sandwich)
 		{
-			var v = kernel1[0].CreateZeroVectorWithSameFormat();
-			Preconditioner.SolveLinearSystem(kernel1[0], v);
+			var v = kernel1[0].CreateZero();
+			Preconditioner.Apply(kernel1[0], v);
 			for (int i = 0; i < kernel2.Length; ++i)
 				sandwich[i] = v.DotProduct(kernel2[i]);
 
-			Preconditioner.SolveLinearSystem(kernel2[kernel2.Length - 1], v);
+			Preconditioner.Apply(kernel2[kernel2.Length - 1], v);
 			for (int i = 1; i < kernel1.Length; ++i)
 				sandwich[kernel2.Length + i - 1] = v.DotProduct(kernel1[i]);
 		}
@@ -150,14 +153,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Evaluates the solution vector using the supplied block vector linear combination coefficients.
 		/// </summary>
 		/// <param name="solutionCoefficients">The block vector linear combination coefficients to be used for the calculation of the solution vector.</param>
-  		private IVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
+  		private IGlobalVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
 		{
-			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
-			Preconditioner.SolveLinearSystem(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
+			var x = residualKernels[0].CreateZero();
+			Preconditioner.Apply(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
 			return x;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IGlobalVector> zeroVectorInitializer)
 		{
 			//CalculateAndPrintExactResidual();
 
@@ -200,14 +203,25 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 							solution.AddIntoThis(EvaluateSolutionVector(solutionOperator));  // x = x0 + M * x. It multiplied with M, because it should be
 						}
 
-						return new IterativeStatistics
+						// We reached the max iterations before BlockPCG converged
+						if (throwIfNotConvergence)
 						{
-							HasConverged = false,
-							HasStagnated = true,
-							AlgorithmName = name,
-							NumIterationsRequired = iteration * blockSize + i,
-							ResidualNormRatioEstimation = resDotPrecondRes / initialResDotPrecondRes
-						};
+							throw new IterativeMethodDidNotConvergeException("Block PCG terminated after the max allowable number of iterations =" +
+								$" {maxIterations}, without reaching the required residual norm ratio tolerance = {ResidualTolerance}." +
+								$" In contrast the final residual norm ratio is {residualNormRatio}. To accept solutions without convergence" +
+								$" set BlockPcgAlgorithm.Builder.ThrowExceptionIfNotConvergence = false");
+						}
+						else
+						{
+							return new IterativeStatistics
+							{
+								HasConverged = false,
+								HasStagnated = true,
+								AlgorithmName = name,
+								NumIterationsRequired = iteration * blockSize + i,
+								ResidualNormRatioEstimation = resDotPrecondRes / initialResDotPrecondRes
+							};
+						}
 					}
 
 					stepSize = resDotPrecondRes / pAp;
@@ -236,7 +250,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 							HasStagnated = false,
 							AlgorithmName = name,
 							NumIterationsRequired = iteration * blockSize + i,
-							ResidualNormRatioEstimation = resDotPrecondRes / initialResDotPrecondRes
+							ResidualNormRatioEstimation = resDotPrecondRes / initialResDotPrecondRes,
 						};
 					}
 				}
@@ -258,20 +272,30 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				UpdateBlockInfo();
 			}
 
-			// We reached the max iterations before converging
-			return new IterativeStatistics
+			// We reached the max iterations before BlockPCG converged
+			if (throwIfNotConvergence)
 			{
-				AlgorithmName = name,
-				HasConverged = false,
-				NumIterationsRequired = maxIterations,
-				ResidualNormRatioEstimation = residualNormRatio
-			};
+				throw new IterativeMethodDidNotConvergeException("Block PCG terminated after the max allowable number of iterations =" +
+					$" {maxIterations}, without reaching the required residual norm ratio tolerance = {ResidualTolerance}." +
+					$" In contrast the final residual norm ratio is {residualNormRatio}. To accept solutions without convergence" +
+					$" set BlockPcgAlgorithm.Builder.ThrowExceptionIfNotConvergence = false");
+			}
+			else
+			{
+				return new IterativeStatistics
+				{
+					AlgorithmName = name,
+					HasConverged = false,
+					NumIterationsRequired = maxIterations,
+					ResidualNormRatioEstimation = residualNormRatio
+				};
+			}
 		}
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = Vector.CreateZero(Rhs.Length);
-			Matrix.Multiply(solution, res);
+			var res = Rhs.CreateZero();
+			Matrix.MultiplyVector(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();
 			Debug.WriteLine($"Iteration {iteration}: norm(r) = {norm}");
@@ -323,8 +347,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			/// </summary>
 			public BlockPcgAlgorithm Build()
 			{
-				return new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider, Convergence, BlockResidualUpdater, 
-					BetaCalculation);
+				return new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider, Convergence,
+											BlockResidualUpdater, ThrowExceptionIfNotConvergence, BetaCalculation);
 			}
 		}
 	}
