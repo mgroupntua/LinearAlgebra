@@ -1,13 +1,14 @@
-﻿using System;
+using System;
+
+using MGroup.LinearAlgebra.LinearAlgebraExtensions;
 
 namespace MGroup.LinearAlgebra.Exceptions
 {
     /// <summary>
     /// The exception that is thrown when a linear algebra operation cannot be executed due to the arguments (vectors or 
     /// matrices) having incompatible dimension (number of rows or columns).
-    /// Authors: Serafeim Bakalakos
     /// </summary>
-    public class NonMatchingDimensionsException: Exception
+    public class NonMatchingDimensionsException: NonMatchingFormatException
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NonMatchingDimensionsException"/> class.

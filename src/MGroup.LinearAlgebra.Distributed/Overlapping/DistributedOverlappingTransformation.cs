@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
 using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
@@ -64,9 +63,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				multiplyMatrixVectorPerComputeNode(nodeID, localX, localY);
 			};
 			Environment.DoPerNode(multiplyLocal);
-			#region debug
-			//Environment.DoPerNodeSerially(multiplyLocal);
-			#endregion
 
 			output.SumOverlappingEntries();
 		}

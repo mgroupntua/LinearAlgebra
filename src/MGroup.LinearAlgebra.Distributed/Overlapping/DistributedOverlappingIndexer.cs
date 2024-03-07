@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.Solvers.DDM.LinearSystem;
 using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.LinearAlgebraExtensions;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {

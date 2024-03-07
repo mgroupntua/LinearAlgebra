@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
 using System.Collections.Concurrent;
 using MGroup.MSolve.Solution.LinearSystem;
 
