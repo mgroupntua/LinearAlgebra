@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using MGroup.Environments;
+using MGroup.Environments.Mpi;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
@@ -11,6 +12,8 @@ using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
+
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
 using Xunit;
 
@@ -269,6 +272,27 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 			double tol = 1E-13;
 			Assert.True(distributedOutputW.Equals(distributedInputW, tol));
+		}
+		public static void RunMpiTests()
+		{
+			// Launch 3 processes
+			using (var mpiEnvironment = new MpiEnvironment(new MasterSlavesGlobalOperationStrategy()))
+			{
+				MpiDebugUtilities.AssistDebuggerAttachment();
+
+				TestAxpyVectors(mpiEnvironment);
+				TestBlockPcg(mpiEnvironment);
+				TestDotProduct(mpiEnvironment);
+				TestEqualVectors(mpiEnvironment);
+				TestLinearCombinationVectors(mpiEnvironment);
+				TestMatrixVectorMultiplication(mpiEnvironment);
+				TestPcg(mpiEnvironment);
+				TestScaleVector(mpiEnvironment);
+				TestSumOverlappingEntries(mpiEnvironment);
+
+				MpiDebugUtilities.DoSerially(MPI.Communicator.world,
+					() => Console.WriteLine($"Process {MPI.Communicator.world.Rank}: All tests passed"));
+			}
 		}
 
 		private static DistributedOverlappingIndexer CreateIndexer(IComputeEnvironment environment)
