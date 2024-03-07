@@ -5,11 +5,9 @@ using System.Diagnostics;
 using System.Text;
 using MGroup.Environments;
 using MGroup.MSolve.Solution.LinearSystem;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.Solvers.DDM.LinearSystem
 {

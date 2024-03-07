@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-//TODO: This belongs in LinearAlgebra project
-namespace MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions
+namespace MGroup.LinearAlgebra.LinearAlgebraExtensions
 {
+	/// <summary>
+	/// The exception that is thrown when a linear algebra operation cannot be executed due to the arguments (vectors, matrices 
+	/// or both) having incompatible storage formats.
+	/// </summary>
 	public class NonMatchingFormatException : ArgumentException
 	{
 		public NonMatchingFormatException()
