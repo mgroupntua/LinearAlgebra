@@ -10,6 +10,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <StartupObject>MGroup.LinearAlgebra.Distributed.Tests.Program</StartupObject>
+    <OutputType>WinExe</OutputType>
   </PropertyGroup>
 
 
