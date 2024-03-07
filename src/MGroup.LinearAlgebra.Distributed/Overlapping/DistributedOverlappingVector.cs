@@ -6,6 +6,7 @@ using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using System.Collections.Concurrent;
 using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Commons;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
@@ -59,6 +60,53 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public IDictionary<int, Vector> LocalVectors { get; }
 
 		public bool CheckForCompatibility { get; set; } = true;
+
+		public bool AreOverlappingEntriesEqual(double tolerance)
+		{
+			var comparer = new ValueComparer(tolerance);
+
+			Dictionary<int, AllToAllNodeData<double>> dataPerNode = ExchangeOverlappingEntries();
+
+			// Add the common entries of neighbors back to the original local vector.
+			Func<int, bool> checkLocalSubvector = nodeID =>
+			{
+				ComputeNode node = Environment.GetComputeNode(nodeID);
+				Vector localVector = LocalVectors[nodeID];
+				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
+
+				IDictionary<int, double[]> recvValues = dataPerNode[nodeID].recvValues;
+				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
+				{
+					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					Vector localValues = localVector.GetSubvector(commonEntries);
+					double[] neighborValues = recvValues[neighborID];
+					Debug.Assert(localValues.Length == neighborValues.Length);
+					if (node.ID < neighborID) // Make sure the comparisons are done with identical arguments for both compute nodes
+					{
+						for (int i = 0; i < localValues.Length; ++i)
+						{
+							if (!comparer.AreEqual(localValues[i], neighborValues[i]))
+							{
+								return false;
+							}
+						}
+					}
+					else
+					{
+						for (int i = 0; i < localValues.Length; ++i)
+						{
+							if (!comparer.AreEqual(neighborValues[i], localValues[i]))
+							{
+								return false;
+							}
+						}
+					}
+				}
+				return true;
+			};
+			Dictionary<int, bool> localResults = Environment.CalcNodeData(checkLocalSubvector);
+			return Environment.AllReduceAnd(localResults);
+		}
 
 		public void AxpyIntoThis(IGlobalVector otherVector, double otherCoefficient)
 		{
@@ -211,17 +259,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Math.Sqrt(Environment.AllReduceSum(dotPerNode));
 		}
 
-		public void ScaleIntoThis(double scalar)
-		{
-			Environment.DoPerNode(node => LocalVectors[node].ScaleIntoThis(scalar));
-		}
-
-		public void SetAll(double value)
-		{
-			Environment.DoPerNode(node => LocalVectors[node].SetAll(value));
-		}
-
-
 		//TODOMPI: A ReduceOverlappingEntries(IReduction), which would cover sum and regularization would be more useful. 
 		//      However the implementation should not be slower than the current SumOverlappingEntries(), since that is a very
 		//      important operation.
@@ -264,6 +301,16 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(regularizeLocalVectors);
 		}
 
+		public void ScaleIntoThis(double scalar)
+		{
+			Environment.DoPerNode(node => LocalVectors[node].ScaleIntoThis(scalar));
+		}
+
+		public void SetAll(double value)
+		{
+			Environment.DoPerNode(node => LocalVectors[node].SetAll(value));
+		}
+
 		/// <summary>
 		/// Gathers the entries of remote vectors that correspond to the boundary entries of the local vectors and sums them.
 		/// As a result, the overlapping entries of each local vector will have the same values. These values are the same
@@ -276,6 +323,28 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// </remarks>
 		public void SumOverlappingEntries()
 		{
+			Dictionary<int, AllToAllNodeData<double>> dataPerNode = ExchangeOverlappingEntries();
+
+			// Add the common entries of neighbors back to the original local vector.
+			Action<int> sumLocalSubvectors = nodeID =>
+			{
+				ComputeNode node = Environment.GetComputeNode(nodeID);
+				Vector localVector = LocalVectors[nodeID];
+				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
+
+				IDictionary<int, double[]> recvValues = dataPerNode[nodeID].recvValues;
+				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
+				{
+					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					var rv = Vector.CreateFromArray(recvValues[neighborID]);
+					localVector.AddIntoThisNonContiguouslyFrom(commonEntries, rv);
+				}
+			};
+			Environment.DoPerNode(sumLocalSubvectors);
+		}
+
+		private Dictionary<int, AllToAllNodeData<double>> ExchangeOverlappingEntries()
+		{
 			// Prepare the boundary entries of each node before communicating them to its neighbors.
 			Func<int, AllToAllNodeData<double>> prepareLocalData = nodeID =>
 			{
@@ -286,7 +355,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				// Find the common entries (to send and receive) of this node with each of its neighbors
 				var transferData = new AllToAllNodeData<double>();
 				(transferData.sendValues, transferData.recvValues) = GetSendRecvBuffers(nodeID);
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode) 
+				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
 				{
 					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
 					var sv = Vector.CreateFromArray(transferData.sendValues[neighborID]);
@@ -300,30 +369,12 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			// Perform AllToAll to exchange the common boundary entries of each node with its neighbors.
 			Environment.NeighborhoodAllToAll(dataPerNode, true);
 
-			// Add the common entries of neighbors back to the original local vector.
-			Action<int> sumLocalSubvectors = nodeID =>
-			{
-				ComputeNode node = Environment.GetComputeNode(nodeID);
-				Vector localVector = LocalVectors[nodeID];
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
-
-				IDictionary<int, double[]> recvValues = dataPerNode[nodeID].recvValues;
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode) 
-				{
-					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
-					var rv = Vector.CreateFromArray(recvValues[neighborID]);
-					localVector.AddIntoThisNonContiguouslyFrom(commonEntries, rv);
-				}
-			};
-			Environment.DoPerNode(sumLocalSubvectors);
+			return dataPerNode;
 		}
 
 		private (ConcurrentDictionary<int, double[]> sendValues, ConcurrentDictionary<int, double[]> recvValues) 
 			GetSendRecvBuffers(int nodeID)
 		{
-			#region debug
-			//CacheSendRecvBuffers = false;
-			#endregion
 			if (CacheSendRecvBuffers)
 			{
 				bool isCached = cachedBuffers.TryGetValue(nodeID, 

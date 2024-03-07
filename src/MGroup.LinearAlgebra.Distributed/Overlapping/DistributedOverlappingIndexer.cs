@@ -120,6 +120,26 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 			public int NumEntries { get; private set; }
 
+			public (int local, int remote) CountCommonEntries()
+			{
+				int local = 0;
+				int remote = 0;
+				foreach (var pair in commonEntriesWithNeighbors)
+				{
+					int neighborID = pair.Key;
+					int[] commonEntries = pair.Value;
+					if (this.Node.Cluster.Nodes.ContainsKey(neighborID))
+					{
+						local += commonEntries.Length;
+					}
+					else
+					{
+						remote += commonEntries.Length;
+					}
+				}
+				return (local, remote);
+			}
+
 			//TODO: cache a buffer for sending and a buffer for receiving inside Indexer (lazily or not) and just return them. 
 			//      Also provide an option to request newly initialized buffers. It may be better to have dedicated Buffer classes to
 			//      handle all that logic (e.g. keeping allocated buffers in a LinkedList, giving them out & locking them, 
@@ -135,6 +155,21 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				}
 				return buffers;
 			}
+
+			public void FindMultiplicities()
+			{
+				var multiplicities = new int[NumEntries];
+				for (int i = 0; i < NumEntries; ++i) multiplicities[i] = 1;
+				foreach (int[] commonEntries in commonEntriesWithNeighbors.Values)
+				{
+					foreach (int i in commonEntries) multiplicities[i] += 1;
+				}
+
+				InverseMultiplicities = new double[NumEntries];
+				for (int i = 0; i < NumEntries; ++i) InverseMultiplicities[i] = 1.0 / multiplicities[i];
+			}
+
+			public int[] GetCommonEntriesWithNeighbor(int neighbor) => commonEntriesWithNeighbors[neighbor];
 
 			public void Initialize(int numTotalEntries, Dictionary<int, int[]> commonEntriesWithNeighbors)
 			{
@@ -155,21 +190,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				this.commonEntriesWithNeighbors = other.commonEntriesWithNeighbors;
 				this.ActiveNeighborsOfNode = other.ActiveNeighborsOfNode;
 				this.InverseMultiplicities = other.InverseMultiplicities;
-			}
-
-			public int[] GetCommonEntriesWithNeighbor(int neighbor) => commonEntriesWithNeighbors[neighbor];
-
-			public void FindMultiplicities()
-			{
-				var multiplicities = new int[NumEntries];
-				for (int i = 0; i < NumEntries; ++i) multiplicities[i] = 1;
-				foreach (int[] commonEntries in commonEntriesWithNeighbors.Values)
-				{
-					foreach (int i in commonEntries) multiplicities[i] += 1;
-				}
-
-				InverseMultiplicities = new double[NumEntries];
-				for (int i = 0; i < NumEntries; ++i) InverseMultiplicities[i] = 1.0 / multiplicities[i];
 			}
 		}
 	}
