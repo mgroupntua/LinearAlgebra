@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using static MGroup.LinearAlgebra.Implementations.LapackUtilities;
 
 //TODO: provide versions of these methods where the user can provide the work arrays.
@@ -9,16 +9,15 @@ namespace MGroup.LinearAlgebra.Implementations
     /// systems of linear equations with double precision arithmetic. Such simplifications are error checking, 
     /// handling workspace arrays, enums instead of string arguments etc. This facade is meant to provide a managed 
     /// object-oriented alternative the LAPACKE library used in C.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
-    internal class LapackLinearEquationsFacade
+    public class LapackLinearEquationsFacade
     {
-        internal LapackLinearEquationsFacade(ILapackProvider provider)
+		public LapackLinearEquationsFacade(ILapackProvider provider)
         {
             this.Provider = provider;
         }
 
-        internal ILapackProvider Provider { get; }
+        public ILapackProvider Provider { get; }
 
         /// <summary>
         /// If the return value is a non-negative int i, then the pivot entry U[i, i] is 0. The factor U is singular, and 
@@ -26,7 +25,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// <see cref="Dgetrs(TransposeMatrix, int, int, double[], int, int, int[], int, double[], int, int)"/>. Matrix inversion
         /// using <see cref="Dgetri(int, double[], int, int, int[], int)"/> will also fail.
         /// </summary>
-        internal int Dgetrf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA, 
+        public int Dgetrf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA, 
             int[] rowExchangesP, int offsetP, double pivotTolerance)
         { 
             int info = DefaultInfo;
@@ -47,7 +46,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// If the return value is a non-negative int i, then the pivot entry U[i, i] is 0. The matrix A is singular, and its
         /// inverse could not be computed.
         /// </summary>
-        internal int Dgetri(int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA, 
+        public int Dgetri(int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA, 
             int[] rowExchangesP, int offsetP, double pivotTolerance)
         {
             int info = DefaultInfo;
@@ -65,7 +64,7 @@ namespace MGroup.LinearAlgebra.Implementations
             return FindZeroPivotFromInfoLU(orderA, leadingDimA, factorizedMatrixA, offsetA, pivotTolerance, info);
         }
 
-        //internal void DgetriWithoutCheckingPivot(int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA,
+        //public void DgetriWithoutCheckingPivot(int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA,
         //    int[] rowExchangesP, int offsetP)
         //{
         //    int info = DefaultInfo;
@@ -74,7 +73,7 @@ namespace MGroup.LinearAlgebra.Implementations
         //    CheckNegativeInfo(info);
         //}
 
-        internal void Dgetrs(TransposeMatrix transposeA, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA,
+        public void Dgetrs(TransposeMatrix transposeA, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA,
             int leadingDimA, int[] rowExchangesP, int offsetP, double[] rhsB, int offsetB, int leadingDimB)
         {
             int info = DefaultInfo;
@@ -96,7 +95,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// If the return value is a non-negative int i, then the leading minor of order i (and the matrix A) is not positive
         /// definite and the factorization could not be completed.
         /// </summary>
-        internal int Dpotrf(StoredTriangle triangle, int orderA, double[] matrixA, int offsetA, int leadingDimA)
+        public int Dpotrf(StoredTriangle triangle, int orderA, double[] matrixA, int offsetA, int leadingDimA)
         {
             int info = DefaultInfo;
             Provider.Dpotrf(triangle.Translate(), orderA, matrixA, offsetA, leadingDimA, ref info);
@@ -117,7 +116,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// If the return value is a non-negative int i, then the entry (i, i) of the factor U or L is 0 and the inverse could 
         /// not be computed.
         /// </summary>
-        internal int Dpotri(StoredTriangle triangle, int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA)
+        public int Dpotri(StoredTriangle triangle, int orderA, double[] factorizedMatrixA, int offsetA, int leadingDimA)
         {
             int info = DefaultInfo;
             Provider.Dpotri(triangle.Translate(), orderA, factorizedMatrixA, offsetA, leadingDimA, ref info);
@@ -134,7 +133,7 @@ namespace MGroup.LinearAlgebra.Implementations
             else return int.MinValue;
         }
 
-        internal void Dpotrs(StoredTriangle triangle, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA,
+        public void Dpotrs(StoredTriangle triangle, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA,
             int leadingDimA, double[] rhsB, int offsetB, int leadingDimB)
         {
             int info = DefaultInfo;
@@ -155,7 +154,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// If the return value is a non-negative int i, then the leading minor of order i (and the matrix A) is not positive
         /// definite and the factorization could not been completed.
         /// </summary>
-        internal int Dpptrf(StoredTriangle triangle, int orderA, double[] matrixA, int offsetA)
+        public int Dpptrf(StoredTriangle triangle, int orderA, double[] matrixA, int offsetA)
         {
             int info = DefaultInfo;
             Provider.Dpptrf(triangle.Translate(), orderA, matrixA, offsetA, ref info);
@@ -171,7 +170,7 @@ namespace MGroup.LinearAlgebra.Implementations
         /// If the return value is a non-negative int i, then the entry (i, i) of the factor U or L is 0 and the inverse could 
         /// not be computed.
         /// </summary>
-        internal int Dpptri(StoredTriangle triangle, int orderA, double[] factorizedMatrixA, int offsetA)
+        public int Dpptri(StoredTriangle triangle, int orderA, double[] factorizedMatrixA, int offsetA)
         {
             int info = DefaultInfo;
             Provider.Dpptri(triangle.Translate(), orderA, factorizedMatrixA, offsetA, ref info);
@@ -183,7 +182,7 @@ namespace MGroup.LinearAlgebra.Implementations
             else return int.MinValue;
         }
 
-        internal void Dpptrs(StoredTriangle triangle, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA, 
+        public void Dpptrs(StoredTriangle triangle, int orderA, int numRhs, double[] factorizedMatrixA, int offsetA, 
             double[] rhsB, int offsetB, int leadingDimB)
         {
             int info = DefaultInfo;

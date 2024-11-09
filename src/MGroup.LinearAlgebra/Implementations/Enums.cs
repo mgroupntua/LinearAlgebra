@@ -4,9 +4,8 @@ namespace MGroup.LinearAlgebra.Implementations
 {
 	/// <summary>
 	/// Describes how a matrix (2D) is stored in the system's memory as a 1D array.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal enum MatrixLayout
+	public enum MatrixLayout
 	{
 		/// <summary>
 		/// Row major layout. Entries corresponding to consecutive columns are stored consecutively. This is the default in C 
@@ -25,7 +24,7 @@ namespace MGroup.LinearAlgebra.Implementations
 	/// to the matrix entries is transposed, e.g. A[j, i] instead of A[i, j].
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal enum TransposeMatrix
+	public enum TransposeMatrix
 	{
 		/// <summary>
 		/// The stored matrix will be accessed normally.
@@ -48,7 +47,7 @@ namespace MGroup.LinearAlgebra.Implementations
 	/// Describes which triangle of a triangular or symmetric matrix is explicitly stored.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal enum StoredTriangle
+	public enum StoredTriangle
 	{
 		/// <summary>
 		/// The upper triangle of the matrix is stored, including the diagonal.
@@ -65,7 +64,7 @@ namespace MGroup.LinearAlgebra.Implementations
 	/// Describes whether the diagonal values of a matrix are explicitly stored or not. Applicable to triangular matrices only.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal enum DiagonalValues
+	public enum DiagonalValues
 	{
 		/// <summary>
 		/// The entries of the diagonal are assumed to be 1. 
@@ -82,7 +81,7 @@ namespace MGroup.LinearAlgebra.Implementations
 	/// Describes on which side of a matrix-matrix multiplication is the matrix of interest located.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal enum MultiplicationSide
+	public enum MultiplicationSide
 	{
 		/// <summary>
 		/// The corresponding matrix A will be multiplied on the left: A * whatever.
@@ -95,7 +94,7 @@ namespace MGroup.LinearAlgebra.Implementations
 		Right
 	}
 
-	internal enum EigensystemJob
+	public enum EigensystemJob
 	{
 		/// <summary>
 		/// Only calculate eigenvalues

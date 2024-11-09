@@ -3,7 +3,6 @@ namespace MGroup.LinearAlgebra.Implementations
     /// <summary>
     /// Provides linear algebra operations as defined by the LAPACK (Linear ALgebra PACKage) interface. These operations are 
     /// more complex than the ones defined by BLAS, e.g. factorizations and operations with the produced factors.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     /// <remarks>
     /// The LAPACK (Fortran) interface has been chosen over the LAPACKE (C) interface, since it is provided by many more 
@@ -14,7 +13,7 @@ namespace MGroup.LinearAlgebra.Implementations
     /// call the LAPACK subroutine and then convert the matrix back to row major by transposing again. All this transposing 
     /// should not be hidden from the matrix classes of the current Linear Algebra project or even the user.
     /// </remarks>
-    internal interface ILapackProvider
+    public interface ILapackProvider
     {
 		/// <summary>
 		/// Computes the eigenvalues and, optionally, left and right eigenvectors of a real square (nonsymmetric) matrix. The 

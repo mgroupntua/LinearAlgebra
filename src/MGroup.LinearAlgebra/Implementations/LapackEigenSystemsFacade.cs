@@ -13,16 +13,16 @@ namespace MGroup.LinearAlgebra.Implementations
 	/// object-oriented alternative the LAPACKE library used in C.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal class LapackEigensystemsFacade
+	public class LapackEigensystemsFacade
 	{
-		internal LapackEigensystemsFacade(ILapackProvider provider)
+		public LapackEigensystemsFacade(ILapackProvider provider)
 		{
 			this.Provider = provider;
 		}
 
-		internal ILapackProvider Provider { get; }
+		public ILapackProvider Provider { get; }
 
-		internal void Dgeev(EigensystemJob jobLeft, EigensystemJob jobRight, int orderA, 
+		public void Dgeev(EigensystemJob jobLeft, EigensystemJob jobRight, int orderA, 
 			double[] matrixA, int offsetA, int leadingDimA, 
 			double[] eigvaluesReal, int offsetEigvaluesReal, double[] eigvaluesImaginary, int offsetEigvaluesImaginary,
 			double[] eigvectorsLeft, int offsetEigvectorsLeft, int leadingDimEigvectorsLeft,
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Implementations
 			else if (info < 0) ProcessNegativeInfo(info);
 		}
 
-		internal void Dsyev(EigensystemJob job, StoredTriangle triangle, int orderA, double[] matrixA, int offsetA,
+		public void Dsyev(EigensystemJob job, StoredTriangle triangle, int orderA, double[] matrixA, int offsetA,
 			int leadingDimA, double[] eigenvalues, int offsetEigenvalues)
 		{
 			int info = DefaultInfo;

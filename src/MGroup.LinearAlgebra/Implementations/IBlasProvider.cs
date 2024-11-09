@@ -5,9 +5,8 @@ namespace MGroup.LinearAlgebra.Implementations
     /// <summary>
     /// Provides linear algebra operations as defined by the BLAS (Basic Linear Algebra Subroutines) interface. These operations
     /// concern vector-vector operations (level 1), matrix-vector operations (level 2) and matrix-matrix operations (level 3). 
-    /// Authors: Serafeim Bakalakos
     /// </summary>
-    internal interface IBlasProvider
+    public interface IBlasProvider
     {
 		#region BLAS Level 1
 		/// <summary>

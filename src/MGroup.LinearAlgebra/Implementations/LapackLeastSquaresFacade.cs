@@ -1,4 +1,4 @@
-﻿using static MGroup.LinearAlgebra.Implementations.LapackUtilities;
+using static MGroup.LinearAlgebra.Implementations.LapackUtilities;
 
 //TODO: provide versions of these methods where the user can provide the work arrays.
 namespace MGroup.LinearAlgebra.Implementations
@@ -10,16 +10,16 @@ namespace MGroup.LinearAlgebra.Implementations
     /// object-oriented alternative the LAPACKE library used in C.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    internal class LapackLeastSquaresFacadeDouble
+    public class LapackLeastSquaresFacadeDouble
     {
-        internal LapackLeastSquaresFacadeDouble(ILapackProvider provider)
+        public LapackLeastSquaresFacadeDouble(ILapackProvider provider)
         {
             this.Provider = provider;
         }
 
-        internal ILapackProvider Provider { get; }
+        public ILapackProvider Provider { get; }
 
-        internal void Dgelqf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA,
+        public void Dgelqf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA,
             double[] reflectorScalarsT, int offsetT)
         {
             int info = DefaultInfo;
@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Implementations
             }
         }
 
-        internal void Dgeqrf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA,
+        public void Dgeqrf(int numRowsA, int numColsA, double[] matrixA, int offsetA, int leadingDimA,
             double[] reflectorScalarsT, int offsetT)
         {
             int info = DefaultInfo;
@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Implementations
             }
         }
 
-        internal void Dorglq(int numRowsQ, int numColsQ, int numReflectors, double[] matrixQ, int offsetQ, int leadingDimQ,
+        public void Dorglq(int numRowsQ, int numColsQ, int numReflectors, double[] matrixQ, int offsetQ, int leadingDimQ,
             double[] reflectorScalarsT, int offsetT)
         {
             int info = DefaultInfo;
@@ -70,7 +70,7 @@ namespace MGroup.LinearAlgebra.Implementations
             }
         }
 
-        internal void Dorgqr(int numRowsQ, int numColsQ, int numReflectors, double[] matrixQ, int offsetQ, int leadingDimQ,
+        public void Dorgqr(int numRowsQ, int numColsQ, int numReflectors, double[] matrixQ, int offsetQ, int leadingDimQ,
             double[] reflectorScalarsT, int offsetT)
         {
             int info = DefaultInfo;
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Implementations
             }
         }
 
-        internal void Dormlq(MultiplicationSide sideQ, TransposeMatrix transposeQ, int numRowsC, int numColsC, int numReflectors,
+        public void Dormlq(MultiplicationSide sideQ, TransposeMatrix transposeQ, int numRowsC, int numColsC, int numReflectors,
             double[] matrixQ, int offsetQ, int leadingDimQ, double[] reflectorScalarsT, int offsetT,
             double[] matrixC, int offsetC, int leadingDimC)
         {
@@ -107,7 +107,7 @@ namespace MGroup.LinearAlgebra.Implementations
             }
         }
 
-        internal void Dormqr(MultiplicationSide sideQ, TransposeMatrix transposeQ, int numRowsC, int numColsC, int numReflectors,
+        public void Dormqr(MultiplicationSide sideQ, TransposeMatrix transposeQ, int numRowsC, int numColsC, int numReflectors,
             double[] matrixQ, int offsetQ, int leadingDimQ, double[] reflectorScalarsT, int offsetT,
             double[] matrixC, int offsetC, int leadingDimC)
         {
