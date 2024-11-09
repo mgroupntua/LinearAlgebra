@@ -9,13 +9,17 @@ namespace MGroup.LinearAlgebra.Implementations
     /// </summary>
     internal interface IBlasProvider
     {
-        #region BLAS Level 1
+		#region BLAS Level 1
+		/// <summary>
+		/// y = alpha * x + beta * y
+		/// </summary>
+		void Daxpby(int n, double alpha, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY);
 
-        /// <summary>
-        /// y = alpha * x + y. See 
-        /// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga8f99d6a644d3396aa32db472e0cfc91c.html#ga8f99d6a644d3396aa32db472e0cfc91c
-        /// </summary>
-        void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
+		/// <summary>
+		/// y = alpha * x + y. See 
+		/// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga8f99d6a644d3396aa32db472e0cfc91c.html#ga8f99d6a644d3396aa32db472e0cfc91c
+		/// </summary>
+		void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
 
         /// <summary>
         /// result = x * y. See

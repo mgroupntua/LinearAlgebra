@@ -582,7 +582,7 @@ namespace MGroup.LinearAlgebra.Vectors
                     else
                     {
                         Array.Copy(this.values, result, this.values.Length);
-                        BlasExtensions.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
+                        Blas.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
                             thisCoefficient, result, 0, 1);
                     }
                     return new SparseVector(Length, result, indices);
@@ -607,7 +607,7 @@ namespace MGroup.LinearAlgebra.Vectors
                 }
                 else
                 {
-                    BlasExtensions.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
+                    Blas.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
                         thisCoefficient, this.values, 0, 1);
                 }
             }

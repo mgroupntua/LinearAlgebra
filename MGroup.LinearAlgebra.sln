@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distributed.Tests", "tests\MGroup.LinearAlgebra.Distributed.Tests\MGroup.LinearAlgebra.Distributed.Tests.csproj", "{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.LinearAlgebra.Implementations.NativeWin64", "src\MGroup.LinearAlgebra.Implementations.NativeWin64\MGroup.LinearAlgebra.Implementations.NativeWin64.csproj", "{C0401316-7390-4B4D-A45A-901CED250B6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Implementations.NativeWin64", "src\MGroup.LinearAlgebra.Implementations.NativeWin64\MGroup.LinearAlgebra.Implementations.NativeWin64.csproj", "{39B4152E-7E5E-480E-956E-CFA62A7FABE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGroup.LinearAlgebra.Implementations.NativeWin64.Tests", "tests\MGroup.LinearAlgebra.Implementations.NativeWin64.Tests\MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.csproj", "{F17610C4-F98A-42CB-8A65-D0E18239943F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Implementations.NativeWin64.Tests", "tests\MGroup.LinearAlgebra.Implementations.NativeWin64.Tests\MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.csproj", "{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,14 +41,14 @@ Global
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C0401316-7390-4B4D-A45A-901CED250B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C0401316-7390-4B4D-A45A-901CED250B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C0401316-7390-4B4D-A45A-901CED250B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C0401316-7390-4B4D-A45A-901CED250B6F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F17610C4-F98A-42CB-8A65-D0E18239943F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F17610C4-F98A-42CB-8A65-D0E18239943F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F17610C4-F98A-42CB-8A65-D0E18239943F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F17610C4-F98A-42CB-8A65-D0E18239943F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,8 +58,8 @@ Global
 		{CB28CCAA-76FE-4036-9A11-006F17F5242B} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
 		{65C1B9BB-D10A-4F3B-BEDC-7642735491BD} = {960E247E-1475-45BD-8D46-26D3D0677FDA}
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
-		{C0401316-7390-4B4D-A45A-901CED250B6F} = {960E247E-1475-45BD-8D46-26D3D0677FDA}
-		{F17610C4-F98A-42CB-8A65-D0E18239943F} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5} = {960E247E-1475-45BD-8D46-26D3D0677FDA}
+		{AD4B8CEE-54A1-4979-827F-35AA43D6DE6A} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B549AB6-C402-4735-9A77-2FC85C81C393}

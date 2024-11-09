@@ -659,7 +659,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else
 			{
 				Array.Copy(data, result, data.Length);
-				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, result, 0, 1);
+				Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new Vector(result);
 		}
@@ -699,7 +699,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			else
 			{
-				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, this.data, 0, 1);
 			}
 		}
 

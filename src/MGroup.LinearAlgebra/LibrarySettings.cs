@@ -70,7 +70,6 @@ namespace MGroup.LinearAlgebra
 				if (providers == LinearAlgebraProviderChoice.Managed)
 				{
 					Blas = ManagedBlasProvider.UniqueInstance;
-					BlasExtensions = ManagedBlasExtensionsProvider.UniqueInstance;
 					SparseBlas = ManagedSparseBlasProvider.UniqueInstance;
 					LapackLinearEquations = new LapackLinearEquationsFacade(ManagedLapackProvider.UniqueInstance);
 					LapackLeastSquares = new LapackLeastSquaresFacadeDouble(ManagedLapackProvider.UniqueInstance);
@@ -79,7 +78,6 @@ namespace MGroup.LinearAlgebra
 				else if (providers == LinearAlgebraProviderChoice.MKL)
 				{
 					Blas = MklBlasProvider.UniqueInstance;
-					BlasExtensions = MklBlasExtensionsProvider.UniqueInstance;
 					SparseBlas = MklSparseBlasProvider.UniqueInstance;
 					LapackLinearEquations = new LapackLinearEquationsFacade(MklLapackProvider.UniqueInstance);
 					LapackLeastSquares = new LapackLeastSquaresFacadeDouble(MklLapackProvider.UniqueInstance);
@@ -95,8 +93,6 @@ namespace MGroup.LinearAlgebra
 		public static bool ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds { get; set; } = true;
 
 		internal static IBlasProvider Blas { get; private set; }
-
-		internal static IBlasExtensionsProvider BlasExtensions { get; private set; }
 
 		internal static ISparseBlasProvider SparseBlas { get; private set; }
 

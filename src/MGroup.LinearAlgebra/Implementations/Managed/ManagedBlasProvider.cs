@@ -26,6 +26,12 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private ManagedBlasProvider() { } // private constructor for singleton pattern
 
 		#region BLAS Level 1
+		public void Daxpby(int n, double alpha, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY)
+		{
+			dscal.Run(n, beta, ref y, offsetY, incY);
+			daxpy.Run(n, alpha, x, offsetX, incX, ref y, offsetY, incY);
+		}
+
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/daxpy.aspx
 		/// </summary>

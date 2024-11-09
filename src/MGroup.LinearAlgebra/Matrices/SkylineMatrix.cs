@@ -905,7 +905,7 @@ namespace MGroup.LinearAlgebra.Matrices
                     else
                     {
                         Array.Copy(this.values, resultValues, values.Length);
-                        BlasExtensions.Daxpby(values.Length, otherCoefficient, otherSKY.values, 0, 1,
+                        Blas.Daxpby(values.Length, otherCoefficient, otherSKY.values, 0, 1,
                             thisCoefficient, resultValues, 0, 1);
                     }
                     return new SkylineMatrix(NumColumns, resultValues, this.diagOffsets);
@@ -954,7 +954,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 }
                 else
                 {
-                    BlasExtensions.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
+                    Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
                         thisCoefficient, this.values, 0, 1);
                 }
             }

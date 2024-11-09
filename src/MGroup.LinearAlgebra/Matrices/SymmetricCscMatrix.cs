@@ -459,7 +459,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					else
 					{
 						Array.Copy(this.values, resultValues, values.Length);
-						BlasExtensions.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
+						Blas.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
 							thisCoefficient, resultValues, 0, 1);
 					}
 

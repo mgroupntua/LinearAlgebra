@@ -375,7 +375,7 @@ namespace MGroup.LinearAlgebra.Matrices
             else
             {
                 Array.Copy(this.data, result, data.Length);
-                BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
+                Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
             }
             return new TriangularUpper(result, NumColumns);
         }
@@ -411,7 +411,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else
             {
-                BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
+                Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
             }
         }
 

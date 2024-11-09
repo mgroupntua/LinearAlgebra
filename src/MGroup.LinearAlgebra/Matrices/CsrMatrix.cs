@@ -561,7 +561,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					else
 					{
 						Array.Copy(this.values, resultValues, values.Length);
-						BlasExtensions.Daxpby(values.Length, otherCoefficient, otherCSR.values, 0, 1,
+						Blas.Daxpby(values.Length, otherCoefficient, otherCSR.values, 0, 1,
 							thisCoefficient, this.values, 0, 1);
 					}
 					return new CsrMatrix(NumRows, NumColumns, resultValues, this.colIndices, this.rowOffsets);
@@ -612,7 +612,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else
 			{
-				BlasExtensions.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
+				Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
 					thisCoefficient, this.values, 0, 1);
 			}
 		}

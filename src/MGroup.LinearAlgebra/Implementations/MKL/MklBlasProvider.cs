@@ -5,27 +5,34 @@ using MGroup.LinearAlgebra.Implementations.Managed;
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
 namespace MGroup.LinearAlgebra.Implementations.MKL
 {
-    /// <summary>
-    /// Implementation of <see cref="IBlasProvider"/> that calls the native dlls of Intel Math Kernel Library. See
-    /// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-and-sparse-blas-routines, particularly
-    /// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-1-routines-and-functions#54BF7621-EE61-46CD-AE5E-A28D786DE838,
-    /// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-2-routines#708B7246-A41B-4401-80A0-62F4DE57BE79,
-    /// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-3-routines#1465FCFE-34BB-4C1C-A6E3-7A839CC0842F
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    internal class MklBlasProvider : IBlasProvider
+	/// <summary>
+	/// Implementation of <see cref="IBlasProvider"/> that calls the native dlls of Intel Math Kernel Library. See
+	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-and-sparse-blas-routines, particularly
+	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-1-routines-and-functions#54BF7621-EE61-46CD-AE5E-A28D786DE838,
+	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-2-routines#708B7246-A41B-4401-80A0-62F4DE57BE79,
+	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-level-3-routines#1465FCFE-34BB-4C1C-A6E3-7A839CC0842F
+	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-blas-like-extensions#AEFE7AA3-E2F1-48B1-BCED-92ADB659AA9D
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	internal class MklBlasProvider : IBlasProvider
     {
         internal static MklBlasProvider UniqueInstance { get; } = new MklBlasProvider();
 		private static readonly ManagedBlasProvider defaultProvider = ManagedBlasProvider.UniqueInstance;
 
 		private MklBlasProvider() { } // private constructor for singleton pattern
 
-        #region BLAS Level 1
+		#region BLAS Level 1
+		/// <summary>
+		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-axpby#4CF5AEEA-E804-4EF6-BEC0-D2C83CC1DC57
+		/// </summary>
+		public void Daxpby(int n, double alpha, double[] x, int offsetX, int incX, double beta, double[] y, int offsetY,
+			int incY)
+			=> Blas.Daxpby(ref n, ref alpha, ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
-        /// <summary>
-        /// See https://software.intel.com/en-us/mkl-developer-reference-fortran-axpy#E25D8E10-0440-4827-BC58-BC71128EA6EE
-        /// </summary>
-        public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
+		/// <summary>
+		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-axpy#E25D8E10-0440-4827-BC58-BC71128EA6EE
+		/// </summary>
+		public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
             => Blas.Daxpy(ref n, ref alpha, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
 
         /// <summary>
