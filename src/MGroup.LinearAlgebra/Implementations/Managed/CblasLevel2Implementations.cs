@@ -1,4 +1,4 @@
-﻿namespace MGroup.LinearAlgebra.Providers.Managed
+﻿namespace MGroup.LinearAlgebra.Implementations.Managed
 {
     /// <summary>
     /// Custom and unoptimized managed implementations of BLAS like operations, for which I have not found 3rd party 

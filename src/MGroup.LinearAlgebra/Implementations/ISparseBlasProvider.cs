@@ -2,7 +2,7 @@
 //TODO: Add offsets.
 //TODO: For now this is my own interface. However there are some semi-standard ones. E.g. the inspector-executor interface, 
 //      which also provides functions for A^T * B * A, a NIST interface, the default and simplified deprecated interfaces of MKL.
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Provides linear algebra operations for sparse matrices and vectors, similar to the ones defined by BLAS for dense 

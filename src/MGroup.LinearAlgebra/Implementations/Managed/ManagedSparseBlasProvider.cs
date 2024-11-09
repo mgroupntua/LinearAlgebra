@@ -1,6 +1,6 @@
 //TODO: At some point I should change my Skyline format to match the one used in MKL. Then the SparseBLAS operations can be 
 //      interchangeable.
-namespace MGroup.LinearAlgebra.Providers.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed
 {
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ISparseBlasProvider"/>.

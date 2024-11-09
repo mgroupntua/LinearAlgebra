@@ -5,14 +5,14 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Output.Formatting;
-using MGroup.LinearAlgebra.Providers.Managed;
+using MGroup.LinearAlgebra.Implementations.Managed;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using System.Linq;
 using MGroup.LinearAlgebra.Reordering;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 
 //TODO: Also linear combinations with other matrix types may be useful, e.g. Skyline (K) with diagonal (M), but I think 
 //      that for global matrices, this should be done through concrete class to use DoEntrywiseIntoThis methods. 

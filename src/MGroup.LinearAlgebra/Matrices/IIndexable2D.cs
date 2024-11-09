@@ -3,7 +3,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	using System;
 
 	using MGroup.LinearAlgebra.Commons;
-	using MGroup.LinearAlgebra.Providers;
+	using MGroup.LinearAlgebra.Implementations;
 
 	/// <summary>
 	/// A matrix that supports indexing These are the most basic operations all matrix classes must

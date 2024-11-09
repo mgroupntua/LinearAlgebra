@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace MGroup.LinearAlgebra.Providers.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed
 {
     /// <summary>
     /// Custom and unoptimized managed implementations of SparseBLAS operations, for which I have not found 3rd party 

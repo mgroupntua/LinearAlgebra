@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Exceptions;
-using static MGroup.LinearAlgebra.Providers.LapackUtilities;
+using static MGroup.LinearAlgebra.Implementations.LapackUtilities;
 
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
 	/// <summary>
 	/// Simplifies the use of LAPACK (see <see cref="ILapackProvider"/>) linear algebra operations that concern the calculation

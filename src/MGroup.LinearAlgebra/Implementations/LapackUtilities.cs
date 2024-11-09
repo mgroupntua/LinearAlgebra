@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using MGroup.LinearAlgebra.Exceptions;
 
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Utility methods to use when calling methods from <see cref="ILapackProvider"/>.

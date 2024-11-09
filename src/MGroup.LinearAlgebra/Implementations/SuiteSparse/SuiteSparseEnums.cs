@@ -2,7 +2,7 @@
 //TODO: These reorderings must be available to the user as dedicated classes. After selecting one the dofs of the finite 
 //      element model should be reordered, since that reordering will be used many times. CHOLDMOD should always be used with 
 //      "natural" ordering, which may have been produced by the user by applying a reordering algorithm.
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Settings to control the ordering of the matrix during factorization with the SuiteSparse library.

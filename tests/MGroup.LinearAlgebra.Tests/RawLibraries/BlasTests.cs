@@ -1,7 +1,7 @@
 ﻿using System;
 using IntelMKL.LP64;
 using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Providers.MKL;
+using MGroup.LinearAlgebra.Implementations.MKL;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using Xunit;

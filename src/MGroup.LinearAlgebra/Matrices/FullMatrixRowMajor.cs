@@ -6,7 +6,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	using System.Text;
 
 	using MGroup.LinearAlgebra.Commons;
-	using MGroup.LinearAlgebra.Providers;
+	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Reduction;
 	using MGroup.LinearAlgebra.Vectors;
 

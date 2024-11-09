@@ -8,8 +8,8 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Output.Formatting;
-	using MGroup.LinearAlgebra.Providers;
-	using MGroup.LinearAlgebra.Providers.MKL;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.MKL;
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>

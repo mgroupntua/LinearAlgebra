@@ -1,8 +1,8 @@
 ﻿using System;
-using static MGroup.LinearAlgebra.Providers.LapackUtilities;
+using static MGroup.LinearAlgebra.Implementations.LapackUtilities;
 
 //TODO: provide versions of these methods where the user can provide the work arrays.
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Simplifies the use of LAPACK (see <see cref="ILapackProvider"/>) linear algebra operations that concern the solution of

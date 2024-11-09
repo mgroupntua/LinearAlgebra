@@ -1,9 +1,9 @@
 using IntelMKL.LP64;
 
-using MGroup.LinearAlgebra.Providers.Managed;
+using MGroup.LinearAlgebra.Implementations.Managed;
 
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
-namespace MGroup.LinearAlgebra.Providers.MKL
+namespace MGroup.LinearAlgebra.Implementations.MKL
 {
     /// <summary>
     /// Implementation of <see cref="IBlasProvider"/> that calls the native dlls of Intel Math Kernel Library. See

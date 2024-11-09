@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
-	using MGroup.LinearAlgebra.Providers;
+	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>

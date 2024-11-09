@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace MGroup.LinearAlgebra.Providers.MKL
+namespace MGroup.LinearAlgebra.Implementations.MKL
 {
     /// <summary>
     /// Platform invoke methods for Intel MKL's Sparse BLAS. These are not covered by any nuget packages. Also see MKL's C user 

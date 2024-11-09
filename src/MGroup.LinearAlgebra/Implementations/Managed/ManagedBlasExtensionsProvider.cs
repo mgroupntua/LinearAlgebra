@@ -1,6 +1,6 @@
 ﻿using DotNumerics.LinearAlgebra.CSLapack;
 
-namespace MGroup.LinearAlgebra.Providers.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed
 {
     /// <summary>
     /// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasExtensionsProvider"/>.

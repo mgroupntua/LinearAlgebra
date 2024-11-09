@@ -1,5 +1,5 @@
 ﻿using System;
-using MGroup.LinearAlgebra.Providers.PInvoke;
+using MGroup.LinearAlgebra.Implementations.PInvoke;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using Xunit;

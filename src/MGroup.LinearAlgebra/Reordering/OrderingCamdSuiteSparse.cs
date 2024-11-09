@@ -1,6 +1,6 @@
 ﻿using System;
 using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Providers.PInvoke;
+using MGroup.LinearAlgebra.Implementations.PInvoke;
 
 //TODO: also return the nonzeros after cholesky, flop count and other statistics
 namespace MGroup.LinearAlgebra.Reordering

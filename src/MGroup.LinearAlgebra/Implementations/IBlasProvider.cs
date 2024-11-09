@@ -1,6 +1,6 @@
 //TODO: I could also provide a CBLAS like wrapper. However it is not as high a priority, since BLAS is easy to use. If I do so,
 //      the enums should be transfered to the wrapper. Here I would need to use strings only.
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Provides linear algebra operations as defined by the BLAS (Basic Linear Algebra Subroutines) interface. These operations

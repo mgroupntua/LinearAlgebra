@@ -2,7 +2,7 @@
 using IntelMKL.LP64;
 
 //TODO: benchmark this against the managed implementation. Use large matrices.
-namespace MGroup.LinearAlgebra.Providers.MKL
+namespace MGroup.LinearAlgebra.Implementations.MKL
 {
     /// <summary>
     /// Implementation of <see cref="ISparseBlasProvider"/> that calls the native dlls of Intel Math Kernel Library. See

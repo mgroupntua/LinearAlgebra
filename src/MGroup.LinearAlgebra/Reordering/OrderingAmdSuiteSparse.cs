@@ -1,7 +1,7 @@
 ﻿using System;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices.Builders;
-using MGroup.LinearAlgebra.Providers.PInvoke;
+using MGroup.LinearAlgebra.Implementations.PInvoke;
 
 //TODO: also return the nonzeros after cholesky, flop count and other statistics
 //TODO: the number of "dense" rows moved to the end is not reported by SuiteSparse and a dummy value (-1) is return. Fix this.

@@ -1,4 +1,4 @@
-﻿namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Provides linear algebra operations that are variations of the usual BLAS subroutines (see <see cref="IBlasProvider"/>) 

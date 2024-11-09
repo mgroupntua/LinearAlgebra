@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
     /// <summary>
     /// Provides linear algebra operations as defined by the LAPACK (Linear ALgebra PACKage) interface. These operations are 

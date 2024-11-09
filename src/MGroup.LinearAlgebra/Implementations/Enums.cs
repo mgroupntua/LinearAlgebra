@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace MGroup.LinearAlgebra.Providers
+namespace MGroup.LinearAlgebra.Implementations
 {
 	/// <summary>
 	/// Describes how a matrix (2D) is stored in the system's memory as a 1D array.

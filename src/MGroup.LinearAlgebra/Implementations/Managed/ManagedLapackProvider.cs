@@ -6,7 +6,7 @@ using MGroup.LinearAlgebra.Commons;
 //TODO: In the custom LAPACK implementations, provide error checking for more than just the index where singularity, etc. is 
 //      found. See LAPACK source for the checks. Error checking needs to be improved in general.
 //TODO: My custom implementations do not use BLAS as they should have. Better port reference LAPACK.
-namespace MGroup.LinearAlgebra.Providers.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed
 {
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ILapackProvider"/>. Uses the 

@@ -2,8 +2,8 @@
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Providers;
-using MGroup.LinearAlgebra.Providers.PInvoke;
+using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Implementations.PInvoke;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: SuiteSparse Common should be represented here by an IDisposable class SuiteSparseCommon.

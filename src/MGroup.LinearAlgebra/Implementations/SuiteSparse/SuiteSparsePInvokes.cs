@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 //TODO: Use enums as return values or at least named constants.
-namespace MGroup.LinearAlgebra.Providers.PInvoke
+namespace MGroup.LinearAlgebra.Implementations.PInvoke
 {
     /// <summary>
     /// Platform Invoke methods for calling the SuiteSparse library via my custom C interface.

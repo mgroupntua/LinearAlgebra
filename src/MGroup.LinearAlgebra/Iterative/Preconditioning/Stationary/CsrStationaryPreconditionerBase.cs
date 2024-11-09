@@ -3,7 +3,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Providers.Managed;
+	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public abstract class CsrStationaryPreconditionerBase : IPreconditioner

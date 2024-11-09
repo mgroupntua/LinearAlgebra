@@ -1,7 +1,7 @@
 using IntelMKL.LP64;
 
 //TODO: this should probably call the MKL dlls directly, instead of using the package Compute.NET Bindings.
-namespace MGroup.LinearAlgebra.Providers.MKL
+namespace MGroup.LinearAlgebra.Implementations.MKL
 {
 	/// <summary>
 	/// Implementation of <see cref="ILapackProvider"/> that calls the native dlls of Intel Math Kernel Library. See

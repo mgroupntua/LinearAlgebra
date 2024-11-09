@@ -3,7 +3,7 @@
 //TODO: Some of these could be done by calling other BLAS, LAPACK functions. See the LAPACK source.
 //TODO: Use a port of reference LAPACK here. Custom implementations should be in another namespace (e.g. Factorizations or 
 //      Triangulations)
-namespace MGroup.LinearAlgebra.Providers.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed
 {
     /// <summary>
     /// Custom and unoptimized managed implementations of LAPACK like operations, for which I have not found 3rd party 

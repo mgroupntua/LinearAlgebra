@@ -5,7 +5,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Providers.Managed;
+	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public abstract class CsrStationaryIterationBase : IStationaryIteration
