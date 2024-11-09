@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Matrices;
@@ -6,6 +6,8 @@ using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Implementations.Managed;
+using MGroup.LinearAlgebra.Implementations.MKL;
 
 namespace MGroup.LinearAlgebra.Tests.Benchmarks
 {
@@ -28,7 +30,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             watch.Stop();
             long dokTime = watch.ElapsedMilliseconds;
 
-            LibrarySettings.LinearAlgebraProviders = LinearAlgebraProviderChoice.Managed;
+            LibrarySettings.GlobalProvider = new ManagedSequentialImplementationProvider();
             watch.Restart();
             Vector csrUnsortedTimesLhs = dok.BuildCsrMatrix(false).Multiply(lhs, false);
             watch.Stop();
@@ -39,7 +41,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             watch.Stop();
             long csrSortedTime = watch.ElapsedMilliseconds;
 
-            LibrarySettings.LinearAlgebraProviders = LinearAlgebraProviderChoice.MKL;
+            LibrarySettings.GlobalProvider = new NativeWin64ImplementationProvider();
             watch.Restart();
             Vector csrUnsortedMklTimesLhs = dok.BuildCsrMatrix(false).Multiply(lhs, false);
             watch.Stop();

@@ -128,7 +128,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			}
 
 			// Call Lapack
-			LapackEigensystems.Dgeev(jobLeft, jobRight, order, matrix, 0, leadingDimA, 
+			GlobalProvider.LapackEigensystems.Dgeev(jobLeft, jobRight, order, matrix, 0, leadingDimA, 
 				eigenvaluesReal, 0, eigenvaluesImaginary, 0,
 				eigenvectorsLeft, 0, leadingDimEigenvectorsLeft,
 				eigenvectorsRight, 0, leadingDimEigenvectorsRight);

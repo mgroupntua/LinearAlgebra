@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -17,9 +18,9 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestEconomyFactorsQ1R1(LinearAlgebraProviderChoice providers)
+        private static void TestEconomyFactorsQ1R1(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 int m = RectangularFullRank10by5.NumRows;
                 int n = RectangularFullRank10by5.NumCols;
@@ -38,9 +39,9 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestFactorsQR(LinearAlgebraProviderChoice providers)
+        private static void TestFactorsQR(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var A = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
                 Matrix expectedQ = Matrix.CreateFromArray(RectangularFullRank10by5.QRFactorQ);
@@ -57,9 +58,9 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestLeastSquaresSolution(LinearAlgebraProviderChoice providers)
+        private static void TestLeastSquaresSolution(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var A = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
                 QRFactorization factorization = A.FactorQR();

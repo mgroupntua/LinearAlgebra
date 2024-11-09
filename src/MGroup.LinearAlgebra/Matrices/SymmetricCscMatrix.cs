@@ -172,7 +172,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					double[] resultValues = new double[values.Length];
 					Array.Copy(this.values, resultValues, values.Length);
 
-					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
+					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
 
 					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
 					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
@@ -201,7 +201,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 				if (HaveSameIndexArrays(otherCSC))
 				{
-					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
+					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
 				}
 			}
 			else
@@ -449,17 +449,17 @@ namespace MGroup.LinearAlgebra.Matrices
 					if (thisCoefficient == 1.0)
 					{
 						Array.Copy(this.values, resultValues, values.Length);
-						Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
+						GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
 					}
 					else if (otherCoefficient == 1.0)
 					{
 						Array.Copy(otherCSC.values, resultValues, values.Length);
-						Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
+						GlobalProvider.Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
 					}
 					else
 					{
 						Array.Copy(this.values, resultValues, values.Length);
-						Blas.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
+						GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
 							thisCoefficient, resultValues, 0, 1);
 					}
 
@@ -490,7 +490,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 				if (HaveSameIndexArrays(otherCSC))
 				{
-					Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
+					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
 				}
 			}
 			else
@@ -593,7 +593,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			// Only apply the operation on non zero entries
 			var resultValues = new double[values.Length];
 			Array.Copy(values, resultValues, values.Length);
-			Blas.Dscal(NumNonZerosUpper, scalar, resultValues, 0, 1);
+			GlobalProvider.Blas.Dscal(NumNonZerosUpper, scalar, resultValues, 0, 1);
 
 			//TODO: Perhaps I should also copy the indexers
 			return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, resultValues, rowIndices, colOffsets);
@@ -602,7 +602,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
 		/// </summary>
-		public void ScaleIntoThis(double scalar) => Blas.Dscal(NumNonZerosUpper, scalar, this.values, 0, 1);
+		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(NumNonZerosUpper, scalar, this.values, 0, 1);
 
 		/// <summary>
 		/// See <see cref="IMatrix.SetEntryRespectingPattern(int, int, double)"/>.

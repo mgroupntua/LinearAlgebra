@@ -1,5 +1,6 @@
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -77,9 +78,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMatrixMatrixMultiplication(LinearAlgebraProviderChoice providers)
+        private static void TestMatrixMatrixMultiplication(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var matrix5x5 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix).GetSubmatrix(0, 5, 0, 5); //TODO: add a 5x5 matrix and its products
                 var matrix10x10 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
@@ -122,9 +123,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMatrixVectorMultiplication(LinearAlgebraProviderChoice providers)
+        private static void TestMatrixVectorMultiplication(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // MultiplyRight() - untransposed 
                 var A = CscMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
@@ -145,9 +146,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMatrixVectorMultiplicationIntoResult(LinearAlgebraProviderChoice providers)
+        private static void TestMatrixVectorMultiplicationIntoResult(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // The result vectors will first be set to some non zero values to make sure that the result overwrites 
                 // them instead of being added to them.

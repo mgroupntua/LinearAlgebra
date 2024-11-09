@@ -283,7 +283,7 @@ namespace MGroup.LinearAlgebra.Matrices
                     // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
                     double[] resultValues = new double[values.Length];
                     Array.Copy(this.values, resultValues, values.Length);
-                    Blas.Daxpy(values.Length, otherCoefficient, otherSKY.values, 0, 1, resultValues, 0, 1);
+					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherSKY.values, 0, 1, resultValues, 0, 1);
                     return new SkylineMatrix(NumColumns, resultValues, this.diagOffsets);
                 }
             }
@@ -318,7 +318,7 @@ namespace MGroup.LinearAlgebra.Matrices
             //TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
             double[] resultValues = new double[values.Length];
             Array.Copy(this.values, resultValues, values.Length);
-            Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, resultValues, 0, 1);
+			GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, resultValues, 0, 1);
             // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
             return new SkylineMatrix(NumColumns, resultValues, this.diagOffsets);
         }
@@ -354,7 +354,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			
 			if (HasSameIndexer(otherMatrix)) // no need to check dimensions if the indexing arrays are the same
             {
-                Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
+				GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
             }
             else
             {
@@ -895,17 +895,17 @@ namespace MGroup.LinearAlgebra.Matrices
                     if (thisCoefficient == 1.0)
                     {
                         Array.Copy(this.values, resultValues, values.Length);
-                        Blas.Daxpy(values.Length, otherCoefficient, otherSKY.values, 0, 1, this.values, 0, 1);
+						GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherSKY.values, 0, 1, this.values, 0, 1);
                     }
                     else if (otherCoefficient == 1.0)
                     {
                         Array.Copy(otherSKY.values, resultValues, values.Length);
-                        Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
+						GlobalProvider.Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
                     }
                     else
                     {
                         Array.Copy(this.values, resultValues, values.Length);
-                        Blas.Daxpby(values.Length, otherCoefficient, otherSKY.values, 0, 1,
+						GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherSKY.values, 0, 1,
                             thisCoefficient, resultValues, 0, 1);
                     }
                     return new SkylineMatrix(NumColumns, resultValues, this.diagOffsets);
@@ -950,11 +950,11 @@ namespace MGroup.LinearAlgebra.Matrices
             {
                 if (thisCoefficient == 1.0)
                 {
-                    Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
+					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
                 }
                 else
                 {
-                    Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
+					GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1,
                         thisCoefficient, this.values, 0, 1);
                 }
             }
@@ -1114,14 +1114,14 @@ namespace MGroup.LinearAlgebra.Matrices
             int nnz = this.values.Length;
             double[] resultValues = new double[nnz];
             Array.Copy(this.values, resultValues, nnz); //TODO: perhaps I should also copy the indexers
-            Blas.Dscal(nnz, scalar, resultValues, 0, 1);
+			GlobalProvider.Blas.Dscal(nnz, scalar, resultValues, 0, 1);
             return new SkylineMatrix(this.NumColumns, resultValues, this.diagOffsets);
         }
 
         /// <summary>
         /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
         /// </summary>
-        public void ScaleIntoThis(double scalar) => Blas.Dscal(values.Length, scalar, values, 0, 1);
+        public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(values.Length, scalar, values, 0, 1);
 
         /// <summary>
         /// See <see cref="IMatrix.SetEntryRespectingPattern(int, int, double)"/>.

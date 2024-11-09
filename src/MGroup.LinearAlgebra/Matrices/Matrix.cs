@@ -383,7 +383,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
 			double[] result = new double[data.Length];
 			Array.Copy(this.data, result, data.Length);
-			Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
@@ -400,7 +400,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSameRowDimension(this, wholeColumn);
 			int colOffset = colIdx * NumRows;
-			Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, data, colOffset, 1);
+			GlobalProvider.Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, data, colOffset, 1);
 		}
 
 		/// <summary>
@@ -435,7 +435,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void AxpyIntoThis(Matrix otherMatrix, double otherCoefficient)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
 		}
 
 		/// <summary>
@@ -949,17 +949,17 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (thisCoefficient == 1.0)
 			{
 				Array.Copy(this.data, result, data.Length);
-				Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
 			}
 			else if (otherCoefficient == 1.0)
 			{
 				Array.Copy(otherMatrix.data, result, data.Length);
-				Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
 			}
 			else
 			{
 				Array.Copy(this.data, result, data.Length);
-				Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new Matrix(result, NumRows, NumColumns);
 		}
@@ -1001,11 +1001,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			if (thisCoefficient == 1.0)
 			{
-				Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
 			}
 			else
 			{
-				Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
 			}
 		}
 
@@ -1067,7 +1067,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 			Preconditions.CheckMultiplicationDimensions(leftCols, rightRows);
 			double[] result = new double[leftRows * rightCols];
-			Blas.Dgemm(transposeLeft, transposeRight, leftRows, rightCols, leftCols,
+			GlobalProvider.Blas.Dgemm(transposeLeft, transposeRight, leftRows, rightCols, leftCols,
 				1.0, this.data, 0, this.NumRows, other.data, 0, other.NumRows,
 				1.0, result, 0, leftRows);
 			return new Matrix(result, leftRows, rightCols);
@@ -1138,7 +1138,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			(TransposeMatrix transposeA, int lhsLength, int rhsLength) = TransposeUtilities.PrepareBlas(this, transposeThis);
 			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
-			Blas.Dgemv(transposeA, NumRows, NumColumns,
+			GlobalProvider.Blas.Dgemv(transposeA, NumRows, NumColumns,
 				1.0, this.data, 0, NumRows, lhsVector.RawData, 0, 1,
 				0.0, rhsVector.RawData, 0, 1);
 		}
@@ -1180,12 +1180,12 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckMultiplicationDimensions(this, lhsVector, lhsOffset, rhsVector, rhsOffset, transposeThis);
 			if (transposeThis)
 			{
-				Blas.Dgemv(TransposeMatrix.Transpose, NumColumns, NumRows, lhsScale, this.data, 0, NumRows,
+				GlobalProvider.Blas.Dgemv(TransposeMatrix.Transpose, NumColumns, NumRows, lhsScale, this.data, 0, NumRows,
 					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
 			}
 			else
 			{
-				Blas.Dgemv(TransposeMatrix.NoTranspose, NumRows, NumColumns, lhsScale, this.data, 0, NumRows,
+				GlobalProvider.Blas.Dgemv(TransposeMatrix.NoTranspose, NumRows, NumColumns, lhsScale, this.data, 0, NumRows,
 					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
 			}
 		}
@@ -1268,14 +1268,14 @@ namespace MGroup.LinearAlgebra.Matrices
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
 			double[] result = new double[data.Length];
 			Array.Copy(data, result, data.Length);
-			Blas.Dscal(data.Length, scalar, result, 0, 1);
+			GlobalProvider.Blas.Dscal(data.Length, scalar, result, 0, 1);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
 		/// <summary>
 		/// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
 		/// </summary>
-		public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
+		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(data.Length, scalar, data, 0, 1);
 
 		/// <summary>
 		/// Sets all entries of this matrix to be equal to <paramref name="value"/>.

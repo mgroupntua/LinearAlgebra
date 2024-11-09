@@ -2,6 +2,10 @@ namespace MGroup.LinearAlgebra.Tests
 {
 	using System;
 
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.Managed;
+	using MGroup.LinearAlgebra.Implementations.MKL;
+
 	using Xunit;
 
 	// Currently SuiteSparse dlls call MKL dll
@@ -20,16 +24,16 @@ namespace MGroup.LinearAlgebra.Tests
 		public const string MessageWhenSkippingSuiteSparse
 			= "SuiteSparse is not set to be tested. See TestSettings.cs for more.";
 
-		public static TheoryData<LinearAlgebraProviderChoice> ProvidersToTest
+		public static TheoryData<IImplementationProvider> ProvidersToTest
 		{
 			get
 			{
-				var theoryData = new TheoryData<LinearAlgebraProviderChoice>();
-				theoryData.Add(LinearAlgebraProviderChoice.Managed);
+				var theoryData = new TheoryData<IImplementationProvider>();
+				theoryData.Add(new ManagedSequentialImplementationProvider());
 				if ((librariesToTest == TestSuiteSparseAndMklLibs.MklOnly)
 					|| (librariesToTest == TestSuiteSparseAndMklLibs.Both))
 				{
-					theoryData.Add(LinearAlgebraProviderChoice.MKL);
+					theoryData.Add(new NativeWin64ImplementationProvider());
 				}
 
 				return theoryData;
@@ -41,10 +45,10 @@ namespace MGroup.LinearAlgebra.Tests
 
 		public static bool TestSuiteSparse => (librariesToTest == TestSuiteSparseAndMklLibs.Both);
 
-		public static void RunMultiproviderTest(LinearAlgebraProviderChoice providers, Action test)
+		public static void RunMultiproviderTest(IImplementationProvider provider, Action test)
 		{
-			LinearAlgebraProviderChoice defaultProviders = LibrarySettings.LinearAlgebraProviders; // Store it for later
-			LibrarySettings.LinearAlgebraProviders = providers;
+			IImplementationProvider defaultProvider = LibrarySettings.GlobalProvider; // Store it for later
+			LibrarySettings.GlobalProvider = provider;
 
 			try
 			{
@@ -52,7 +56,7 @@ namespace MGroup.LinearAlgebra.Tests
 			}
 			finally
 			{
-				LibrarySettings.LinearAlgebraProviders = defaultProviders; // Once finished, reset the default providers
+				LibrarySettings.GlobalProvider = defaultProvider; // Once finished, reset the default providers
 			}
 		}
 	}

@@ -218,7 +218,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				"The entries to set exceed this vector's length");
 			if (sourceVector is Vector subvectorDense)
 			{
-				Blas.Daxpy(length, 1.0, subvectorDense.data, sourceIdx, 1, this.data, destinationIdx, 1);
+				GlobalProvider.Blas.Daxpy(length, 1.0, subvectorDense.data, sourceIdx, 1, this.data, destinationIdx, 1);
 			}
 			else this.AddSubvectorIntoThis(destinationIdx, sourceVector, 0, sourceVector.Length);
 		}
@@ -255,7 +255,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				Preconditions.CheckVectorDimensions(this, otherVector);
 				double[] result = new double[data.Length];
 				Array.Copy(data, result, data.Length);
-				SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
+				GlobalProvider.SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
 					sparse.RawIndices, 0, result, 0);
 				return Vector.CreateFromArray(result, false);
 			}
@@ -277,7 +277,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
 			double[] result = new double[data.Length];
 			Array.Copy(data, result, data.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
+			GlobalProvider.Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
 			return new Vector(result);
 		}
 
@@ -294,7 +294,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				{
 					if (sparse.RawIndices.Length != 0)
 					{
-						SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
+						GlobalProvider.SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
 							sparse.RawIndices, 0, data, 0);
 					}
 				}
@@ -317,7 +317,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void AxpyIntoThis(Vector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
+			GlobalProvider.Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
 		}
 
 		/// <summary>
@@ -331,7 +331,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 			if (sourceVector is Vector casted)
 			{
-				Blas.Daxpy(Length, sourceCoefficient, casted.data, sourceIndex, 1, this.data, destinationIndex, 1);
+				GlobalProvider.Blas.Daxpy(Length, sourceCoefficient, casted.data, sourceIndex, 1, this.data, destinationIndex, 1);
 			}
 			else
 			{
@@ -564,7 +564,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double DotProduct(Vector vector)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			return Blas.Ddot(Length, this.data, 0, 1, vector.data, 0, 1);
+			return GlobalProvider.Blas.Ddot(Length, this.data, 0, 1, vector.data, 0, 1);
 		}
 
 		/// <summary>
@@ -649,17 +649,17 @@ namespace MGroup.LinearAlgebra.Vectors
 			if (thisCoefficient == 1.0)
 			{
 				Array.Copy(data, result, data.Length);
-				Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
 			}
 			else if (otherCoefficient == 1.0)
 			{
 				Array.Copy(otherVector.data, result, data.Length);
-				Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
 			}
 			else
 			{
 				Array.Copy(data, result, data.Length);
-				Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, result, 0, 1);
+				GlobalProvider.Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new Vector(result);
 		}
@@ -695,11 +695,11 @@ namespace MGroup.LinearAlgebra.Vectors
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (thisCoefficient == 1.0)
 			{
-				Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
 			}
 			else
 			{
-				Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, this.data, 0, 1);
 			}
 		}
 
@@ -733,7 +733,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IVectorView.Norm2"/>
 		/// </summary>
-		public double Norm2() => Blas.Dnrm2(Length, data, 0, 1);
+		public double Norm2() => GlobalProvider.Blas.Dnrm2(Length, data, 0, 1);
 
 		/// <summary>
 		/// This method is used to remove duplicate values of a Knot Value Vector and return the multiplicity up to
@@ -851,14 +851,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
 			double[] result = new double[data.Length];
 			Array.Copy(data, result, data.Length);
-			Blas.Dscal(Length, scalar, result, 0, 1);
+			GlobalProvider.Blas.Dscal(Length, scalar, result, 0, 1);
 			return new Vector(result);
 		}
 
 		/// <summary>
 		/// See <see cref="IVector.ScaleIntoThis(double)"/>.
 		/// </summary>
-		public void ScaleIntoThis(double scalar) => Blas.Dscal(Length, scalar, data, 0, 1);
+		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(Length, scalar, data, 0, 1);
 
 		/// <summary>
 		/// Sets all entries of this vector to be equal to <paramref name="value"/>.

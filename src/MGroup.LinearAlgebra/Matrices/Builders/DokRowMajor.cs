@@ -12,6 +12,8 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 	using MGroup.LinearAlgebra.Implementations.MKL;
 	using MGroup.LinearAlgebra.Vectors;
 
+	using static MGroup.LinearAlgebra.LibrarySettings;
+
 	/// <summary>
 	/// Use this class for building large sparse matrices, e.g. <see cref="CsrMatrix"/>, not for operations. Convert to other 
 	/// matrix formats once finished and use them instead for matrix operations. The large matrices and their properties will be 
@@ -471,7 +473,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		public Vector MultiplyRight(Vector vector, bool avoidBuilding = false)
 		{
 			// SparseBLAS functions are way faster than managed code. Just don't sort the CSR.
-			bool buildCSR = (!avoidBuilding) && (LibrarySettings.SparseBlas is MklSparseBlasProvider);
+			bool buildCSR = (!avoidBuilding) && (GlobalProvider.SparseBlas is MklSparseBlasProvider);
 			if (buildCSR) return BuildCsrMatrix(false).Multiply(vector);
 
 			Preconditions.CheckMultiplicationDimensions(NumColumns, vector.Length);

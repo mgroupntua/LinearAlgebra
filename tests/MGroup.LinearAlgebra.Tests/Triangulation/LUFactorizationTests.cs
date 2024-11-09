@@ -1,10 +1,11 @@
-﻿using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
+using MGroup.LinearAlgebra.Implementations;
 
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
@@ -18,9 +19,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDeterminantInvertiblePositive(LinearAlgebraProviderChoice providers)
+        private static void TestDeterminantInvertiblePositive(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible (rank = 10) with positive det
                 var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
@@ -32,9 +33,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDeterminantInvertibleNegative(LinearAlgebraProviderChoice providers)
+        private static void TestDeterminantInvertibleNegative(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // Switch 2 rows to make the det negative
                 var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
@@ -50,9 +51,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDeterminantSingular1(LinearAlgebraProviderChoice providers)
+        private static void TestDeterminantSingular1(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // singular (rank = 8)
                 var A = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
@@ -64,9 +65,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDeterminantSingular2(LinearAlgebraProviderChoice providers)
+        private static void TestDeterminantSingular2(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // singular (rank = 9)
                 var A = Matrix.CreateFromArray(SquareSingularSingleDeficiency10by10.Matrix);
@@ -78,9 +79,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestFactorsLU(LinearAlgebraProviderChoice providers)
+        private static void TestFactorsLU(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible (rank = 10)
                 var A1 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
@@ -116,9 +117,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestInversion(LinearAlgebraProviderChoice providers)
+        private static void TestInversion(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible (rank = 10)
                 var A1 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
@@ -141,9 +142,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestSystemSolution(LinearAlgebraProviderChoice providers)
+        private static void TestSystemSolution(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible (rank = 10)
                 var A1 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);

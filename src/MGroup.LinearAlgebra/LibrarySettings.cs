@@ -15,91 +15,25 @@ using MGroup.LinearAlgebra.Implementations.MKL;
 namespace MGroup.LinearAlgebra
 {
 	/// <summary>
-	/// Represents a linear algebra library and its corresponding set of providers.
-	/// Authors: Serafeim Bakalakos
-	/// </summary>
-	public enum LinearAlgebraProviderChoice
-	{
-		/// <summary>
-		/// Providers that call one or more linear algebra libraries written in managed C# code. Those libraries could be 3rd 
-		/// party, custom ones or any combination thereof. They should be used if the libraries required by the other providers 
-		/// are not installed on the user's system.
-		/// </summary>
-		Managed,
-
-		/// <summary>
-		/// Providers that call the highly optimized Intel Math Kernel Library (native dlls). Note that Intel MKL relies heavily 
-		/// on OpenMP (and sometimes TBB), which might not be desirable if the user also wants to fully utilize the available 
-		/// CPU cores in their own multi-threaded code.
-		/// </summary>
-		MKL
-	}
-
-	/// <summary>
 	/// Allows the user to set global settings, such as whether to use managed C# linear algebra libraries or optimized native
 	/// ones. Methods exposed here are not thread-safe yet.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public static class LibrarySettings
 	{
-		private static LinearAlgebraProviderChoice providers;
-
 		static LibrarySettings()
 		{
-			LinearAlgebraProviders = LinearAlgebraProviderChoice.Managed;
+			GlobalProvider = new ManagedSequentialImplementationProvider();
 		}
 
 		/// <summary>
 		/// Linear algebra providers are classes that wrap calls to custom or 3rd party libraries for linear algebra operations.
-		/// This property allows the user to choose which library will be used. E.g. For good performance MKL providers (native 
-		/// dlls) should be chosen, but if the user hasn't installed Intel MKL, then they can always fall back into the managed 
-		/// C# providers. The default behaviour is to use managed providers, which are comparatively inefficient. It is strongly 
-		/// recommended to use other providers, if the required libraries are indeed installed. 
+		/// This property allows the user to choose which library will be used. E.g. For good performance MKL providers (native
+		/// dlls) should be chosen, but if the user hasn't installed Intel MKL, then they can always fall back into the managed
+		/// C# providers. The default behaviour is to use managed providers, which are comparatively inefficient. It is strongly
+		/// recommended to use other providers, if the required libraries are indeed installed.
 		/// </summary>
-		/// <remarks>
-		/// Note that some linear algebra classes work only with a specific library, which is usually stated in their name or 
-		/// at least in their description. When using these classes, the user must make sure that the required libraries are
-		/// installed on their system, regardless of the choice of providers here.
-		/// </remarks>
-		public static LinearAlgebraProviderChoice LinearAlgebraProviders
-		{
-			get => providers;
-			set
-			{
-				providers = value;
-				if (providers == LinearAlgebraProviderChoice.Managed)
-				{
-					Blas = ManagedBlasProvider.UniqueInstance;
-					SparseBlas = ManagedSparseBlasProvider.UniqueInstance;
-					LapackLinearEquations = new LapackLinearEquationsFacade(ManagedLapackProvider.UniqueInstance);
-					LapackLeastSquares = new LapackLeastSquaresFacadeDouble(ManagedLapackProvider.UniqueInstance);
-					LapackEigensystems = new LapackEigensystemsFacade(ManagedLapackProvider.UniqueInstance);
-				}
-				else if (providers == LinearAlgebraProviderChoice.MKL)
-				{
-					Blas = MklBlasProvider.UniqueInstance;
-					SparseBlas = MklSparseBlasProvider.UniqueInstance;
-					LapackLinearEquations = new LapackLinearEquationsFacade(MklLapackProvider.UniqueInstance);
-					LapackLeastSquares = new LapackLeastSquaresFacadeDouble(MklLapackProvider.UniqueInstance);
-					LapackEigensystems = new LapackEigensystemsFacade(MklLapackProvider.UniqueInstance);
-				}
-				else // This is useful to catch errors when adding new providers.
-				{
-					throw new NotImplementedException("For now only managed and MKL providers are available.");
-				}
-			}
-		}
+		public static IImplementationProvider GlobalProvider { get; set; }
 
 		public static bool ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds { get; set; } = true;
-
-		internal static IBlasProvider Blas { get; private set; }
-
-		internal static ISparseBlasProvider SparseBlas { get; private set; }
-
-		internal static LapackLinearEquationsFacade LapackLinearEquations { get; private set; }
-
-		internal static LapackLeastSquaresFacadeDouble LapackLeastSquares { get; private set; }
-
-		internal static LapackEigensystemsFacade LapackEigensystems { get; private set; }
 	}
 }

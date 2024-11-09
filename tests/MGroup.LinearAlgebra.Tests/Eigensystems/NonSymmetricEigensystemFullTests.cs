@@ -7,6 +7,7 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Eigensystems;
 using MGroup.LinearAlgebra.Tests.Utilities;
+using MGroup.LinearAlgebra.Implementations;
 
 //TODO: Test all 4 combos (only values, all three, values and left or right
 //TODO: Test for matrices that have all real eigenvalues and for matrices that have complex
@@ -19,9 +20,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesOnly(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesOnly(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
@@ -38,9 +39,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesAndRightEigenvectors(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesAndRightEigenvectors(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
@@ -58,9 +59,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesAndLeftEigenvectors(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesAndLeftEigenvectors(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
@@ -78,9 +79,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesAndAllEigenvectors(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesAndAllEigenvectors(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
@@ -99,9 +100,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigensystemCalledFromFullMatrix(LinearAlgebraProviderChoice providers)
+		private static void TestEigensystemCalledFromFullMatrix(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);

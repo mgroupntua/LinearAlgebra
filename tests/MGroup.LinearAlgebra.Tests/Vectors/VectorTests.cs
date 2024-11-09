@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
@@ -21,9 +22,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestAddition(LinearAlgebraProviderChoice providers)
+		private static void TestAddition(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var v1 = Vector.CreateFromArray(TestVectors.Vector1);
 				var v2 = Vector.CreateFromArray(TestVectors.Vector2);
@@ -41,9 +42,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestAxpy(LinearAlgebraProviderChoice providers)
+		private static void TestAxpy(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var v1 = Vector.CreateFromArray(TestVectors.Vector1);
 				var v2 = Vector.CreateFromArray(TestVectors.Vector2);
@@ -81,9 +82,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestDotProduct(LinearAlgebraProviderChoice providers)
+		private static void TestDotProduct(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var v1 = Vector.CreateFromArray(TestVectors.Vector1);
 				var v2 = Vector.CreateFromArray(TestVectors.Vector2);
@@ -114,9 +115,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestLinearCombination(LinearAlgebraProviderChoice providers)
+		private static void TestLinearCombination(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var v1 = Vector.CreateFromArray(TestVectors.Vector1);
 				var v2 = Vector.CreateFromArray(TestVectors.Vector2);
@@ -135,9 +136,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestNorm2(LinearAlgebraProviderChoice providers)
+		private static void TestNorm2(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var vector = Vector.CreateFromArray(TestVectors.Vector1);
 				comparer.AssertEqual(TestVectors.Norm2OfVector1, vector.Norm2());
@@ -146,9 +147,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestScaling(LinearAlgebraProviderChoice providers)
+		private static void TestScaling(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var vector = Vector.CreateFromArray(TestVectors.Vector1);
 				var expected = Vector.CreateFromArray(TestVectors.Vector1Times2);
@@ -195,9 +196,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestSubtraction(LinearAlgebraProviderChoice providers)
+		private static void TestSubtraction(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var v1 = Vector.CreateFromArray(TestVectors.Vector1);
 				var v2 = Vector.CreateFromArray(TestVectors.Vector2);

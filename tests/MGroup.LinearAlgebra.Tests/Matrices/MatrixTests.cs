@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -22,9 +23,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		internal static void TestAddition(LinearAlgebraProviderChoice providers)
+		internal static void TestAddition(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				var A2 = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -38,9 +39,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		internal static void TestAxpyColumn(LinearAlgebraProviderChoice providers)
+		internal static void TestAxpyColumn(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				var columnVector = Vector.CreateWithValue(10, 1.0);
@@ -128,9 +129,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		internal static void TestInvertAndDeterminant(LinearAlgebraProviderChoice providers)
+		internal static void TestInvertAndDeterminant(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var matrix = Matrix.CreateFromArray(new double[,]
 				{
@@ -158,9 +159,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestLinearCombination(LinearAlgebraProviderChoice providers)
+		private static void TestLinearCombination(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				double scalar1 = 2.0;
@@ -181,9 +182,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestMatrixMatrixMultiplication(LinearAlgebraProviderChoice providers)
+		private static void TestMatrixMatrixMultiplication(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				var A2 = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
@@ -209,9 +210,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestMatrixVectorMultiplication(LinearAlgebraProviderChoice providers)
+		private static void TestMatrixVectorMultiplication(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var mvChecker = new MatrixDenseVectorMultiplicationChecker(
 				(A, x, tranpose) => ((Matrix)A).Multiply(x, tranpose),
@@ -242,9 +243,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestMatrixVectorMultiplicationIntoResult(LinearAlgebraProviderChoice providers)
+		private static void TestMatrixVectorMultiplicationIntoResult(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				// The result vectors will first be set to some non zero values to make sure that the result overwrites 
 				// them instead of being added to them.
@@ -268,9 +269,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestScaling(LinearAlgebraProviderChoice providers)
+		private static void TestScaling(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var matrix = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
 				double scalar = 5.0;
@@ -321,9 +322,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestSubtraction(LinearAlgebraProviderChoice providers)
+		private static void TestSubtraction(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				var A2 = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);

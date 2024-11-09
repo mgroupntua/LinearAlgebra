@@ -6,8 +6,8 @@ namespace MGroup.LinearAlgebra.Implementations.MKL
 	using MGroup.LinearAlgebra.Implementations.Managed;
 
 	/// <summary>
-	/// Providers that call the highly optimized Intel Math Kernel Library (native dlls). Note that Intel MKL relies heavily 
-	/// on OpenMP (and sometimes TBB), which might not be desirable if the user also wants to fully utilize the available 
+	/// Providers that call the highly optimized Intel Math Kernel Library (native dlls). Note that Intel MKL relies heavily
+	/// on OpenMP (and sometimes TBB), which might not be desirable if the user also wants to fully utilize the available
 	/// CPU cores in their own multi-threaded code.
 	/// </summary>
 	public class NativeWin64ImplementationProvider : IImplementationProvider
