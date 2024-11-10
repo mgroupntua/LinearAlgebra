@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Tests
 
 	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Implementations.Managed;
-	using MGroup.LinearAlgebra.Implementations.MKL;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64;
 
 	using Xunit;
 

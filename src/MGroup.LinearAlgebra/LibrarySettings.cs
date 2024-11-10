@@ -1,7 +1,6 @@
 using System;
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Implementations.Managed;
-using MGroup.LinearAlgebra.Implementations.MKL;
 
 //TODO: These should be thread-safe. Update the documentation as well.
 //TODO: A different approach is to employ the Abstract Factory pattern. Clients would use factories to create matrices, instead

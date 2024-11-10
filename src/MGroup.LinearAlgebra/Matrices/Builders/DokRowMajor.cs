@@ -9,7 +9,6 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Output.Formatting;
 	using MGroup.LinearAlgebra.Implementations;
-	using MGroup.LinearAlgebra.Implementations.MKL;
 	using MGroup.LinearAlgebra.Vectors;
 
 	using static MGroup.LinearAlgebra.LibrarySettings;
@@ -473,8 +472,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		public Vector MultiplyRight(Vector vector, bool avoidBuilding = false)
 		{
 			// SparseBLAS functions are way faster than managed code. Just don't sort the CSR.
-			bool buildCSR = (!avoidBuilding) && (GlobalProvider.SparseBlas is MklSparseBlasProvider);
-			if (buildCSR) return BuildCsrMatrix(false).Multiply(vector);
+			if (!avoidBuilding) return BuildCsrMatrix(false).Multiply(vector);
 
 			Preconditions.CheckMultiplicationDimensions(NumColumns, vector.Length);
 			var result = new double[this.NumRows];

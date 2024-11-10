@@ -7,7 +7,7 @@ using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.LinearAlgebra.Implementations.Managed;
-using MGroup.LinearAlgebra.Implementations.MKL;
+using MGroup.LinearAlgebra.Implementations.NativeWin64;
 
 namespace MGroup.LinearAlgebra.Tests.Benchmarks
 {
@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
 
             var watch = new Stopwatch();
             watch.Start();
-            Vector dokTimesLhs = dok.MultiplyRight(lhs);
+            Vector dokTimesLhs = dok.MultiplyRight(lhs, avoidBuilding: true);
             watch.Stop();
             long dokTime = watch.ElapsedMilliseconds;
 

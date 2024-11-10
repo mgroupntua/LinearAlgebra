@@ -8,16 +8,16 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 	/// Linear algebra operations to be tested against. These are naive implementations for dense matrices and vectors, 
 	/// thus they are much more reliable. Still getting the result from another software (e.g. matlab) would be preferable.
 	/// </summary>
-	internal static class MatrixOperations
+	public static class MatrixOperations
 	{
-		internal static double[] LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2)
+		public static double[] LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2)
 		{
 			var result = new double[vector1.Length];
 			LinearCombination(scalar1, vector1, scalar2, vector2, result);
 			return result;
 		}
 
-		internal static void LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2, double[] result)
+		public static void LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2, double[] result)
 		{
 			int n = vector1.Length;
 			if (vector2.Length != n) throw new NonMatchingDimensionsException("Cannot add arrays with different length");
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 		}
 
-		internal static double[,] LinearCombination(double scalar1, double[,] matrix1, double scalar2, double[,] matrix2)
+		public static double[,] LinearCombination(double scalar1, double[,] matrix1, double scalar2, double[,] matrix2)
 		{
 			int m = matrix1.GetLength(0);
 			int n = matrix1.GetLength(1);
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return c;
 		}
 
-		internal static double DotProduct(double[] a, double[] b)
+		public static double DotProduct(double[] a, double[] b)
 		{
 			int n = a.Length;
 			if (b.Length != n) throw new NonMatchingDimensionsException("Cannot add arrays with different length");
@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return sum;
 		}
 
-		internal static double[] MatrixTimesVector(double[,] matrix, double[] vector)
+		public static double[] MatrixTimesVector(double[,] matrix, double[] vector)
 		{
 			int m = matrix.GetLength(0);
 			int n = matrix.GetLength(1);
@@ -73,7 +73,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
-		internal static double[,] MatrixTimesMatrix(double[,] leftMatrix, double[,] rightMatrix)
+		public static double[,] MatrixTimesMatrix(double[,] leftMatrix, double[,] rightMatrix)
 		{
 			if (leftMatrix.GetLength(1) != rightMatrix.GetLength(0))
 				throw new NonMatchingDimensionsException("Invalid dimensions");
@@ -93,7 +93,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
-		internal static double[] Round(double[] vector, int decimals)
+		public static double[] Round(double[] vector, int decimals)
 		{
 			int n = vector.Length;
 			double[] rounded = new double[n];
@@ -104,7 +104,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return rounded;
 		}
 
-		internal static double[,] Round(double[,] matrix, int decimals)
+		public static double[,] Round(double[,] matrix, int decimals)
 		{
 			int m = matrix.GetLength(0);
 			int n = matrix.GetLength(1);
@@ -119,7 +119,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return rounded;
 		}
 
-		internal static double[] Scale(double scalar, double[] vector)
+		public static double[] Scale(double scalar, double[] vector)
 		{
 			int n = vector.Length;
 			double[] scaled = new double[n];
@@ -130,7 +130,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return scaled;
 		}
 
-		internal static double[,] Scale(double scalar, double[,] matrix)
+		public static double[,] Scale(double scalar, double[,] matrix)
 		{
 			int m = matrix.GetLength(0);
 			int n = matrix.GetLength(1);
@@ -145,7 +145,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return scaled;
 		}
 
-		internal static double[,] Transpose(double[,] matrix)
+		public static double[,] Transpose(double[,] matrix)
 		{
 			int m = matrix.GetLength(0);
 			int n = matrix.GetLength(1);

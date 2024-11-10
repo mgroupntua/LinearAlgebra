@@ -1,17 +1,17 @@
-﻿using System;
+using System;
 using IntelMKL.LP64;
 using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Implementations.MKL;
+using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
+using MGroup.LinearAlgebra.Tests;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using Xunit;
 
 
-namespace MGroup.LinearAlgebra.Tests.RawLibraries
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
 {
     /// <summary>
     /// Tests for Intel MKL library's BLAS functions.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public static class MklBlasTests
     {

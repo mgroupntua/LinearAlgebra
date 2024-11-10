@@ -8,9 +8,8 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasProvider"/>. Uses the 
 	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSBlas/Default.aspx) for the most
 	/// part. For BLAS subroutines not provided by DotNumerics, custom C# implementations are used instead. 
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal class ManagedBlasProvider : IBlasProvider
+	public class ManagedBlasProvider : IBlasProvider
 	{
 		//TODO: perhaps these should not be static.
 		private static readonly DAXPY daxpy = new DAXPY();
@@ -21,7 +20,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private static readonly DSCAL dscal = new DSCAL();
 		private static readonly DTRSV dtrsv = new DTRSV();
 
-		internal static ManagedBlasProvider UniqueInstance { get; } = new ManagedBlasProvider();
+		public static ManagedBlasProvider UniqueInstance { get; } = new ManagedBlasProvider();
 
 		private ManagedBlasProvider() { } // private constructor for singleton pattern
 

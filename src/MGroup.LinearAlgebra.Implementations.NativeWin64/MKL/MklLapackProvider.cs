@@ -1,18 +1,17 @@
 using IntelMKL.LP64;
 
 //TODO: this should probably call the MKL dlls directly, instead of using the package Compute.NET Bindings.
-namespace MGroup.LinearAlgebra.Implementations.MKL
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 {
 	/// <summary>
 	/// Implementation of <see cref="ILapackProvider"/> that calls the native dlls of Intel Math Kernel Library. See
 	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-lapack-routines, particularly
 	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-lapack-linear-equation-routines,
 	/// https://software.intel.com/en-us/mkl-developer-reference-fortran-orthogonal-factorizations-lapack-computational-routines#7C288008-E0D0-4E7A-9835-F03B984C3C8E
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal class MklLapackProvider : ILapackProvider
+	public class MklLapackProvider : ILapackProvider
 	{
-		internal static MklLapackProvider UniqueInstance { get; } = new MklLapackProvider();
+		public static MklLapackProvider UniqueInstance { get; } = new MklLapackProvider();
 
 		private MklLapackProvider() { } // private constructor for singleton pattern
 
@@ -37,9 +36,9 @@ namespace MGroup.LinearAlgebra.Implementations.MKL
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-geqrf#C860486D-506E-44CA-A47B-FA4E5288147D
 		/// </summary>
-		public void Dgeqrf(int m, int n, double[] a, int offsetA, int ldA, double[] tau, int offsetTau, 
+		public void Dgeqrf(int m, int n, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
-			=> Lapack.Dgeqrf(ref m, ref n, ref a[offsetA], ref ldA, ref tau[offsetTau], 
+			=> Lapack.Dgeqrf(ref m, ref n, ref a[offsetA], ref ldA, ref tau[offsetTau],
 				ref work[offsetWork], ref lWork, ref info);
 
 		/// <summary>
@@ -60,13 +59,13 @@ namespace MGroup.LinearAlgebra.Implementations.MKL
 		/// </summary>
 		public void Dgetrs(string transA, int n, int nRhs, double[] a, int offsetA, int ldA, int[] ipiv, int offsetIpiv,
 			double[] b, int offsetB, int ldB, ref int info)
-			=> Lapack.Dgetrs(transA, ref n, ref nRhs, ref a[offsetA], ref ldA, ref ipiv[offsetIpiv], 
+			=> Lapack.Dgetrs(transA, ref n, ref nRhs, ref a[offsetA], ref ldA, ref ipiv[offsetIpiv],
 				ref b[offsetB], ref ldB, ref info);
 
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-orglq#C8D288CD-C41A-46EB-94B6-62C4569FC0DC
 		/// </summary>
-		public void Dorglq(int m, int n, int k, double[] a, int offsetA, int ldA, double[] tau, int offsetTau, 
+		public void Dorglq(int m, int n, int k, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
 			=> Lapack.Dorglq(ref m, ref n, ref k, ref a[offsetA], ref ldA, ref tau[offsetTau],
 				ref work[offsetWork], ref lWork, ref info);
@@ -76,13 +75,13 @@ namespace MGroup.LinearAlgebra.Implementations.MKL
 		/// </summary>
 		public void Dorgqr(int m, int n, int k, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
-			=> Lapack.Dorgqr(ref m, ref n, ref k, ref a[offsetA], ref ldA, ref tau[offsetTau], 
+			=> Lapack.Dorgqr(ref m, ref n, ref k, ref a[offsetA], ref ldA, ref tau[offsetTau],
 				ref work[offsetWork], ref lWork, ref info);
 
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-ormlq#0ECF1EB6-C8B0-4C81-8873-940EFEA2C08B
 		/// </summary>
-		public void Dormlq(string side, string transQ, int m, int n, int k, double[] a, int offsetA, int ldA, double[] tau, 
+		public void Dormlq(string side, string transQ, int m, int n, int k, double[] a, int offsetA, int ldA, double[] tau,
 			int offsetTau, double[] c, int offsetC, int ldC, double[] work, int offsetWork, int lWork, ref int info)
 			=> Lapack.Dormlq(side, transQ, ref m, ref n, ref k, ref a[offsetA], ref ldA, ref tau[offsetTau],
 				ref c[offsetC], ref ldC, ref work[offsetWork], ref lWork, ref info);

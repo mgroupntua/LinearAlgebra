@@ -12,5 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\MGroup.LinearAlgebra\MGroup.LinearAlgebra.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+	<InternalsVisibleTo Include="MGroup.LinearAlgebra.Implementations.NativeWin64.Tests" />
+  </ItemGroup>
 
 </Project>

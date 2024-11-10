@@ -1,9 +1,11 @@
-namespace MGroup.LinearAlgebra.Implementations.MKL
+
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Text;
-	using MGroup.LinearAlgebra.Implementations.Managed;
+
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
 
 	/// <summary>
 	/// Providers that call the highly optimized Intel Math Kernel Library (native dlls). Note that Intel MKL relies heavily
