@@ -1,11 +1,3 @@
-using System;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Implementations.PInvoke;
-using MGroup.LinearAlgebra.Vectors;
-
 //TODO: SuiteSparse Common should be represented here by an IDisposable class SuiteSparseCommon.
 //TODO: Perhaps I should express the back/forward/full solve using the L*D*L^T, L*L^T, L^T, L^T*D factors as in CHOLMOD.
 //TODO: During a non linear or dynamic analysis the sparsity pattern stays the same. Perhaps the symbolic factorization phase
@@ -16,8 +8,18 @@ using MGroup.LinearAlgebra.Vectors;
 //      solution, the rhs and solution vectors must be permuted and the same pattern must be processed to find a good reordering.
 //TODO: I think this uses Cholesky and not LDL. When the dlls were created, SuiteSparse supported simplicial Cholesky,
 //		simplicial LDL, supernodal LL, but not supernodal LDL.
-namespace MGroup.LinearAlgebra.Triangulation
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 {
+	using System;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.PInvoke;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Triangulation;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Cholesky factorization of a sparse symmetric positive definite matrix using the SuiteSparse library. The original matrix
 	/// must be in Compressed Sparse Columns format, with only the upper triangle stored.

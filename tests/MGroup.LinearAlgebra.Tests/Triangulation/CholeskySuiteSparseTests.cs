@@ -1,15 +1,14 @@
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Matrices.Builders;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Tests.TestData;
-using MGroup.LinearAlgebra.Tests.Utilities;
-using MGroup.LinearAlgebra.Vectors;
-using Xunit;
-
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Matrices.Builders;
+	using MGroup.LinearAlgebra.Tests.TestData;
+	using MGroup.LinearAlgebra.Tests.Utilities;
+	using MGroup.LinearAlgebra.Triangulation;
+	using MGroup.LinearAlgebra.Vectors;
+	using Xunit;
+
 	/// <summary>
 	/// Tests for <see cref="CholeskySuiteSparse"/>.
 	/// </summary>

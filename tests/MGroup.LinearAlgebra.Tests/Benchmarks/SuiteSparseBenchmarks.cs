@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Matrices.Builders;
-using MGroup.LinearAlgebra.Vectors;
-
 namespace MGroup.LinearAlgebra.Tests.Benchmarks
 {
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Matrices.Builders;
+	using MGroup.LinearAlgebra.Vectors;
+
 	public class SuiteSparseBenchmarks
 	{
 		public static void MemoryConsumptionDebugging()
