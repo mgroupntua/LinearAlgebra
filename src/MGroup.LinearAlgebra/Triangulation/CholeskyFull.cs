@@ -168,7 +168,6 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <exception cref="AccessViolationException">
 		/// Thrown if the unmanaged memory that holds the factorization data has been released.
 		/// </exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Matrix SolveLinearSystems(Matrix rhs)
 		{
 			CheckOverwritten();

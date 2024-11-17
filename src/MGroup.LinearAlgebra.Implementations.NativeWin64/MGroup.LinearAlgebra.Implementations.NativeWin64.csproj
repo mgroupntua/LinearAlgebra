@@ -16,5 +16,9 @@
   <ItemGroup>
 	<InternalsVisibleTo Include="MGroup.LinearAlgebra.Implementations.NativeWin64.Tests" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Triangulation\" />
+  </ItemGroup>
 
 </Project>

@@ -77,7 +77,8 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 			SymmetricCscMatrix submatrix11, double comparisonTolerance, double[,] expectedSchur11)
 		{
 			var comparer = new MatrixComparer(comparisonTolerance);
-			ITriangulation inverseA11 = CholeskyCSparseNet.Factorize(submatrix11);
+			using var inverseA11 = new CholeskyCSparseNet();
+			inverseA11.Factorize(submatrix11);
 
 			// Test the method that returns a new instance for the Schur complement
 			SymmetricMatrix computedS11 = SchurComplementPckCsrSymCsc.CalcSchurComplement(submatrix00, submatrix01, inverseA11);
