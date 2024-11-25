@@ -10,7 +10,7 @@ namespace MGroup.LinearAlgebra.Implementations
 	{
 		/// <summary>
 		/// Apply the Approximate Minimum Degree (AMD) algorithm to find a fill-reducing permutation of the rows and columns.
-		/// AMD's permutation is always new-to-old.
+		/// AMD's permutation is always new-to-old, namely reordered[i] = original[permutation[i]].
 		/// </summary>
 		/// <param name="order">The number of rows/columns of the matrix.</param>
 		/// <param name="cscRowIndices">The row indices in symmetric CSC format of the upper triangle of the matrix.</param>

@@ -39,9 +39,11 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
 
 			int n = SparsePosDef10by10.Order;
 			var pattern = SparsityPatternSymmetric.CreateFromDense(Matrix.CreateFromArray(SparsePosDef10by10.Matrix));
-			var orderingAlg = new OrderingCamdSuiteSparse();
-			(int[] permutation, ReorderingStatistics stats) =
-				orderingAlg.FindPermutation(pattern, SparsePosDef10by10.ConstraintsCAMD);
+
+			(int[] rowIndices, int[] colOffsets) = pattern.BuildSymmetricCSCArrays(true);
+			var suiteSparseProvider = new SuiteSparseReorderingProvider();
+			(int[] permutation, ReorderingStatistics stats) = suiteSparseProvider.Camd(
+				pattern.Order, rowIndices, colOffsets, SparsePosDef10by10.ConstraintsCAMD);
 
 			var originalDiagonal = new double[n];
 			var permutedDiagonal = new double[n];

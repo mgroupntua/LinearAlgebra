@@ -23,7 +23,9 @@ namespace MGroup.LinearAlgebra.Reordering
 		}
 
 		/// <inheritdoc/>
-		/// <remarks>The returned permutation is always new-to-old when using AMD.</remarks>
+		/// <remarks>
+		/// The returned permutation is always new-to-old when using AMD, namely reordered[i] = original[permutation[i]].
+		/// </remarks>
 		public (int[] permutation, bool oldToNew) FindPermutation(SparsityPatternSymmetric pattern)
 		{
 			(int[] rowIndices, int[] colOffsets) = pattern.BuildSymmetricCSCArrays(sortRowsOfEachCol: true);
@@ -32,7 +34,9 @@ namespace MGroup.LinearAlgebra.Reordering
 		}
 
 		/// <inheritdoc/>
-		/// <remarks>The returned permutation is always new-to-old when using AMD.</remarks>
+		/// <remarks>
+		/// The returned permutation is always new-to-old when using AMD, namely reordered[i] = original[permutation[i]].
+		/// </remarks>
 		public (int[] permutation, bool oldToNew) FindPermutation(int order, int[] cscRowIndices, int[] cscColOffsets)
 		{
 			(int[] permutation, _) = GlobalProvider.Reordering.AmdSymmetric(order, cscRowIndices, cscColOffsets);
@@ -42,7 +46,9 @@ namespace MGroup.LinearAlgebra.Reordering
 		/// <summary>
 		/// Finds a fill-reducting permutation for the rows/columns of a symmetric sparse matrix in DOK format.
 		/// </summary>
-		/// <remarks>The returned permutation is always new-to-old when using AMD.</remarks>
+		/// <remarks>
+		/// The returned permutation is always new-to-old when using AMD, namely reordered[i] = original[permutation[i]].
+		/// </remarks>
 		/// <param name="dok">The symmetric sparse matrix in DOK format.</param>
 		/// <returns>
 		/// permutation: An array containing the fill reducing permutation.
