@@ -1,3 +1,6 @@
+//TODO: Creating a dummy variables array with as many entries as the non zero entries is expensive and not needed. I would be 
+//      better off copying the AMD source code and avoiding that step.
+//TODO: Find out what is going wrong when AMD returns a permutation with more entries than the matrix order.
 namespace MGroup.LinearAlgebra.Implementations.Managed
 {
 	using System;

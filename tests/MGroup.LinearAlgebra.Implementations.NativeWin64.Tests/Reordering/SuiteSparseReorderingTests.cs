@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.Reordering
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
 {
 	using System;
 	using System.Collections;
@@ -6,27 +6,30 @@ namespace MGroup.LinearAlgebra.Tests.Reordering
 	using System.Linq;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.Managed;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Output;
 	using MGroup.LinearAlgebra.Reordering;
-
+	using MGroup.LinearAlgebra.Tests;
+	using MGroup.LinearAlgebra.Tests.Reordering;
 	using MGroup.LinearAlgebra.Tests.TestData;
 	using MGroup.LinearAlgebra.Tests.Utilities;
-
 	using Xunit;
 
 	public class SuiteSparseReorderingTests
 	{
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-13);
+		private static readonly IImplementationProvider provider = new CustomImplementationProvider(
+			ManagedBlasProvider.UniqueInstance, ManagedSparseBlasProvider.UniqueInstance,
+			ManagedLapackProvider.UniqueInstance, new SuiteSparseReorderingProvider());
 
 		[SkippableFact]
 		private static void TestReorderingAmdSuiteSparse()
 		{
 			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
-			var pattern = SparsityPatternSymmetric.CreateFromDense(Matrix.CreateFromArray(SparsePosDef10by10.Matrix));
-			var orderingAlg = new OrderingAmdSuiteSparse();
-			(int[] permutation, bool oldToNew) = orderingAlg.FindPermutation(pattern);
-			comparer.AssertEqual(SparsePosDef10by10.MatlabPermutationAMD, permutation);
+			AmdSymmetricOrderingTests.TestFindPermutationGivenPattern(provider);
 		}
 
 		[SkippableFact]

@@ -21,6 +21,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 			LapackLinearEquations = new LapackLinearEquationsFacade(MklLapackProvider.UniqueInstance);
 			LapackLeastSquares = new LapackLeastSquaresFacadeDouble(MklLapackProvider.UniqueInstance);
 			LapackEigensystems = new LapackEigensystemsFacade(MklLapackProvider.UniqueInstance);
+			Reordering = new SuiteSparseReorderingProvider();
 		}
 
 		public IBlasProvider Blas { get; }
@@ -30,6 +31,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 		public LapackLeastSquaresFacadeDouble LapackLeastSquares { get; }
 
 		public LapackEigensystemsFacade LapackEigensystems { get; }
+
+		public IReorderingProvider Reordering { get; }
 
 		public ISparseBlasProvider SparseBlas { get; }
 	}

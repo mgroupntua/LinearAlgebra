@@ -14,6 +14,8 @@ namespace MGroup.LinearAlgebra.Implementations
 
 		public LapackEigensystemsFacade LapackEigensystems { get; }
 
+		public IReorderingProvider Reordering { get; }
+
 		public ISparseBlasProvider SparseBlas { get; }
 	}
 }

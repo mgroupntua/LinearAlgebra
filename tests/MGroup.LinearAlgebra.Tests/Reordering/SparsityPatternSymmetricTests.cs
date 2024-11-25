@@ -5,10 +5,8 @@ namespace MGroup.LinearAlgebra.Tests.Reordering
 	using System.Reflection;
 
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Output;
 	using MGroup.LinearAlgebra.Reordering;
 	using MGroup.LinearAlgebra.Tests.TestData;
-	using MGroup.LinearAlgebra.Tests.Utilities;
 
 	using Xunit;
 

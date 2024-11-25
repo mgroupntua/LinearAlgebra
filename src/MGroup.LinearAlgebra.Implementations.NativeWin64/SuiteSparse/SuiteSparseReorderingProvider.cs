@@ -1,4 +1,6 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+// TODO: also return the nonzeros after cholesky, flop count and other statistics
+//TODO: the number of "dense" rows moved to the end is not reported by SuiteSparse and a dummy value (-1) is returned. Fix this.
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 {
 	using System;
 	using System.Collections.Generic;
