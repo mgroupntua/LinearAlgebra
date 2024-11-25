@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Implementations;
-	using MGroup.LinearAlgebra.Implementations.PInvoke;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;

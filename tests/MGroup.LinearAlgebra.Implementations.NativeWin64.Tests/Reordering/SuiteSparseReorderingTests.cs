@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
 
 	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Implementations.Managed;
-	using MGroup.LinearAlgebra.Implementations.NativeWin64;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Output;
 	using MGroup.LinearAlgebra.Reordering;
