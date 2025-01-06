@@ -15,14 +15,14 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 	public class SuiteSparseReorderingProvider : IReorderingProvider
 	{
 		/// <inheritdoc/>
-		/// <exception cref="SuiteSparseException">Thrown if SuiteSparse dlls cannot be loaded or if AMD fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if SuiteSparse dlls cannot be loaded or if AMD fails.</exception>
 		public (int[] permutation, ReorderingStatistics stats) AmdSymmetric(int order, int[] cscRowIndices, int[] cscColOffsets)
 		{
 			var permutation = new int[order];
 			IntPtr common = SuiteSparsePInvokes.CreateCommon(0, 0);
 			if (common == IntPtr.Zero)
 			{
-				throw new SuiteSparseException("Failed to initialize SuiteSparse.");
+				throw new NativeLibException("SuiteSparse (win64)", "Failed to initialize SuiteSparse.");
 			}
 
 			int numNonZerosUpper = cscRowIndices.Length;
@@ -30,8 +30,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 				out int nnzFactor, common);
 			if (status == 0)
 			{
-				throw new SuiteSparseException("AMD failed. This could be caused by the matrix being so large it"
-					+ " cannot be processed with the available memory.");
+				throw new NativeLibException("SuiteSparse (win64)", "AMD failed. This could be caused by the matrix being so " +
+					"large it cannot be processed with the available memory.");
 			}
 
 			SuiteSparsePInvokes.DestroyCommon(ref common);
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 		/// If <paramref name="order"/>, <paramref name="cscRowIndices"/> or <paramref name="cscColOffsets"/> do not describe 
 		/// a valid symmetric matrix.
 		/// </exception>
-		/// <exception cref="SuiteSparseException">
+		/// <exception cref="NativeLibException">
 		/// Thrown if SuiteSparse dlls cannot be loaded, or if there is not enough memory to allocate during CAMD.
 		/// </exception>
 		public (int[] permutation, ReorderingStatistics stats) Camd(int order, int[] cscRowIndices, int[] cscColOffsets,
@@ -110,7 +110,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 			}
 			else if (status == 3)
 			{
-				throw new SuiteSparseException("Not enough memory could be allocated");
+				throw new NativeLibException("SuiteSparse (win64)", "Not enough memory could be allocated");
 			}
 
 			return (permutation, new ReorderingStatistics(nnzFactor, numMovedDense));

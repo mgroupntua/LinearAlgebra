@@ -83,7 +83,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     </exception>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="newRow"/> violates the described
 		///     constraints. </exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails, usually due to insufficient
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails, usually due to insufficient
 		///     memory.</exception>
 		public void AddRow(int rowIdx, SparseVector newRow)
 		{
@@ -98,6 +98,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 				throw new IndexOutOfRangeException($"Cannot access row {rowIdx} in a"
 					+ $" {Order}-by-{Order} matrix");
 			}
+
 			if (newRow.Length != Order)
 			{
 				throw new NonMatchingDimensionsException($"The new row/column must have the same number of rows as this"
@@ -110,7 +111,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 				nnz, newRow.RawValues, newRow.RawIndices, colOffsets, common);
 			if (status != 1)
 			{
-				throw new SuiteSparseException("Rows addition did not succeed. This could be caused by insufficent memory");
+				throw new NativeLibException(
+					"SuiteSparse (win64)", "Rows addition did not succeed. This could be caused by insufficent memory");
 			}
 		}
 
@@ -124,7 +126,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     constraints.</exception>
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Vector BackSubstitution(Vector rhsVector)
 		{
 			var solution = new double[rhsVector.Length];
@@ -142,7 +144,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     constraints.</exception>
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Matrix BackSubstitutions(Matrix rhsVectors) => SolveInternal(SystemType.BackSubstitution, rhsVectors);
 
 		/// <summary>
@@ -165,7 +167,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="Order"/>.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> violates the described constraints.
 		///     </exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails, usually due to insufficient
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails, usually due to insufficient
 		///     memory.</exception>
 		public void DeleteRow(int rowIdx)
 		{
@@ -181,7 +183,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 			int status = SuiteSparsePInvokes.RowDelete(factorizedMatrix, rowIdx, common);
 			if (status != 1)
 			{
-				throw new SuiteSparseException("Rows deletion did not succeed.");
+				throw new NativeLibException("SuiteSparse (win64)", "Rows deletion did not succeed.");
 			}
 		}
 
@@ -208,14 +210,18 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 
 			int factorizationType = superNodal ? 1 : 0;
 			IntPtr common = SuiteSparsePInvokes.CreateCommon(factorizationType, (int)SuiteSparseOrdering.Natural);
-			if (common == IntPtr.Zero) throw new SuiteSparseException("Failed to initialize SuiteSparse.");
+			if (common == IntPtr.Zero)
+			{
+				throw new NativeLibException("SuiteSparse (win64)", "Failed to initialize SuiteSparse.");
+			}
+
 			int status = SuiteSparsePInvokes.FactorizeCSCUpper(order, numNonZerosUpper, cscValues, cscRowIndices, cscColOffsets,
 				out IntPtr factorizedMatrix, common);
 			if (status == -2)
 			{
 				SuiteSparsePInvokes.DestroyCommon(ref common);
-				throw new SuiteSparseException("Factorization did not succeed. This could be caused by insufficent memory,"
-					+ " due to excessive fill-in.");
+				throw new NativeLibException("SuiteSparse (win64)", 
+					"Factorization did not succeed. This could be caused by insufficent memory, due to excessive fill-in.");
 			}
 			else if (status >= 0)
 			{
@@ -250,7 +256,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     constraints.</exception>
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Vector ForwardSubstitution(Vector rhsVector)
 		{
 			var solution = new double[rhsVector.Length];
@@ -268,7 +274,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     constraints.</exception>
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Matrix ForwardSubstitutions(Matrix rhsVectors) => SolveInternal(SystemType.ForwardSubstitution, rhsVectors);
 
 		/// <summary>
@@ -281,7 +287,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public void SolveLinearSystem(Vector rhsVector, Vector solution)
 		{
 			Preconditions.CheckMultiplicationDimensions(Order, solution.Length);
@@ -298,7 +304,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 		///     constraints.</exception>
 		/// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been
 		///     released.</exception>
-		/// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
+		/// <exception cref="NativeLibException">Thrown if the call to SuiteSparse library fails.</exception>
 		public Matrix SolveLinearSystems(Matrix rhsVectors) => SolveInternal(SystemType.Regular, rhsVectors);
 
 		/// <summary>
@@ -314,6 +320,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 				{
 					throw new AccessViolationException("The matrix in unmanaged memory has already been cleared or lost");
 				}
+
 				SuiteSparsePInvokes.DestroyFactor(ref factorizedMatrix, common);
 				factorizedMatrix = IntPtr.Zero;
 				SuiteSparsePInvokes.DestroyCommon(ref common);
@@ -327,7 +334,10 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 			Preconditions.CheckSystemSolutionDimensions(Order, rhs.Length);
 
 			int status = SuiteSparsePInvokes.Solve((int)system, Order, 1, factorizedMatrix, rhs.RawData, solution, common);
-			if (status != 1) throw new SuiteSparseException("System solution failed.");
+			if (status != 1)
+			{
+				throw new NativeLibException("SuiteSparse (win64)", "System solution failed.");
+			}
 		}
 
 		private Matrix SolveInternal(SystemType system, Matrix rhs)
@@ -337,7 +347,11 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 			double[] solution = new double[rhs.NumRows * rhs.NumColumns];
 			int status = SuiteSparsePInvokes.Solve((int)system, Order, rhs.NumColumns, factorizedMatrix, rhs.RawData,
 				solution, common);
-			if (status != 1) throw new SuiteSparseException("System solution failed.");
+			if (status != 1)
+			{
+				throw new NativeLibException("SuiteSparse (win64)", "System solution failed.");
+			}
+
 			return Matrix.CreateFromArray(solution, rhs.NumRows, rhs.NumColumns, false);
 		}
 
