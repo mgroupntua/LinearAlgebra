@@ -11,13 +11,13 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 	public abstract class CsrStationaryIterationBase : IStationaryIteration
 	{
 		protected readonly List<IStationaryIteration> linkedIterations = new List<IStationaryIteration>();
-		protected readonly StationaryIterationManagedProvider provider;
+		protected readonly ManagedStationaryIterationProvider provider;
 		protected CsrMatrix matrix;
 		protected int[] diagonalOffsets;
 
 		public CsrStationaryIterationBase()
 		{
-			provider = new StationaryIterationManagedProvider();
+			provider = new ManagedStationaryIterationProvider();
 		}
 
 		public void LinkWith(IStationaryIteration other)

@@ -1,20 +1,21 @@
-using System;
-using DotNumerics.LinearAlgebra.CSLapack;
-using MGroup.LinearAlgebra.Commons;
-
 //TODO: find a managed BLAS that supports the methods DotNumerics doesn't.
 //TODO: In the custom LAPACK implementations, provide error checking for more than just the index where singularity, etc. is 
 //      found. See LAPACK source for the checks. Error checking needs to be improved in general.
 //TODO: My custom implementations do not use BLAS as they should have. Better port reference LAPACK.
 namespace MGroup.LinearAlgebra.Implementations.Managed
 {
+	using System;
+
+	using DotNumerics.LinearAlgebra.CSLapack;
+
+	using MGroup.LinearAlgebra.Commons;
+
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ILapackProvider"/>. Uses the 
 	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSLapack/Default.aspx) for the most
 	/// part. For LAPACK subroutines not provided by DotNumerics, custom C# implementations are used instead. 
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal class ManagedLapackProvider : ILapackProvider
+	public class ManagedLapackProvider : ILapackProvider
 	{
 		private static readonly DGEEV dgeev = new DGEEV();
 		private static readonly DGELQF dgelqf = new DGELQF();
@@ -29,7 +30,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private static readonly DSYEV dsyev = new DSYEV();
 		private static readonly DTRSM dtrsm = new DTRSM();
 
-		internal static ManagedLapackProvider UniqueInstance { get; } = new ManagedLapackProvider();
+		public static ManagedLapackProvider UniqueInstance { get; } = new ManagedLapackProvider();
 
 		private ManagedLapackProvider() { } // private constructor for singleton pattern
 

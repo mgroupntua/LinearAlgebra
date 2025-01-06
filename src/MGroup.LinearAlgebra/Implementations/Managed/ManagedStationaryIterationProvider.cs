@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 
 	using MGroup.LinearAlgebra.Exceptions;
 
-	public class StationaryIterationManagedProvider
+	public class ManagedStationaryIterationProvider
 	{
 		public void CsrGaussSeidelBack(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			int[] diagOffsets, double[] rhs, double[] solution)
