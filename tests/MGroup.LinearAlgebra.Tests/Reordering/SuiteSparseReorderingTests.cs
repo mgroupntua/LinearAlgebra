@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
+namespace MGroup.LinearAlgebra.Tests.Reordering
 {
 	using System;
 	using System.Collections;
@@ -13,7 +13,6 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
 	using MGroup.LinearAlgebra.Output;
 	using MGroup.LinearAlgebra.Reordering;
 	using MGroup.LinearAlgebra.Tests;
-	using MGroup.LinearAlgebra.Tests.Reordering;
 	using MGroup.LinearAlgebra.Tests.TestData;
 	using MGroup.LinearAlgebra.Tests.Utilities;
 	using Xunit;

@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
+namespace MGroup.LinearAlgebra.Tests.RawLibraries
 {
 	using System;
 

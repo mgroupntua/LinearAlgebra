@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Benchmarks
+namespace MGroup.LinearAlgebra.Tests.Benchmarks
 {
 	using System;
 	using System.Diagnostics;

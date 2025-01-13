@@ -1,7 +1,3 @@
-using System.Runtime.InteropServices;
-
-using IntelMKL.LP64;
-
 //TODO: Replace Compute.NET functions with th LAPACKE interface for triangulations (~trf) and system solutions (~trs)
 //TODO: Wrap these methods with ones using enums, which will then call MKL with the correct arguments.
 //TODO: This class works because the dlls are copied due to Compute.NET. If that library is removed or different dlls need to 
@@ -9,6 +5,10 @@ using IntelMKL.LP64;
 //      and 1 for x86).
 namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 {
+	using System.Runtime.InteropServices;
+
+	using IntelMKL.LP64;
+
 	/// <summary>
 	/// Platform Invoke methods for Intel MKL's LAPACKE (C interface of LAPACK). These are not covered by any nuget packages.
 	/// Also see the included "lapacke.h" C header file and MKL's C user guide.

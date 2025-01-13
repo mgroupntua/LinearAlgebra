@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
+namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
 	using MGroup.LinearAlgebra.Matrices;

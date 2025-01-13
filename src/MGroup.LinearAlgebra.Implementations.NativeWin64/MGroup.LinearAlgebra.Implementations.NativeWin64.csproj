@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -14,7 +14,7 @@
   </ItemGroup>
   
   <ItemGroup>
-	<InternalsVisibleTo Include="MGroup.LinearAlgebra.Implementations.NativeWin64.Tests" />
+	<InternalsVisibleTo Include="MGroup.LinearAlgebra.Tests" />
   </ItemGroup>
   
   <ItemGroup>
