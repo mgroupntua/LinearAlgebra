@@ -4,6 +4,8 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Triangulation;
+
 	/// <summary>
 	/// Providers that call one or more linear algebra libraries written in managed C# code. Those libraries could be 3rd 
 	/// party, custom ones or any combination thereof. They should be used if the libraries required by the other providers 
@@ -32,5 +34,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public IReorderingProvider Reordering { get; }
 
 		public ISparseBlasProvider SparseBlas { get; }
+
+		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal) => new CholeskyCSparseNet();
 	}
 }

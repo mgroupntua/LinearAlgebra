@@ -9,6 +9,7 @@ namespace MGroup.LinearAlgebra.Tests
 	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Implementations.NativeWin64;
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
+	using MGroup.LinearAlgebra.Triangulation;
 
 	using Xunit;
 
@@ -43,7 +44,8 @@ namespace MGroup.LinearAlgebra.Tests
 							MklBlasProvider.UniqueInstance,
 							MklSparseBlasProvider.UniqueInstance,
 							MklLapackProvider.UniqueInstance,
-							new ManagedReorderingProvider()));
+							new ManagedReorderingProvider(),
+							superNodal => new CholeskyCSparseNet()));
 					}
 				}
 			}

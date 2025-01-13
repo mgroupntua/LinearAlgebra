@@ -15,6 +15,8 @@ namespace MGroup.LinearAlgebra.Tests.Reordering
 	using MGroup.LinearAlgebra.Tests;
 	using MGroup.LinearAlgebra.Tests.TestData;
 	using MGroup.LinearAlgebra.Tests.Utilities;
+	using MGroup.LinearAlgebra.Triangulation;
+
 	using Xunit;
 
 	public class SuiteSparseReorderingTests
@@ -22,7 +24,7 @@ namespace MGroup.LinearAlgebra.Tests.Reordering
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-13);
 		private static readonly IImplementationProvider provider = new CustomImplementationProvider(
 			ManagedBlasProvider.UniqueInstance, ManagedSparseBlasProvider.UniqueInstance,
-			ManagedLapackProvider.UniqueInstance, new SuiteSparseReorderingProvider());
+			ManagedLapackProvider.UniqueInstance, new SuiteSparseReorderingProvider(), superNodal => new CholeskyCSparseNet());
 
 		[SkippableFact]
 		private static void TestReorderingAmdSuiteSparse()

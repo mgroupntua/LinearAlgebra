@@ -4,10 +4,14 @@ namespace MGroup.LinearAlgebra.Implementations
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Triangulation;
+
 	public class CustomImplementationProvider : IImplementationProvider
 	{
-		public CustomImplementationProvider(IBlasProvider blas, ISparseBlasProvider sparseBlas, ILapackProvider lapackProvider, 
-			IReorderingProvider reordering) 
+		private readonly Func<bool, ICholeskySymmetricCsc> createSymmetricCscTriangulation;
+
+		public CustomImplementationProvider(IBlasProvider blas, ISparseBlasProvider sparseBlas, ILapackProvider lapackProvider,
+			IReorderingProvider reordering, Func<bool, ICholeskySymmetricCsc> createSymmetricCscTriangulation)
 		{ 
 			this.Blas = blas;
 			this.SparseBlas = sparseBlas;
@@ -15,6 +19,7 @@ namespace MGroup.LinearAlgebra.Implementations
 			this.LapackLeastSquares = new LapackLeastSquaresFacadeDouble(lapackProvider);
 			this.LapackEigensystems = new LapackEigensystemsFacade(lapackProvider);
 			this.Reordering = reordering;
+			this.createSymmetricCscTriangulation = createSymmetricCscTriangulation;
 		}
 
 		public IBlasProvider Blas { get; }
@@ -28,5 +33,8 @@ namespace MGroup.LinearAlgebra.Implementations
 		public IReorderingProvider Reordering { get; }
 
 		public ISparseBlasProvider SparseBlas { get; }
+
+		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal)
+			=> createSymmetricCscTriangulation(superNodal);
 	}
 }

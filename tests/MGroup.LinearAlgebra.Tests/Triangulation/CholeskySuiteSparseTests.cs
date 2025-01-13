@@ -124,36 +124,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 		}
 
 		[SkippableFact]
-		private static void TestSystemSolution1()
-		{
-			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
-
-			// Define linear system
-			var rhs = Vector.CreateFromArray(new double[] { 6.0, 14.0, 11.0, 12.0 });
-			var solutionExpected = Vector.CreateFromArray(new double[] { 1.0, 1.0, 1.0, 1.0 });
-			var matrixDOK = DokSymmetric.CreateEmpty(4);
-			matrixDOK[0, 0] = 4.0; matrixDOK[0, 2] = 2.0;
-			matrixDOK[1, 1] = 10.0; matrixDOK[1, 2] = 1.0; matrixDOK[1, 3] = 3.0;
-			matrixDOK[2, 2] = 8.0;
-			matrixDOK[3, 3] = 9.0;
-			SymmetricCscMatrix matrixCSC = matrixDOK.BuildSymmetricCscMatrix(true);
-
-			//const int n = 4;
-			//const int nnz = 7;
-			//int[] colOffsets = new int[n + 1] { 0, 1, 2, 5, nnz };
-			//int[] rowIndices = new int[nnz] { 0, 1, 0, 1, 2, 1, 3 };
-			//double[] values = new double[nnz] { 4.0, 10.0, 2.0, 1.0, 8.0, 3.0, 9.0 };
-			//SymmetricCSC matrixCSC = new SymmetricCSC(values, rowIndices, colOffsets, false);
-
-			//Solve it using SuiteSparse
-			using var factor = new CholeskySuiteSparse(superNodal: true);
-			factor.Factorize(matrixCSC);
-			Vector solution = factor.SolveLinearSystem(rhs);
-			comparer.AssertEqual(solutionExpected, solution);
-		}
-
-		[SkippableFact]
-		private static void CheckSystemSolution2()
+		private static void TestSystemSolutionSteps()
 		{
 			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 

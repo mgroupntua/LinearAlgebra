@@ -7,6 +7,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
+	using MGroup.LinearAlgebra.Triangulation;
 
 	/// <summary>
 	/// Providers that call the highly optimized Intel Math Kernel Library (native dlls). Note that Intel MKL relies heavily
@@ -36,5 +38,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 		public IReorderingProvider Reordering { get; }
 
 		public ISparseBlasProvider SparseBlas { get; }
+
+		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal) => new CholeskySuiteSparse(superNodal);
 	}
 }

@@ -4,6 +4,8 @@ namespace MGroup.LinearAlgebra.Implementations
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Triangulation;
+
 	public interface IImplementationProvider
 	{
 		public IBlasProvider Blas { get; }
@@ -17,5 +19,7 @@ namespace MGroup.LinearAlgebra.Implementations
 		public IReorderingProvider Reordering { get; }
 
 		public ISparseBlasProvider SparseBlas { get; }
+
+		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal);
 	}
 }
