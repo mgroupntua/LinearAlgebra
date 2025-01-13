@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
         [SkippableFact]
         internal static void TestDgetrf_Dgetrs()
         {
-            Skip.IfNot(TestSettings.TestMkl, TestSettings.MessageWhenSkippingMKL);
+            Skip.IfNot(TestSettings.LibsToTest.Win64IntelMkl, TestSettings.SkipMessage);
 
             int layout = LapackePInvokes.LAPACK_COL_MAJOR;
             char transA = LapackePInvokes.LAPACK_NO_TRANSPOSE;

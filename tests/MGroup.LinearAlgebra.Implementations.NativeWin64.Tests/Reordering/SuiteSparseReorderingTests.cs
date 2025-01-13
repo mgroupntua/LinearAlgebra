@@ -28,14 +28,14 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Reordering
 		[SkippableFact]
 		private static void TestReorderingAmdSuiteSparse()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 			AmdSymmetricOrderingTests.TestFindPermutationGivenPattern(provider);
 		}
 
 		[SkippableFact]
 		private static void TestReorderingCamdSuiteSparse()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			int n = SparsePosDef10by10.Order;
 			var pattern = SparsityPatternSymmetric.CreateFromDense(Matrix.CreateFromArray(SparsePosDef10by10.Matrix));

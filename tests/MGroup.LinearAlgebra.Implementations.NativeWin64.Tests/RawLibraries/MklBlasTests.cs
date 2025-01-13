@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
         [SkippableFact]
         private static void RunComputeNetExample()
         {
-            Skip.IfNot(TestSettings.TestMkl, TestSettings.MessageWhenSkippingMKL);
+            Skip.IfNot(TestSettings.LibsToTest.Win64IntelMkl, TestSettings.SkipMessage);
 
             //Variable typeA is not used and it triggers a warning
 #pragma warning disable CS0219
@@ -95,7 +95,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
         [SkippableFact]
         private static void TestAxpy()
         {
-            Skip.IfNot(TestSettings.TestMkl, TestSettings.MessageWhenSkippingMKL);
+            Skip.IfNot(TestSettings.LibsToTest.Win64IntelMkl, TestSettings.SkipMessage);
 
             int n = 5;
             double[] a = { 1, 2, 3, 4, 5 };
@@ -112,7 +112,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
         [SkippableFact]
         private static void TestDdot()
         {
-            Skip.IfNot(TestSettings.TestMkl, TestSettings.MessageWhenSkippingMKL);
+            Skip.IfNot(TestSettings.LibsToTest.Win64IntelMkl, TestSettings.SkipMessage);
 
             int n = 5;
             double[] a = { 1, 2, 3, 4, 5 };
@@ -125,7 +125,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
         [SkippableFact]
         private static void TestDgemv()
         {
-            Skip.IfNot(TestSettings.TestMkl, TestSettings.MessageWhenSkippingMKL);
+            Skip.IfNot(TestSettings.LibsToTest.Win64IntelMkl, TestSettings.SkipMessage);
 
             CBLAS_LAYOUT layout = CBLAS_LAYOUT.CblasColMajor;
             CBLAS_TRANSPOSE transA = CBLAS_TRANSPOSE.CblasNoTrans;

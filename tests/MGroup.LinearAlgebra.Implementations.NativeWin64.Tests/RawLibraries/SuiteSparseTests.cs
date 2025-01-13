@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
 		[SkippableFact]
 		private static void TestCholeskySolver()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			// Define linear system
 			const int n = 4;
@@ -49,7 +49,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.RawLibraries
 		[SkippableFact]
 		private static void TestReordering()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			int order = SparseSymm5by5.Order;
 			int[] rowIndices = SparseSymm5by5.CscRowIndices;

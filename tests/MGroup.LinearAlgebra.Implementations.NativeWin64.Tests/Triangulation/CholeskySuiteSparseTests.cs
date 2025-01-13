@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
 		[SkippableFact]
 		private static void TestRowAddition()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
 			Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
 		//[SkippableFact]
 		private static void TestRowAdditionReverse()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
 			Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
 		[SkippableFact]
 		private static void TestRowDeletion()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
 			Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
@@ -126,7 +126,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
 		[SkippableFact]
 		private static void TestSystemSolution1()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			// Define linear system
 			var rhs = Vector.CreateFromArray(new double[] { 6.0, 14.0, 11.0, 12.0 });
@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Tests.Triangulation
 		[SkippableFact]
 		private static void CheckSystemSolution2()
 		{
-			Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
+			Skip.IfNot(TestSettings.LibsToTest.Win64SuiteSparse, TestSettings.SkipMessage);
 
 			int order = SparsePosDef10by10.Order;
 

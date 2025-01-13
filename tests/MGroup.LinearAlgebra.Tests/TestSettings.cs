@@ -1,53 +1,69 @@
 namespace MGroup.LinearAlgebra.Tests
 {
 	using System;
+	using System.IO;
+	using System.Reflection;
+	using System.Text.Json;
 
 	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Implementations.NativeWin64;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
 
 	using Xunit;
 
-	// Currently SuiteSparse dlls call MKL dll
-	public enum TestSuiteSparseAndMklLibs
+	public static class TestSettings
 	{
-		Neither, MklOnly, Both
-	}
-
-	public class TestSettings
-	{
-		// Set the appropriate enums and flags here, in order to choose which native library tests will be run.
-		private static readonly TestSuiteSparseAndMklLibs librariesToTest = TestSuiteSparseAndMklLibs.Neither;
-
-		public const string MessageWhenSkippingMKL = "MKL is not set to be tested. See TestSettings.cs for more.";
-
-		public const string MessageWhenSkippingSuiteSparse
-			= "SuiteSparse is not set to be tested. See TestSettings.cs for more.";
-
-		public static TheoryData<IImplementationProvider> ProvidersToTest
+		// Explicit static constructor to tell C# compiler not to mark type as beforefieldinit. Only required for laziness.
+		static TestSettings()
 		{
-			get
-			{
-				var theoryData = new TheoryData<IImplementationProvider>();
-				theoryData.Add(new ManagedSequentialImplementationProvider());
-				if ((librariesToTest == TestSuiteSparseAndMklLibs.MklOnly)
-					|| (librariesToTest == TestSuiteSparseAndMklLibs.Both))
-				{
-					theoryData.Add(new NativeWin64ImplementationProvider());
-				}
+			LibsToTest = NativeLibsToTest.CreateWithNone();
+			ProvidersToTest = new TheoryData<IImplementationProvider>();
+			ProvidersToTest.Add(new ManagedSequentialImplementationProvider());
 
-				return theoryData;
+			try
+			{
+				// Read from JSON
+				string execDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+				string jsonFile = Path.Combine(execDirectory, "NativeLibsToTest.json");
+				string jsonText = File.ReadAllText(jsonFile);
+
+				var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+				LibsToTest = JsonSerializer.Deserialize<NativeLibsToTest>(jsonText, options);
+
+				if (LibsToTest.Win64IntelMkl)
+				{
+					if (LibsToTest.Win64SuiteSparse)
+					{
+						ProvidersToTest.Add(new NativeWin64ImplementationProvider());
+					}
+					else
+					{
+						ProvidersToTest.Add(new CustomImplementationProvider(
+							MklBlasProvider.UniqueInstance,
+							MklSparseBlasProvider.UniqueInstance,
+							MklLapackProvider.UniqueInstance,
+							new ManagedReorderingProvider()));
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				// If reading native lib options fails for any reason, do nothing (use only managed providers).
 			}
 		}
 
-		public static bool TestMkl => (librariesToTest == TestSuiteSparseAndMklLibs.MklOnly)
-			|| (librariesToTest == TestSuiteSparseAndMklLibs.Both);
+		public static NativeLibsToTest LibsToTest { get; }
 
-		public static bool TestSuiteSparse => (librariesToTest == TestSuiteSparseAndMklLibs.Both);
+		public static TheoryData<IImplementationProvider> ProvidersToTest { get; }
+
+		public const string SkipMessage =
+			"This native library is not set to be tested. You can set it in NativeLibsToTest.json. See TestSettings.cs for more.";
 
 		public static void RunMultiproviderTest(IImplementationProvider provider, Action test)
 		{
-			IImplementationProvider defaultProvider = LibrarySettings.GlobalProvider; // Store it for later
+			//TODO: The default provider logic is not thread-safe
+			IImplementationProvider defaultProvider = LibrarySettings.GlobalProvider; // Store it for later.
 			LibrarySettings.GlobalProvider = provider;
 
 			try
