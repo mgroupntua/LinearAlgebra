@@ -1,4 +1,4 @@
 {
-  "Win64IntelMkl": true,
-  "Win64SuiteSparse": true
+  "Win64IntelMkl": false,
+  "Win64SuiteSparse": false
 }

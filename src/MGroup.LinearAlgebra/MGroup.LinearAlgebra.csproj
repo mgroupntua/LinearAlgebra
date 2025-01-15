@@ -15,10 +15,16 @@
   </PropertyGroup>
  
   <ItemGroup>
-    <PackageReference Include="Compute.Bindings.IntelMKL" Version="0.1.5" />
-    <PackageReference Include="CSparse" Version="3.2.3" />
+    <PackageReference Include="CSparse" Version="4.2.0" />
     <PackageReference Include="DotNumerics" Version="1.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Update="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
