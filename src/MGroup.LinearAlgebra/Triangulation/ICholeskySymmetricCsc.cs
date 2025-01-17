@@ -45,5 +45,20 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <param name="matrix">The matrix in symmetric (only upper triangle) CSC format.</param>
 		/// <exception cref="IndefiniteMatrixException">Thrown if the original matrix is not positive definite.</exception>
 		void Factorize(SymmetricCscMatrix matrix);
+
+		/// <summary>
+		/// Solves a series of linear systems A * X = B, where A is the original matrix (before the factorization),
+		/// B = <paramref name="rhsVectors"/> is a matrix containing the rhs vectors as columns and X is a matrix containing the
+		/// solution vectors as columns.
+		/// </summary>
+		/// <param name="rhsVectors">
+		/// Matrix containing the right hand side vectors as columns. Its <see cref="Matrix.NumRows"/> must be equal to the
+		/// number of rows of the original matrix A.
+		/// </param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
+		/// </exception>
+		/// <returns>Matrix containing the solution vectos as columns.</returns>
+		Matrix SolveLinearSystems(Matrix rhsVectors);
 	}
 }

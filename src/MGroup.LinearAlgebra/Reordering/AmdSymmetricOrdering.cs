@@ -8,8 +8,6 @@ namespace MGroup.LinearAlgebra.Reordering
 	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Matrices.Builders;
 
-	using static MGroup.LinearAlgebra.LibrarySettings;
-
 	/// <summary>
 	/// Calculates a fill-reducing permutation for the rows/columns of a symmetric sparse matrix, using the Approximate Minimum
 	/// Degree (AMD) ordering algorithm.
@@ -17,9 +15,18 @@ namespace MGroup.LinearAlgebra.Reordering
 	/// </summary>
 	public class AmdSymmetricOrdering : IReorderingAlgorithm
 	{
+		private readonly IImplementationProvider provider;
 
-		public AmdSymmetricOrdering()
+		public AmdSymmetricOrdering(IImplementationProvider provider = null)
 		{
+			if (provider == null)
+			{
+				this.provider = LibrarySettings.GlobalProvider;
+			}
+			else
+			{
+				this.provider = provider;
+			}
 		}
 
 		/// <inheritdoc/>
@@ -29,7 +36,7 @@ namespace MGroup.LinearAlgebra.Reordering
 		public (int[] permutation, bool oldToNew) FindPermutation(SparsityPatternSymmetric pattern)
 		{
 			(int[] rowIndices, int[] colOffsets) = pattern.BuildSymmetricCSCArrays(sortRowsOfEachCol: true);
-			(int[] permutation, _) = GlobalProvider.Reordering.AmdSymmetric(pattern.Order, rowIndices, colOffsets);
+			(int[] permutation, _) = provider.Reordering.AmdSymmetric(pattern.Order, rowIndices, colOffsets);
 			return (permutation, false);
 		}
 
@@ -39,7 +46,7 @@ namespace MGroup.LinearAlgebra.Reordering
 		/// </remarks>
 		public (int[] permutation, bool oldToNew) FindPermutation(int order, int[] cscRowIndices, int[] cscColOffsets)
 		{
-			(int[] permutation, _) = GlobalProvider.Reordering.AmdSymmetric(order, cscRowIndices, cscColOffsets);
+			(int[] permutation, _) = provider.Reordering.AmdSymmetric(order, cscRowIndices, cscColOffsets);
 			return (permutation, false);
 		}
 
@@ -58,7 +65,7 @@ namespace MGroup.LinearAlgebra.Reordering
 		{
 			(double[] values, int[] rowIndices, int[] colOffsets) = dok.BuildSymmetricCscArrays(true);
 			(int[] permutation, ReorderingStatistics stats) =
-				GlobalProvider.Reordering.AmdSymmetric(dok.NumColumns, rowIndices, colOffsets);
+				provider.Reordering.AmdSymmetric(dok.NumColumns, rowIndices, colOffsets);
 			return (permutation, false, stats);
 		}
 	}

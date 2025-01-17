@@ -18,7 +18,6 @@ namespace MGroup.LinearAlgebra.Tests
 
 		public bool Win64SuiteSparse { get; set; }
 
-		public static NativeLibsToTest CreateWithNone() 
-			=> new NativeLibsToTest(false, false);
+		public static NativeLibsToTest CreateWithNone() => new NativeLibsToTest(false, false);
 	}
 }

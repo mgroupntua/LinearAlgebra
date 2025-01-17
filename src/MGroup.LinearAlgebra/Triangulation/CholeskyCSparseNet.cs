@@ -4,6 +4,7 @@ using CSparse;
 using CSparse.Double;
 using CSparse.Double.Factorization;
 
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
@@ -86,10 +87,26 @@ namespace MGroup.LinearAlgebra.Triangulation
 		{
 			if (factorization == null)
 			{
-				throw new InvalidOperationException("A factorization already exists.");
+				throw new InvalidOperationException("No matrix has been factorized yet");
 			}
 
 			factorization.Solve(rhs.RawData, solution.RawData);
+		}
+
+		/// <inheritdoc/>
+		public Matrix SolveLinearSystems(Matrix rhsVectors)
+		{
+			Preconditions.CheckSystemSolutionDimensions(Order, rhsVectors.NumRows);
+			var result = Matrix.CreateZero(Order, rhsVectors.NumColumns);
+			var x = Vectors.Vector.CreateZero(Order);
+			for (int j = 0; j < rhsVectors.NumColumns; j++)
+			{
+				Vectors.Vector b = rhsVectors.GetColumn(j);
+				factorization.Solve(b.RawData, x.RawData);
+				result.SetSubcolumn(j, x, 0);
+			}
+
+			return result;
 		}
 	}
 }
