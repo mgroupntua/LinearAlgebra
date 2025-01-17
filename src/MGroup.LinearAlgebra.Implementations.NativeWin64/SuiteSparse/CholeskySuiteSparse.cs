@@ -8,7 +8,7 @@
 //      solution, the rhs and solution vectors must be permuted and the same pattern must be processed to find a good reordering.
 //TODO: I think this uses Cholesky and not LDL. When the dlls were created, SuiteSparse supported simplicial Cholesky,
 //		simplicial LDL, supernodal LL, but not supernodal LDL.
-namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
+namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 {
 	using System;
 
@@ -220,7 +220,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation
 			if (status == -2)
 			{
 				SuiteSparsePInvokes.DestroyCommon(ref common);
-				throw new NativeLibException("SuiteSparse (win64)", 
+				throw new NativeLibException("SuiteSparse (win64)",
 					"Factorization did not succeed. This could be caused by insufficent memory, due to excessive fill-in.");
 			}
 			else if (status >= 0)

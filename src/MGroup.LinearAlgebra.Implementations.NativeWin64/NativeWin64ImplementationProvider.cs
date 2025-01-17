@@ -7,7 +7,6 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.MKL;
 	using MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse;
-	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
 	using MGroup.LinearAlgebra.Triangulation;
 
 	/// <summary>

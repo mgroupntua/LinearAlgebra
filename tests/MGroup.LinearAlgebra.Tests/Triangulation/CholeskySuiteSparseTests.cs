@@ -1,6 +1,6 @@
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
-	using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
+	using MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Matrices.Builders;
 	using MGroup.LinearAlgebra.Tests;

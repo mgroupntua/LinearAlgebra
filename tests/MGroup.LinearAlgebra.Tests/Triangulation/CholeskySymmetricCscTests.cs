@@ -1,16 +1,14 @@
-using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Matrices.Builders;
-using MGroup.LinearAlgebra.Tests.TestData;
-using MGroup.LinearAlgebra.Tests.Utilities;
-using MGroup.LinearAlgebra.Vectors;
-using Xunit;
-using MGroup.LinearAlgebra.Implementations.Managed;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Implementations.NativeWin64.Triangulation;
-
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
+	using MGroup.LinearAlgebra.Triangulation;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Matrices.Builders;
+	using MGroup.LinearAlgebra.Tests.TestData;
+	using MGroup.LinearAlgebra.Tests.Utilities;
+	using MGroup.LinearAlgebra.Vectors;
+	using Xunit;
+	using MGroup.LinearAlgebra.Implementations;
+
 	/// <summary>
 	/// Tests for <see cref="CholeskyCSparseNet"/>.
 	/// </summary>
