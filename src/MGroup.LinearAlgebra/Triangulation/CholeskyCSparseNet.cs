@@ -52,7 +52,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 			throw new NotImplementedException();
 		}
 
-		public void Dispose() { } // Do nothing. This is purely managed
+		public void Dispose() { } // Do nothing. This is purely managed code.
 
 		/// <inheritdoc/>
 		public void Factorize(int order, int numNonZerosUpper, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets)

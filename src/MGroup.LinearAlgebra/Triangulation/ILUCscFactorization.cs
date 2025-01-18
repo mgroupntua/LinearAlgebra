@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Matrices;
 
-	public interface ILUCscFactorization : ITriangulation
+	public interface ILUCscFactorization : ITriangulation, IDisposable
 	{
 		/// <summary>
 		/// Performs the LU factorization: A = L * U of a ssquare matrix A.  The matrix A is provided in CSC format described by

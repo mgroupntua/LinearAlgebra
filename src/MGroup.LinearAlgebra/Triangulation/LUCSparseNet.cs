@@ -45,6 +45,8 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// </summary>
 		public SparseLU RawData => factorization;
 
+		public void Dispose() { } // Do nothing. This is purely managed code.
+
 		/// <inheritdoc/>
 		public void Factorize(
 			int order, int numNonZeros, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets, double pivotTolerance)
