@@ -105,7 +105,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 
 			// Factorize
 			IImplementationProvider provider = new ManagedSequentialImplementationProvider();
-			ILUCscFactorization inverseA11 = provider.CreateLUCscTriangulation();
+			ILUCscFactorization inverseA11 = provider.CreateLUTriangulation();
 			inverseA11.Factorize(submatrix11, 1E-7);
 
 			// Test the method that returns a new instance for the Schur complement

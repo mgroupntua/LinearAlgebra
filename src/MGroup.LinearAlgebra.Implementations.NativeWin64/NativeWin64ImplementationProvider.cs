@@ -38,8 +38,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 
 		public ISparseBlasProvider SparseBlas { get; }
 
-		public ILUCscFactorization CreateLUCscTriangulation() => new LUCSparseNet();
+		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet();
 
-		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal) => new CholeskySuiteSparse(superNodal);
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal) => new CholeskySuiteSparse(superNodal);
 	}
 }

@@ -34,9 +34,9 @@ namespace MGroup.LinearAlgebra.Implementations
 
 		public ISparseBlasProvider SparseBlas { get; }
 
-		public ILUCscFactorization CreateLUCscTriangulation() => new LUCSparseNet();
+		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet();
 
-		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal)
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal)
 			=> createSymmetricCscTriangulation(superNodal);
 	}
 }
