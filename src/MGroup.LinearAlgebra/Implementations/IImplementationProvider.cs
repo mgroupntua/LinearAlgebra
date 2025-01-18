@@ -20,6 +20,8 @@ namespace MGroup.LinearAlgebra.Implementations
 
 		public ISparseBlasProvider SparseBlas { get; }
 
+		public ILUCscFactorization CreateLUCscTriangulation();
+
 		public ICholeskySymmetricCsc CreateSymmetricCscTriangulation(bool superNodal);
 	}
 }

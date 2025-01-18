@@ -30,22 +30,25 @@ namespace MGroup.LinearAlgebra.Tests
 				string jsonText = File.ReadAllText(jsonFile);
 
 				var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-				LibsToTest = JsonSerializer.Deserialize<NativeLibsToTest>(jsonText, options);
-
-				if (LibsToTest.Win64IntelMkl)
+				NativeLibsToTest deserialized = JsonSerializer.Deserialize<NativeLibsToTest>(jsonText, options);
+				if (deserialized != null)
 				{
-					if (LibsToTest.Win64SuiteSparse)
+					LibsToTest = deserialized;
+					if (LibsToTest.Win64IntelMkl)
 					{
-						ProvidersToTest.Add(new NativeWin64ImplementationProvider());
-					}
-					else
-					{
-						ProvidersToTest.Add(new CustomImplementationProvider(
-							MklBlasProvider.UniqueInstance,
-							MklSparseBlasProvider.UniqueInstance,
-							MklLapackProvider.UniqueInstance,
-							new ManagedReorderingProvider(),
-							superNodal => new CholeskyCSparseNet()));
+						if (LibsToTest.Win64SuiteSparse)
+						{
+							ProvidersToTest.Add(new NativeWin64ImplementationProvider());
+						}
+						else
+						{
+							ProvidersToTest.Add(new CustomImplementationProvider(
+								MklBlasProvider.UniqueInstance,
+								MklSparseBlasProvider.UniqueInstance,
+								MklLapackProvider.UniqueInstance,
+								new ManagedReorderingProvider(),
+								superNodal => new CholeskyCSparseNet()));
+						}
 					}
 				}
 			}

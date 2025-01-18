@@ -6,6 +6,8 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 	using System.Text;
 	using System.Threading.Tasks;
 
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.SchurComplements;
 	using MGroup.LinearAlgebra.Tests.TestData;
@@ -100,7 +102,11 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 			CscMatrix submatrix11, double comparisonTolerance, double[,] expectedSchur11)
 		{
 			var comparer = new MatrixComparer(comparisonTolerance);
-			ITriangulation inverseA11 = LUCSparseNet.Factorize(submatrix11, 1E-7);
+
+			// Factorize
+			IImplementationProvider provider = new ManagedSequentialImplementationProvider();
+			ILUCscFactorization inverseA11 = provider.CreateLUCscTriangulation();
+			inverseA11.Factorize(submatrix11, 1E-7);
 
 			// Test the method that returns a new instance for the Schur complement
 			Matrix computedS11 = SchurComplementFullCsrCsrCsc.CalcSchurComplement(submatrix00, submatrix01, submatrix10, inverseA11);

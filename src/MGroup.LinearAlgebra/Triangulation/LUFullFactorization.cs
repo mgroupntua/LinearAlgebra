@@ -1,12 +1,3 @@
-using System;
-using System.Diagnostics;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Vectors;
-using static MGroup.LinearAlgebra.LibrarySettings;
-
 //TODO: When returning L & U, use Triangular matrices. Also return P. Also L, U should be TriangularLower and TriangularUpper
 //TODO: Is the determinant affected by the permutation P? I think P changes the sign, depending on how many row exhanges there 
 //      are. I did not take it into account in the implementation or the documentation.
@@ -14,13 +5,22 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 //      handled there by having a naive (fast) and a safe version.
 namespace MGroup.LinearAlgebra.Triangulation
 {
+	using System;
+	using System.Diagnostics;
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Vectors;
+	using static MGroup.LinearAlgebra.LibrarySettings;
+
 	/// <summary>
-	/// The LU factorization of a matrix A with partial pivoting (row exchanges) consists of a lower triangular matrix L 
+	/// The LU factorization of a dense matrix A with partial pivoting (row exchanges) consists of a lower triangular matrix L 
 	/// (with 1 in its diagonal entries), an upper triangular matrix U and a permutation matrix P, such that A = P*L*U. This 
-	/// class stores L,U,P in an efficient manner and provides common methods to use them. A must be square. Uses LAPACK.
-	/// Authors: Serafeim Bakalakos
+	/// class stores L,U,P in an efficient manner and provides common methods to use them. A must be square and use full format.
+	/// The implementation uses LAPACK.
 	/// </summary>
-	public class LUFactorization : ITriangulation
+	public class LUFullFactorization : ITriangulation
 	{
 		/// <summary>
 		/// The default value under which a diagonal entry (pivot) is considered to be 0 during Cholesky factorization.
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		private readonly int firstZeroPivot;
 		private readonly double pivotTolerance;
 
-		private LUFactorization(int order, double[] lowerUpper, int[] permutation, int firstZeroPivot, bool isSingular,
+		private LUFullFactorization(int order, double[] lowerUpper, int[] permutation, int firstZeroPivot, bool isSingular,
 			double pivotTolerance)
 		{
 			this.Order = order;
@@ -93,12 +93,12 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <param name="pivotTolerance">If a diagonal entry (called pivot) is &lt;= <paramref name="pivotTolerance"/> it will be  
 		///     considered as zero and a permutation will be used to find a non-zero pivot (the process is called pivoting).
 		///     </param>
-		public static LUFactorization Factorize(int order, double[] matrix,
-			double pivotTolerance = LUFactorization.PivotTolerance)
+		public static LUFullFactorization Factorize(int order, double[] matrix,
+			double pivotTolerance = LUFullFactorization.PivotTolerance)
 		{
 			int[] rowExchanges = new int[order];
 			int firstZeroPivot = GlobalProvider.LapackLinearEquations.Dgetrf(order, order, matrix, 0, order, rowExchanges, 0, pivotTolerance);
-			return new LUFactorization(order, matrix, rowExchanges, firstZeroPivot, firstZeroPivot > 0, pivotTolerance);
+			return new LUFullFactorization(order, matrix, rowExchanges, firstZeroPivot, firstZeroPivot > 0, pivotTolerance);
 		}
 
 		/// <summary>

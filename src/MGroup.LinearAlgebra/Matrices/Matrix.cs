@@ -684,19 +684,19 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
-		public LUFactorization FactorLU(bool inPlace = false)
+		public LUFullFactorization FactorLU(bool inPlace = false)
 		{
 			Preconditions.CheckSquare(this);
 			if (inPlace)
 			{
-				var factor = LUFactorization.Factorize(NumColumns, data);
+				var factor = LUFullFactorization.Factorize(NumColumns, data);
 				// Set the internal array to null to force NullReferenceException if it is accessed again.
 				// TODO: perhaps there is a better way to handle this.
 				data = null;
 				isOverwritten = true;
 				return factor;
 			}
-			else return LUFactorization.Factorize(NumColumns, CopyInternalData());
+			else return LUFullFactorization.Factorize(NumColumns, CopyInternalData());
 		}
 
 		/// <summary>
@@ -868,7 +868,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			else
 			{
 				// The next will update the entries of this matrix, but we do not need the intermediate objects
-				LUFactorization.Factorize(NumColumns, data).Invert(true); 
+				LUFullFactorization.Factorize(NumColumns, data).Invert(true); 
 			}
 		}
 
@@ -905,7 +905,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else
 			{
-				LUFactorization factor = FactorLU(false);
+				LUFullFactorization factor = FactorLU(false);
 				double det = factor.CalcDeterminant(); // Call this before factor.Invert(), else the factor will be overwritten.
 				Matrix inverse = factor.Invert(true); 
 				return (inverse, det);
