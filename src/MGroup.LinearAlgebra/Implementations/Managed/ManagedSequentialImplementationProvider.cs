@@ -13,8 +13,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	/// </summary>
 	public class ManagedSequentialImplementationProvider : IImplementationProvider
 	{
-		public ManagedSequentialImplementationProvider()
+		private readonly double luPivotTolerance;
+
+		public ManagedSequentialImplementationProvider(double luPivotTolerance = LUCSparseNet.DefaultPivotTolerance)
 		{
+			this.luPivotTolerance = luPivotTolerance;
 			Blas = ManagedBlasProvider.UniqueInstance;
 			SparseBlas = ManagedSparseBlasProvider.UniqueInstance;
 			LapackLinearEquations = new LapackLinearEquationsFacade(ManagedLapackProvider.UniqueInstance);
@@ -35,8 +38,8 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 
 		public ISparseBlasProvider SparseBlas { get; }
 
-		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet();
+		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet(luPivotTolerance);
 
-		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal) => new CholeskyCSparseNet();
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation() => new CholeskyCSparseNet();
 	}
 }

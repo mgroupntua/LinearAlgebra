@@ -22,6 +22,6 @@ namespace MGroup.LinearAlgebra.Implementations
 
 		public ILUCscFactorization CreateLUTriangulation();
 
-		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal);
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation();
 	}
 }

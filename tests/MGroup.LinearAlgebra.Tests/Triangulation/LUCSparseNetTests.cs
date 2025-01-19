@@ -27,8 +27,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
 			(double[] cscValues, int[] cscRowIndices, int[] cscColOffsets) = dok.BuildCscArrays(true);
-			var lu = new LUCSparseNet();
-			lu.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets, pivotTolerance);
+			var lu = new LUCSparseNet(pivotTolerance);
+			lu.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets);
 			Vector xComputed = lu.SolveLinearSystem(b);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
@@ -43,8 +43,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 			var xExpected = Vector.CreateWithValue(order, 1.0);
 			var b = csc.Multiply(xExpected);
 
-			var lu = new LUCSparseNet();
-			lu.Factorize(order, csc.NumNonZeros, csc.RawValues, csc.RawRowIndices, csc.RawColOffsets, pivotTolerance);
+			var lu = new LUCSparseNet(pivotTolerance);
+			lu.Factorize(order, csc.NumNonZeros, csc.RawValues, csc.RawRowIndices, csc.RawColOffsets);
 			Vector xComputed = lu.SolveLinearSystem(b);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
@@ -64,8 +64,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 			}
 
 			(double[] cscValues, int[] cscRowIndices, int[] cscColOffsets) = dok.BuildCscArrays(true);
-			var lu = new LUCSparseNet();
-			lu.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets, pivotTolerance);
+			var lu = new LUCSparseNet(pivotTolerance);
+			lu.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets);
 			Vector xComputed = lu.SolveLinearSystem(b);
 			comparer.AssertEqual(xExpected, xComputed);
 		}

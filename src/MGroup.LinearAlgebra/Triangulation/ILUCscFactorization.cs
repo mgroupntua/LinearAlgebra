@@ -31,17 +31,14 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <paramref name="cscRowIndices"/>. Its length must be <paramref name="order"/> + 1. The last entry must be
 		/// <paramref name="numNonZeros"/>.
 		/// </param>
-		/// <param name="pivotTolerance">The partial pivoting tolerance (from 0.0 to 1.0).</param>
 		/// <exception cref="SingularMatrixException">Thrown if the original matrix is not invertible.</exception>
-		public void Factorize(
-			int order, int numNonZeros, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets, double pivotTolerance);
+		public void Factorize(int order, int numNonZeros, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets);
 
 		/// <summary>
 		/// Performs the LU factorization: A = L * U of a square matrix A. The matrix A is provided in CSC format.
 		/// </summary>
 		/// <param name="matrix">The matrix in CSC format. Must be a square matrix.</param>
-		/// <param name="pivotTolerance">The partial pivoting tolerance (from 0.0 to 1.0).</param>
 		/// <exception cref="SingularMatrixException">Thrown if the original matrix is not invertible.</exception>
-		public void Factorize(CscMatrix matrix, double pivotTolerance);
+		public void Factorize(CscMatrix matrix);
 	}
 }

@@ -38,7 +38,9 @@ namespace MGroup.LinearAlgebra.Tests
 					{
 						if (LibsToTest.Win64SuiteSparse)
 						{
-							ProvidersToTest.Add(new NativeWin64ImplementationProvider());
+							ProvidersToTest.Add(new NativeWin64ImplementationProvider(
+								luPivotTolerance: LUCSparseNet.DefaultPivotTolerance,
+								superNodalCholesky: true));
 						}
 						else
 						{
@@ -47,7 +49,8 @@ namespace MGroup.LinearAlgebra.Tests
 								MklSparseBlasProvider.UniqueInstance,
 								MklLapackProvider.UniqueInstance,
 								new ManagedReorderingProvider(),
-								superNodal => new CholeskyCSparseNet()));
+								() => new LUCSparseNet(LUCSparseNet.DefaultPivotTolerance),
+								() => new CholeskyCSparseNet()));
 						}
 					}
 				}

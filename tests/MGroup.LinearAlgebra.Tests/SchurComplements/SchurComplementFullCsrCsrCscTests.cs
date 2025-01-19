@@ -104,9 +104,9 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 			var comparer = new MatrixComparer(comparisonTolerance);
 
 			// Factorize
-			IImplementationProvider provider = new ManagedSequentialImplementationProvider();
+			IImplementationProvider provider = new ManagedSequentialImplementationProvider(luPivotTolerance: 1E-7);
 			ILUCscFactorization inverseA11 = provider.CreateLUTriangulation();
-			inverseA11.Factorize(submatrix11, 1E-7);
+			inverseA11.Factorize(submatrix11);
 
 			// Test the method that returns a new instance for the Schur complement
 			Matrix computedS11 = SchurComplementFullCsrCsrCsc.CalcSchurComplement(submatrix00, submatrix01, submatrix10, inverseA11);

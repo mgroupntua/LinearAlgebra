@@ -16,8 +16,15 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 	/// </summary>
 	public class NativeWin64ImplementationProvider : IImplementationProvider
 	{
-		public NativeWin64ImplementationProvider()
+		private readonly double luPivotTolerance;
+		private readonly bool superNodalCholesky;
+
+		public NativeWin64ImplementationProvider(
+			double luPivotTolerance = LUCSparseNet.DefaultPivotTolerance, bool superNodalCholesky = true)
 		{
+			this.luPivotTolerance = luPivotTolerance;
+			this.superNodalCholesky = superNodalCholesky;
+
 			Blas = MklBlasProvider.UniqueInstance;
 			SparseBlas = MklSparseBlasProvider.UniqueInstance;
 			LapackLinearEquations = new LapackLinearEquationsFacade(MklLapackProvider.UniqueInstance);
@@ -38,8 +45,8 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64
 
 		public ISparseBlasProvider SparseBlas { get; }
 
-		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet();
+		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet(luPivotTolerance);
 
-		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal) => new CholeskySuiteSparse(superNodal);
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation() => new CholeskySuiteSparse(superNodalCholesky);
 	}
 }

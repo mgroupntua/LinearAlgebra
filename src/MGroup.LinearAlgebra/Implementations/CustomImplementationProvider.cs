@@ -8,10 +8,13 @@ namespace MGroup.LinearAlgebra.Implementations
 
 	public class CustomImplementationProvider : IImplementationProvider
 	{
-		private readonly Func<bool, ICholeskySymmetricCsc> createSymmetricCscTriangulation;
+		private readonly Func<ICholeskySymmetricCsc> createCholeskyTriangulation;
+		private readonly Func<ILUCscFactorization> createLUTriangulation;
 
 		public CustomImplementationProvider(IBlasProvider blas, ISparseBlasProvider sparseBlas, ILapackProvider lapackProvider,
-			IReorderingProvider reordering, Func<bool, ICholeskySymmetricCsc> createSymmetricCscTriangulation)
+			IReorderingProvider reordering,
+			Func<ILUCscFactorization> createLUTriangulation,
+			Func<ICholeskySymmetricCsc> createCholeskyTriangulation)
 		{ 
 			this.Blas = blas;
 			this.SparseBlas = sparseBlas;
@@ -19,7 +22,8 @@ namespace MGroup.LinearAlgebra.Implementations
 			this.LapackLeastSquares = new LapackLeastSquaresFacadeDouble(lapackProvider);
 			this.LapackEigensystems = new LapackEigensystemsFacade(lapackProvider);
 			this.Reordering = reordering;
-			this.createSymmetricCscTriangulation = createSymmetricCscTriangulation;
+			this.createLUTriangulation = createLUTriangulation;
+			this.createCholeskyTriangulation = createCholeskyTriangulation;
 		}
 
 		public IBlasProvider Blas { get; }
@@ -34,9 +38,8 @@ namespace MGroup.LinearAlgebra.Implementations
 
 		public ISparseBlasProvider SparseBlas { get; }
 
-		public ILUCscFactorization CreateLUTriangulation() => new LUCSparseNet();
+		public ILUCscFactorization CreateLUTriangulation() => createLUTriangulation();
 
-		public ICholeskySymmetricCsc CreateCholeskyTriangulation(bool superNodal)
-			=> createSymmetricCscTriangulation(superNodal);
+		public ICholeskySymmetricCsc CreateCholeskyTriangulation() => createCholeskyTriangulation();
 	}
 }

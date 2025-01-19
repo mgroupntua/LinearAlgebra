@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
 				(double[] cscValues, int[] cscRowIndices, int[] cscColOffsets) = dok.BuildSymmetricCscArrays(true);
 
-				using ICholeskySymmetricCsc factorization = provider.CreateCholeskyTriangulation(superNodal: true);
+				using ICholeskySymmetricCsc factorization = provider.CreateCholeskyTriangulation();
 				factorization.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets);
 				Vector xComputed = factorization.SolveLinearSystem(b);
 				comparer.AssertEqual(xExpected, xComputed);
@@ -61,7 +61,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 				//double[] values = new double[nnz] { 4.0, 10.0, 2.0, 1.0, 8.0, 3.0, 9.0 };
 				//SymmetricCSC matrixCSC = new SymmetricCSC(values, rowIndices, colOffsets, false);
 
-				using ICholeskySymmetricCsc factorization = provider.CreateCholeskyTriangulation(superNodal: true);
+				using ICholeskySymmetricCsc factorization = provider.CreateCholeskyTriangulation();
 				factorization.Factorize(matrixCSC);
 				Vector solution = factorization.SolveLinearSystem(rhs);
 				comparer.AssertEqual(solutionExpected, solution);

@@ -21,9 +21,24 @@ namespace MGroup.LinearAlgebra.Triangulation
 	/// </summary>
 	public class LUCSparseNet : ILUCscFactorization
 	{
-		public const double DefaultPivotTolelance = 0.1; // between 0.0, 1.0. TODO: Find a good default
+		public const double DefaultPivotTolerance = 0.001; // between 0.0, 1.0. TODO: Find a good default
+		private readonly double pivotTolerance;
 
 		private SparseLU factorization;
+
+		/// <summary>
+		/// Create a new instance of <see cref="LUCSparseNet"/> factorization.
+		/// </summary>
+		/// <param name="pivotTolerance">The partial pivoting tolerance (from 0.0 to 1.0).</param>
+		public LUCSparseNet(double pivotTolerance)
+		{
+			if (pivotTolerance < 0 || pivotTolerance > 1.0)
+			{
+				throw new ArgumentException($"LU pivot tolerance must be in the range [0, 1], but was {pivotTolerance}.");
+			}
+
+			this.pivotTolerance = pivotTolerance;
+		}
 
 		public int NumColumns => Order;
 
@@ -48,8 +63,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		public void Dispose() { } // Do nothing. This is purely managed code.
 
 		/// <inheritdoc/>
-		public void Factorize(
-			int order, int numNonZeros, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets, double pivotTolerance)
+		public void Factorize(int order, int numNonZeros, double[] cscValues, int[] cscRowIndices, int[] cscColOffsets)
 		{
 			try
 			{
@@ -66,9 +80,8 @@ namespace MGroup.LinearAlgebra.Triangulation
 		}
 
 		/// <inheritdoc/>
-		public void Factorize(CscMatrix matrix, double pivotTolerance)
-			=> Factorize(matrix.NumColumns, matrix.NumNonZeros, matrix.RawValues, matrix.RawRowIndices, matrix.RawColOffsets,
-				pivotTolerance);
+		public void Factorize(CscMatrix matrix)
+			=> Factorize(matrix.NumColumns, matrix.NumNonZeros, matrix.RawValues, matrix.RawRowIndices, matrix.RawColOffsets);
 
 		/// <summary>
 		/// See <see cref="ITriangulation.CalcDeterminant"/>.

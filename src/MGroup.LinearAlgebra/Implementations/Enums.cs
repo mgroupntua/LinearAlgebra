@@ -13,8 +13,10 @@ namespace MGroup.LinearAlgebra.Implementations
 		/// </summary>
 		RowMajor,
 
+		/// <summary>
 		/// Column major layout. Entries corresponding to consecutive rows are stored consecutively. This is the default in 
 		/// FORTRAN and most linear algebra libraries that use the BLAS & LAPACK interfaces.
+		/// </summary>
 		ColMajor
 	}
 
