@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 
 //TODO: Should the AddSubmatrix...() methods checks that the submatrix respects the pattern? 
 namespace MGroup.LinearAlgebra.Matrices.Builders

@@ -1,14 +1,17 @@
-using System;
-using System.IO;
-using CSparse;
-using CSparse.Double.Factorization;
-using CSparse.IO;
-using MGroup.LinearAlgebra.Tests.Utilities;
-using Xunit;
-
 //TODO: add test for rectangular matrix
 namespace MGroup.LinearAlgebra.Tests.RawLibraries
 {
+	using System;
+	using System.IO;
+
+	using CSparse;
+	using CSparse.Double.Factorization;
+	using CSparse.IO;
+
+	using MGroup.LinearAlgebra.Tests.Utilities;
+
+	using Xunit;
+
 	public static class CSparseNetTests
 	{
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-13);

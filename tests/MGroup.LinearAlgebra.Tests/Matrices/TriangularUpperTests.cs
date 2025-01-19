@@ -1,5 +1,6 @@
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -63,9 +64,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMatrixVectorMultiplication(LinearAlgebraProviderChoice providers)
+        private static void TestMatrixVectorMultiplication(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible
                 var A1 = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);
@@ -85,12 +86,12 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMatrixVectorMultiplicationIntoResult(LinearAlgebraProviderChoice providers)
+        private static void TestMatrixVectorMultiplicationIntoResult(IImplementationProvider provider)
         {
             // The result vectors will first be set to some non zero values to make sure that the result overwrites 
             // them instead of being added to them.
 
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var A = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);
                 var x = Vector.CreateFromArray(UpperInvertible10by10.Lhs);
@@ -103,9 +104,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestSystemSolution(LinearAlgebraProviderChoice providers)
+        private static void TestSystemSolution(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // invertible
                 var A1 = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);

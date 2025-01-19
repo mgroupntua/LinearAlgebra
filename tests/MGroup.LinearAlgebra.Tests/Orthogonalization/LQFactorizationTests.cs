@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -17,9 +18,9 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestFactorsLQ(LinearAlgebraProviderChoice providers)
+        private static void TestFactorsLQ(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var A = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix).Transpose();
                 Matrix expectedL = Matrix.CreateFromArray(RectangularFullRank10by5.LQFactorL);
@@ -36,9 +37,9 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestMinNormSolution(LinearAlgebraProviderChoice providers)
+        private static void TestMinNormSolution(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var A = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix).Transpose();
                 var b = Vector.CreateFromArray(RectangularFullRank10by5.RhsMinNorm);

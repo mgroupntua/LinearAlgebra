@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
@@ -227,7 +227,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
 			double[] result = new double[data.Length];
 			Array.Copy(this.data, result, data.Length);
-			Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
 			return new SymmetricMatrix(result, NumColumns, DefiniteProperty.Unknown);
 		}
 
@@ -254,7 +254,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void AxpyIntoThis(SymmetricMatrix otherMatrix, double otherCoefficient)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
 			this.Definiteness = DefiniteProperty.Unknown;
 		}
 
@@ -512,17 +512,17 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (thisCoefficient == 1.0)
 			{
 				Array.Copy(this.data, result, data.Length);
-				Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
 			}
 			else if (otherCoefficient == 1.0)
 			{
 				Array.Copy(otherMatrix.data, result, data.Length);
-				Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
 			}
 			else
 			{
 				Array.Copy(this.data, result, data.Length);
-				BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new SymmetricMatrix(result, NumColumns, DefiniteProperty.Unknown);
 		}
@@ -551,11 +551,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			if (thisCoefficient == 1.0)
 			{
-				Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
 			}
 			else
 			{
-				BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
 			}
 			this.Definiteness = DefiniteProperty.Unknown;
 		}
@@ -623,7 +623,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckMultiplicationDimensions(this.NumColumns, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(this.NumRows, rhsVector.Length);
-			Blas.Dspmv(StoredTriangle.Upper, Order,
+			GlobalProvider.Blas.Dspmv(StoredTriangle.Upper, Order,
 				1.0, this.data, 0, lhsVector.RawData, 0, 1,
 				0.0, rhsVector.RawData, 0, 1);
 		}
@@ -657,11 +657,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			int numStoredEntries = this.data.Length;
 			double[] result = new double[numStoredEntries];
 			Array.Copy(this.data, result, numStoredEntries);
-			Blas.Dscal(numStoredEntries, scalar, result, 0, 1);
+			GlobalProvider.Blas.Dscal(numStoredEntries, scalar, result, 0, 1);
 			return new SymmetricMatrix(result, this.Order, this.Definiteness);
 		}
 
-		public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
+		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(data.Length, scalar, data, 0, 1);
 
 		// Not very efficient
 		public void SetEntryRespectingPattern(int rowIdx, int colIdx, double value)

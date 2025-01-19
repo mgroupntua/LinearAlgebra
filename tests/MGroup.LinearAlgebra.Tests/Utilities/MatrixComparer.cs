@@ -10,18 +10,18 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 	/// <summary>
 	/// Compares scalars, vectors and matrices.
 	/// </summary>
-	internal class MatrixComparer
+	public class MatrixComparer
 	{
 		private readonly ValueComparer valueComparer;
 
-		internal MatrixComparer(double tolerance = 1e-13)
+		public MatrixComparer(double tolerance = 1e-13)
 		{
 			this.valueComparer = new ValueComparer(tolerance);
 		}
 
-		internal bool AreEqual(double a, double b) => valueComparer.AreEqual(a, b);
+		public bool AreEqual(double a, double b) => valueComparer.AreEqual(a, b);
 
-		internal bool AreEqual(int[] a, int[] b)
+		public bool AreEqual(int[] a, int[] b)
 		{
 			int n = a.Length;
 			if (b.Length != n)
@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(double[] a, double[] b)
+		public bool AreEqual(double[] a, double[] b)
 		{
 			int n = a.Length;
 			if (b.Length != n)
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(double[,] a, double[,] b)
+		public bool AreEqual(double[,] a, double[,] b)
 		{
 			int m = a.GetLength(0);
 			int n = a.GetLength(1);
@@ -82,7 +82,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(IIndexable1D a, IIndexable1D b)
+		public bool AreEqual(IIndexable1D a, IIndexable1D b)
 		{
 			int n = a.Length;
 			if (b.Length != n)
@@ -101,7 +101,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(double[] a, IIndexable1D b)
+		public bool AreEqual(double[] a, IIndexable1D b)
 		{
 			int n = a.Length;
 			if (b.Length != n)
@@ -120,9 +120,9 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(IIndexable1D a, double[] b) => AreEqual(b, a);
+		public bool AreEqual(IIndexable1D a, double[] b) => AreEqual(b, a);
 
-		internal bool AreEqual(IIndexable2D a, IIndexable2D b)
+		public bool AreEqual(IIndexable2D a, IIndexable2D b)
 		{
 			int m = a.NumRows;
 			int n = a.NumColumns;
@@ -145,7 +145,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(double[,] a, IIndexable2D b)
+		public bool AreEqual(double[,] a, IIndexable2D b)
 		{
 			int m = a.GetLength(0);
 			int n = a.GetLength(1);
@@ -168,10 +168,10 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(IIndexable2D a, double[,] b) => AreEqual(b, a);
+		public bool AreEqual(IIndexable2D a, double[,] b) => AreEqual(b, a);
 
 
-		internal bool AreEqual(int[,] a, IIndexableInt2D b)
+		public bool AreEqual(int[,] a, IIndexableInt2D b)
 		{
 			int m = a.GetLength(0);
 			int n = a.GetLength(1);
@@ -194,30 +194,30 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
-		internal bool AreEqual(IIndexableInt2D a, int[,] b) => AreEqual(b, a);
+		public bool AreEqual(IIndexableInt2D a, int[,] b) => AreEqual(b, a);
 
-		internal void AssertEqual(double a, double b) => Assert.True(AreEqual(a, b), $"a={a}, b={b}");
+		public void AssertEqual(double a, double b) => Assert.True(AreEqual(a, b), $"a={a}, b={b}");
 
-		internal void AssertEqual(int[] a, int[] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(int[] a, int[] b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(double[] a, double[] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(double[] a, double[] b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(double[,] a, double[,] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(double[,] a, double[,] b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(IIndexable1D a, IIndexable1D b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(IIndexable1D a, IIndexable1D b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(double[] a, IIndexable1D b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(double[] a, IIndexable1D b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(IIndexable1D a, double[] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(IIndexable1D a, double[] b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(IIndexable2D a, IIndexable2D b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(IIndexable2D a, IIndexable2D b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(double[,] a, IIndexable2D b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(double[,] a, IIndexable2D b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(IIndexable2D a, double[,] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(IIndexable2D a, double[,] b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(int[,] a, IIndexableInt2D b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(int[,] a, IIndexableInt2D b) => Assert.True(AreEqual(a, b));
 
-		internal void AssertEqual(IIndexableInt2D a, int[,] b) => Assert.True(AreEqual(a, b));
+		public void AssertEqual(IIndexableInt2D a, int[,] b) => Assert.True(AreEqual(a, b));
 	}
 }

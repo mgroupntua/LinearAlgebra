@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Triangulation;
+using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -19,9 +19,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
         //[Theory]
         //[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
         [Fact]
-        private static void TestMultipleSystemsSolution(/*LinearAlgebraProviderChoice providers*/)
+        private static void TestMultipleSystemsSolution(/*IImplementationProvider provider*/)
         {
-            //TestSettings.RunMultiproviderTest(providers, delegate () {
+            //TestSettings.RunMultiproviderTest(provider, delegate () {
             //
 
             var skyline = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.SkylineValues,
@@ -41,9 +41,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
         //[Theory]
         //[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
         [Fact]
-        private static void TestSystemSolution(/*LinearAlgebraProviderChoice providers*/)
+        private static void TestSystemSolution(/*IImplementationProvider provider*/)
         {
-            //TestSettings.RunMultiproviderTest(providers, delegate () {
+            //TestSettings.RunMultiproviderTest(provider, delegate () {
             //
 
             var skyline = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.SkylineValues,

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 
@@ -67,7 +67,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			EigensystemJob job = calcEigenvectors ? EigensystemJob.EigenvaluesAndEigenVectors : EigensystemJob.OnlyEigenvalues;
 			int leadingDimA = order;
 			var eigenvalues = new double[order]; // symmetric matrices have as many eigenvalues as their size
-			LapackEigensystems.Dsyev(job, StoredTriangle.Upper, order, matrix, 0, leadingDimA, eigenvalues, 0);
+			GlobalProvider.LapackEigensystems.Dsyev(job, StoredTriangle.Upper, order, matrix, 0, leadingDimA, eigenvalues, 0);
 
 			if (calcEigenvectors)
 			{

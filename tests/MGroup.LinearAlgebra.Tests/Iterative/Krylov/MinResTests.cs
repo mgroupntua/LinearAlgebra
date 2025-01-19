@@ -1,3 +1,4 @@
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Iterative.MinimumResidual;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Matrices;
@@ -16,9 +17,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 	{
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestIndefiniteSystem(LinearAlgebraProviderChoice providers)
+		private static void TestIndefiniteSystem(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var comparer = new MatrixComparer(1E-4);
 				var residualTolerance = 1e-8;
@@ -31,9 +32,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestPosDefDenseSystem(LinearAlgebraProviderChoice providers)
+		private static void TestPosDefDenseSystem(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var comparer = new MatrixComparer(1E-6);
 				var n = SparsePosDef10by10.Order;
@@ -48,9 +49,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestPosDefSparseSystem(LinearAlgebraProviderChoice providers)
+		private static void TestPosDefSparseSystem(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var comparer = new MatrixComparer(1E-6);
 				var n = SparsePosDef10by10.Order;

@@ -7,12 +7,12 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 	/// A 10-by-5 rectangular matrix with full column rank (rank = number of columns). Its transpose will have full row rank.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	internal static class RectangularFullRank10by5
+	public static class RectangularFullRank10by5
 	{
-		internal const int NumRows = 10;
-		internal const int NumCols = 5;
+		public const int NumRows = 10;
+		public const int NumCols = 5;
 
-		internal static double[,] Matrix => new double[,] {
+		public static double[,] Matrix => new double[,] {
 			{ 1.687338, 1.910625, 0.078085, 2.332444, 3.131424 },
 			{ 3.215230, 1.767679, 1.883659, 0.809185, 2.026953 },
 			{ 0.981285, 1.325970, 2.639193, 0.923645, 3.475809 },
@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			{ 3.186167, 0.066731, 1.536828, 2.245892, 2.542407 }
 		};
 
-		internal static double[] MatrixRowMajor => new double[] {
+		public static double[] MatrixRowMajor => new double[] {
 			1.687338, 1.910625, 0.078085, 2.332444, 3.131424,
 			3.215230, 1.767679, 1.883659, 0.809185, 2.026953,
 			0.981285, 1.325970, 2.639193, 0.923645, 3.475809,
@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			3.186167, 0.066731, 1.536828, 2.245892, 2.542407
 		};
 
-		internal static double[] MatrixColMajor => new double[] {
+		public static double[] MatrixColMajor => new double[] {
 			1.687338, 3.215230, 0.981285, 0.751857, 3.446088, 0.779645, 0.968975, 3.581092, 1.536053, 3.186167,
 			1.910625, 1.767679, 1.325970, 2.296387, 3.932793, 1.764859, 3.746153, 1.647008, 0.897209, 0.066731,
 			0.078085, 1.883659, 2.639193, 2.101308, 0.828995, 1.694237, 2.681011, 3.430712, 3.872541, 1.536828,
@@ -49,30 +49,30 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// <summary>
 		/// A vector with length = 5, such that <see cref="Matrix"/> * <see cref="Lhs5"/> = <see cref="Rhs10"/>.
 		/// </summary>
-		internal static double[] Lhs5 => new double[] { 3.4484, 1.9563, 2.7385, 4.2828, 5.3064 };
+		public static double[] Lhs5 => new double[] { 3.4484, 1.9563, 2.7385, 4.2828, 5.3064 };
 
 		/// <summary>
 		/// A vector with length = 10, such that <see cref="Matrix"/> * <see cref="Lhs5"/> = <see cref="Rhs10"/>.
 		/// </summary>
-		internal static double[] Rhs10 => MatrixOperations.MatrixTimesVector(Matrix, Lhs5);
+		public static double[] Rhs10 => MatrixOperations.MatrixTimesVector(Matrix, Lhs5);
 
 		/// <summary>
 		/// A vector with length = 10, such that <see cref="Matrix"/> * <see cref="Lhs10"/> = <see cref="Rhs5"/>.
 		/// </summary>
-		internal static double[] Lhs10 => new double[] {
+		public static double[] Lhs10 => new double[] {
 			3.4484, 1.9563, 2.7385, 4.2828, 5.3064, 4.3251, 0.1117, 4.0487, 2.6311, 2.6269
 		};
 
 		/// <summary>
 		/// A vector with length = 5, such that <see cref="Matrix"/> * <see cref="Lhs10"/> = <see cref="Rhs5"/>.
 		/// </summary>
-		internal static double[] Rhs5 => MatrixOperations.MatrixTimesVector(MatrixOperations.Transpose(Matrix), Lhs10);
+		public static double[] Rhs5 => MatrixOperations.MatrixTimesVector(MatrixOperations.Transpose(Matrix), Lhs10);
 
 		/// <summary>
 		/// The orthogonal matrix Q after the factorization: A = Q * R, where A (m-by-n) = <see cref="Matrix"/>,  
 		/// Q (m-by-m), R (m-by-n)
 		/// </summary>
-		internal static double[,] QRFactorQ => new double[,] {
+		public static double[,] QRFactorQ => new double[,] {
 			{ -0.23075142099349710,  0.14858764284193901,  0.31792868485316900,  0.52033887561493763,  0.25119640190154863, -0.31609052075075511, -0.14778642143763676, -0.20713121727488037,  0.38894313590494700, -0.41690588846886784 },
 			{ -0.43969785029491520, -0.10772975041878161,  0.07417564455815109, -0.25365561595287567,  0.00742163793160727,  0.50045187775446243,  0.46428134845573432, -0.34723518223729494,  0.05832008220679226, -0.36766705946723366 },
 			{ -0.13419534684195095,  0.13124334022410436, -0.36103200437303257, -0.19632113866951575,  0.62338833887492229, -0.15238342744727723, -0.24643597223954369, -0.33041361660005214, -0.45550611799719420, -0.08159225990019033 },
@@ -89,7 +89,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// The upper trapezoidal matrix R after the factorization: A = Q * R, where A (m-by-n) = <see cref="Matrix"/>,
 		/// Q (m-by-m), R (m-by-n)
 		/// </summary>
-		internal static double[,] QRqrFactorR => new double[,] {
+		public static double[,] QRqrFactorR => new double[,] {
 			{ -7.312362336644295, -5.194296836207316, -5.506302126480993, -4.455957642566284, -6.588771140414244 },
 			{  0.000000000000000,  4.792011033788077,  1.820469593879060,  1.842539394813214,  2.284251661879478 },
 			{  0.000000000000000,  0.000000000000000, -4.601665076558234, -1.960507008648889, -1.852780335086659 },
@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// <summary>
 		/// Actually since I am taking LQ(transpose(A)), this is the transpose of <see cref="QRqrFactorR"/>
 		/// </summary>
-		internal static double[,] LQFactorL => new double[,] {
+		public static double[,] LQFactorL => new double[,] {
 			{ -7.312362336644295, 0.000000000000000,  0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000 },
 			{ -5.194296836207316, 4.792011033788077,  0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000 },
 			{ -5.506302126480993, 1.820469593879060, -4.601665076558234, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000, 0.000000000000000 },
@@ -117,7 +117,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// <summary>
 		/// Actually since I am taking LQ(transpose(A)), this is the transpose of <see cref="QRFactorQ"/>
 		/// </summary>
-		internal static double[,] LQFactorQ => new double[,] {
+		public static double[,] LQFactorQ => new double[,] {
 			{ -0.23075142099349710, -0.43969785029491520, -0.13419534684195095, -0.10281998694624772, -0.47126876942772489, -0.10662012686283072, -0.13251189634630042, -0.48973120246710766, -0.21006248450003742, -0.43572334812147162 },
 			{  0.14858764284193901, -0.10772975041878161,  0.13124334022410436,  0.36775989343103105,  0.30986638208644840,  0.25272112351608017,  0.63811348815517166, -0.18714506899997330, -0.04046691405280455, -0.45837653401074380 },
 			{  0.31792868485316900,  0.07417564455815109, -0.36103200437303257, -0.18811764198214728,  0.50635053078230396, -0.14061937078687231, -0.17161054696409667, -0.23356674775948780, -0.60620280595936349,  0.00607081461594355 },
@@ -133,7 +133,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// <summary>
 		/// Solution of the least squares system <see cref="Matrix"/> * <see cref="LhsLsq"/> ~= <see cref="RhsLsq"/>.
 		/// </summary>
-		internal static double[] LhsLsq => new double[] {
+		public static double[] LhsLsq => new double[] {
 			1.073134012122104, -0.126789906548218, 1.420147230082810, 1.877832570455326, -1.117439931920276
 		};
 
@@ -142,14 +142,14 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// <see cref="Matrix"/> * <see cref="LhsLsq"/> = <see cref="RhsLsq"/> 
 		/// can only be solved approximately, via least squares.
 		/// </summary>
-		internal static double[] RhsLsq => new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 };
+		public static double[] RhsLsq => new double[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 };
 
 
 		/// <summary>
 		/// Right hand side vector of the minimum norm system
 		/// transpose(<see cref="Matrix"/>) * <see cref="LhsMinNorm"/> = <see cref="RhsMinNorm"/>.
 		/// </summary>
-		internal static double[] RhsMinNorm => new double[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
+		public static double[] RhsMinNorm => new double[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
 
 		/// <summary>
 		/// Solution of the minimum norm system
@@ -159,7 +159,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			0.4115012354314005, -0.1652228399115381, 0.3318849071280361, 0.4048451728664134, -0.4209082824823209, 0.3061133109183448, 0.2615025913792203, 0.1943785674066800, -0.0675278461506491, 0.1798101026385349
 		};
 
-		internal static string FilePath => Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName
+		public static string FilePath => Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName
 			+ @"\MGroup.LinearAlgebra.Tests\Resources\RectangularFullRank10by5.txt";
 	}
 }

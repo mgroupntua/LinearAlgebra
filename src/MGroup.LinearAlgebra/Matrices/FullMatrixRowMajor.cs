@@ -6,7 +6,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	using System.Text;
 
 	using MGroup.LinearAlgebra.Commons;
-	using MGroup.LinearAlgebra.Providers;
+	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Reduction;
 	using MGroup.LinearAlgebra.Vectors;
 
@@ -153,7 +153,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			(TransposeMatrix transposeA, int lhsLength, int rhsLength) = TransposeUtilities.PrepareBlas(this, transposeThis);
 			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
-			Blas.DgemvRowMajor(transposeA, NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
+			GlobalProvider.Blas.DgemvRowMajor(transposeA, NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
 		}
 
 		public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)

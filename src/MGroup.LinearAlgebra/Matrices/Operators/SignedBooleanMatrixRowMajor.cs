@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Output.Formatting;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Investigate if you can store this in COO like format: rowsPlus, colsPlus, rowsMinus, colsMinus.

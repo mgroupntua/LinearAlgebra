@@ -5,7 +5,7 @@ namespace MGroup.LinearAlgebra.Commons
 	using System.Text;
 
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Providers;
+	using MGroup.LinearAlgebra.Implementations;
 
 	internal static class TransposeUtilities
 	{

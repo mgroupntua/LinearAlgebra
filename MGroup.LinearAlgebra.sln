@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distributed.Tests", "tests\MGroup.LinearAlgebra.Distributed.Tests\MGroup.LinearAlgebra.Distributed.Tests.csproj", "{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Implementations.NativeWin64", "src\MGroup.LinearAlgebra.Implementations.NativeWin64\MGroup.LinearAlgebra.Implementations.NativeWin64.csproj", "{39B4152E-7E5E-480E-956E-CFA62A7FABE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{CB28CCAA-76FE-4036-9A11-006F17F5242B} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
 		{65C1B9BB-D10A-4F3B-BEDC-7642735491BD} = {960E247E-1475-45BD-8D46-26D3D0677FDA}
 		{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D} = {D4252C12-DA3E-4A75-982F-96F9B1603D47}
+		{39B4152E-7E5E-480E-956E-CFA62A7FABE5} = {960E247E-1475-45BD-8D46-26D3D0677FDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B549AB6-C402-4735-9A77-2FC85C81C393}

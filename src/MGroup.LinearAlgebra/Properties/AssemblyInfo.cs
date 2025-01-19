@@ -37,3 +37,5 @@ using System.Runtime.InteropServices;
 
 // Expose internal methods to the testing project.
 [assembly: InternalsVisibleTo("MGroup.LinearAlgebra.Tests")]
+[assembly: InternalsVisibleTo("MGroup.LinearAlgebra.Implementations.NativeWin64")]
+[assembly: InternalsVisibleTo("MGroup.LinearAlgebra.Implementations.NativeWin64.Tests")]

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 
@@ -128,7 +128,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			}
 
 			// Call Lapack
-			LapackEigensystems.Dgeev(jobLeft, jobRight, order, matrix, 0, leadingDimA, 
+			GlobalProvider.LapackEigensystems.Dgeev(jobLeft, jobRight, order, matrix, 0, leadingDimA, 
 				eigenvaluesReal, 0, eigenvaluesImaginary, 0,
 				eigenvectorsLeft, 0, leadingDimEigenvectorsLeft,
 				eigenvectorsRight, 0, leadingDimEigenvectorsRight);

@@ -7,6 +7,7 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Eigensystems;
 using MGroup.LinearAlgebra.Tests.Utilities;
+using MGroup.LinearAlgebra.Implementations;
 
 namespace MGroup.LinearAlgebra.Tests.Eigensystems
 {
@@ -38,9 +39,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesAndEigenvectors(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesAndEigenvectors(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
@@ -57,9 +58,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigenvaluesOnly(LinearAlgebraProviderChoice providers)
+		private static void TestEigenvaluesOnly(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
@@ -76,9 +77,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigensystemCalledFromFullMatrix(LinearAlgebraProviderChoice providers)
+		private static void TestEigensystemCalledFromFullMatrix(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
@@ -93,9 +94,9 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestEigensystemCalledFromPackedMatrix(LinearAlgebraProviderChoice providers)
+		private static void TestEigensystemCalledFromPackedMatrix(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
 				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);

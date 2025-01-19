@@ -1,5 +1,6 @@
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -30,9 +31,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestMatrixVectorMultiplication(LinearAlgebraProviderChoice providers)
+		private static void TestMatrixVectorMultiplication(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = SymmetricCscMatrix.CreateFromArrays(
 					SparsePosDef10by10.Order, SparsePosDef10by10.SymmetricCscValues,
@@ -67,9 +68,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestMatrixVectorMultiplicationIntoResult(LinearAlgebraProviderChoice providers)
+		private static void TestMatrixVectorMultiplicationIntoResult(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				// The result vectors will first be set to some non zero values to make sure that the result overwrites 
 				// them instead of being added to them.

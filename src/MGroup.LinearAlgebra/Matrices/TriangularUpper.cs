@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Providers;
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
             //TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
             double[] result = new double[data.Length];
             Array.Copy(this.data, result, data.Length);
-            Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
             return new TriangularUpper(result, NumColumns);
         }
 
@@ -184,7 +184,7 @@ namespace MGroup.LinearAlgebra.Matrices
         public void AxpyIntoThis(TriangularUpper otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-            Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
         }
 
         /// <summary>
@@ -365,17 +365,17 @@ namespace MGroup.LinearAlgebra.Matrices
             if (thisCoefficient == 1.0)
             {
                 Array.Copy(this.data, result, data.Length);
-                Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
             }
             else if (otherCoefficient == 1.0)
             {
                 Array.Copy(otherMatrix.data, result, data.Length);
-                Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
             }
             else
             {
                 Array.Copy(this.data, result, data.Length);
-                BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
             }
             return new TriangularUpper(result, NumColumns);
         }
@@ -407,11 +407,11 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
             if (thisCoefficient == 1.0)
             {
-                Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
             }
             else
             {
-                BlasExtensions.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
             }
         }
 
@@ -497,7 +497,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckMultiplicationDimensions(Order, lhsVector.Length);
             Preconditions.CheckSystemSolutionDimensions(Order, rhsVector.Length);
             Array.Copy(lhsVector.RawData, rhsVector.RawData, Order);
-            Blas.Dtpmv(StoredTriangle.Upper, transpose, DiagonalValues.NonUnit, Order,
+			GlobalProvider.Blas.Dtpmv(StoredTriangle.Upper, transpose, DiagonalValues.NonUnit, Order,
                 this.data, 0, rhsVector.RawData, 0, 1);
         }
 
@@ -529,14 +529,14 @@ namespace MGroup.LinearAlgebra.Matrices
             int nnz = this.data.Length;
             double[] result = new double[nnz];
             Array.Copy(this.data, result, nnz);
-            Blas.Dscal(nnz, scalar, result, 0, 1);
+			GlobalProvider.Blas.Dscal(nnz, scalar, result, 0, 1);
             return new TriangularUpper(result, this.Order);
         }
 
         /// <summary>
         /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
         /// </summary>
-        public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
+        public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(data.Length, scalar, data, 0, 1);
 
         /// <summary>
         /// See <see cref="IMatrix.SetEntryRespectingPattern(int, int, double)"/>.
@@ -558,7 +558,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckSystemSolutionDimensions(this, rhs);
             double[] result = rhs.CopyToArray();
             TransposeMatrix transposeBlas = transposeThis ? TransposeMatrix.Transpose : TransposeMatrix.NoTranspose;
-            Blas.Dtpsv(StoredTriangle.Upper, transposeBlas, DiagonalValues.NonUnit, Order,
+			GlobalProvider.Blas.Dtpsv(StoredTriangle.Upper, transposeBlas, DiagonalValues.NonUnit, Order,
                 this.data, 0, result, 0, 1);
             return Vector.CreateFromArray(result, false);
         }

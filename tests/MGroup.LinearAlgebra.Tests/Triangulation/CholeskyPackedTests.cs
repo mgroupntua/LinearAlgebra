@@ -1,10 +1,11 @@
-﻿using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
+using MGroup.LinearAlgebra.Implementations;
 
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
@@ -18,9 +19,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDeterminant(LinearAlgebraProviderChoice providers)
+        private static void TestDeterminant(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // positive definite
                 var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -32,9 +33,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestInversion(LinearAlgebraProviderChoice providers)
+        private static void TestInversion(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // positive definite
                 var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -47,9 +48,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestFactorization(LinearAlgebraProviderChoice providers)
+        private static void TestFactorization(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // positive definite
                 var A1 = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -66,9 +67,9 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestSystemSolution(LinearAlgebraProviderChoice providers)
+        private static void TestSystemSolution(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 // positive definite
                 var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);

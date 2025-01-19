@@ -135,9 +135,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
         //[Theory]
         //[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
         [Fact]
-        private static void TestMatrixVectorMultiplication(/*LinearAlgebraProviderChoice providers*/)
+        private static void TestMatrixVectorMultiplication(/*IImplementationProvider provider*/)
         {
-            //TestSettings.RunMultiproviderTest(providers, delegate () {
+            //TestSettings.RunMultiproviderTest(provider, delegate () {
             //
 
             var A = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,
@@ -154,9 +154,9 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
         //[Theory]
         //[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
         [Fact]
-        private static void TestMatrixVectorMultiplicationIntoResult(/*LinearAlgebraProviderChoice providers*/)
+        private static void TestMatrixVectorMultiplicationIntoResult(/*IImplementationProvider provider*/)
         {
-            //TestSettings.RunMultiproviderTest(providers, delegate () {
+            //TestSettings.RunMultiproviderTest(provider, delegate () {
             //
 
             var A = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,

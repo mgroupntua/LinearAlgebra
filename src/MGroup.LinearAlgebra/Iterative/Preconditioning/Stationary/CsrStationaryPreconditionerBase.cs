@@ -3,20 +3,20 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Providers.Managed;
+	using MGroup.LinearAlgebra.Implementations.Managed;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public abstract class CsrStationaryPreconditionerBase : IPreconditioner
 	{
 		protected readonly int numApplications;
-		protected readonly StationaryIterationManagedProvider provider;
+		protected readonly ManagedStationaryIterationProvider provider;
 		protected CsrMatrix matrix;
 		protected int[] diagonalOffsets;
 
 		public CsrStationaryPreconditionerBase(int numApplications)
 		{
 			this.numApplications = numApplications;
-			provider = new StationaryIterationManagedProvider();
+			provider = new ManagedStationaryIterationProvider();
 		}
 
 		public virtual void UpdateMatrix(IMatrixView matrix, bool isPatternModified)

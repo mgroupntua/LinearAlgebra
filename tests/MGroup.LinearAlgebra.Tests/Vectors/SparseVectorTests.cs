@@ -1,4 +1,5 @@
-﻿using MGroup.LinearAlgebra.Tests.TestData;
+using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
@@ -15,9 +16,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestAxpy(LinearAlgebraProviderChoice providers)
+        private static void TestAxpy(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var sparse = SparseVector.CreateFromArrays(SparseVector10.Length, SparseVector10.NonZeroValues,
                     SparseVector10.NonZeroIndices, true, false);
@@ -36,9 +37,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestDotProduct(LinearAlgebraProviderChoice providers)
+        private static void TestDotProduct(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var sparse = SparseVector.CreateFromArrays(SparseVector10.Length, SparseVector10.NonZeroValues,
                     SparseVector10.NonZeroIndices, true, false);
@@ -54,9 +55,9 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
         [Theory]
         [MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-        private static void TestNorm2(LinearAlgebraProviderChoice providers)
+        private static void TestNorm2(IImplementationProvider provider)
         {
-            TestSettings.RunMultiproviderTest(providers, delegate ()
+            TestSettings.RunMultiproviderTest(provider, delegate ()
             {
                 var vector = SparseVector.CreateFromArrays(SparseVector10.Length, SparseVector10.NonZeroValues,
                     SparseVector10.NonZeroIndices, true, false);

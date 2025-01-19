@@ -1,3 +1,4 @@
+using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
@@ -19,9 +20,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestDenseSystem(LinearAlgebraProviderChoice providers)
+		private static void TestDenseSystem(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 				var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
@@ -39,9 +40,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestSparseSystem(LinearAlgebraProviderChoice providers)
+		private static void TestSparseSystem(IImplementationProvider provider)
 		{
-			TestSettings.RunMultiproviderTest(providers, delegate ()
+			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
 				var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
