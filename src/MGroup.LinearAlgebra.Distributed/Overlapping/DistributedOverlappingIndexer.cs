@@ -119,6 +119,13 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 			public int NumEntries { get; private set; }
 
+			/// <summary>
+			/// Counts how many vector (or matrix) entries are common with other compute nodes. 
+			/// </summary>
+			/// <returns>
+			/// "local" = how many entries in common with vectors (or matrices) in the same cluster.
+			/// "remote" = how many entries in common with vectors (or matrices) in other clusters.
+			/// </returns>
 			public (int local, int remote) CountCommonEntries()
 			{
 				int local = 0;

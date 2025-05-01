@@ -6,7 +6,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
     {
         public static void Main(string[] args)
         {
-            Hexagon1DTests.RunMpiTests();
+            DistributedOverlappingVectorTests.RunMpiTests();
         }
     }
 }
