@@ -397,7 +397,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			{
 				x[i] = 2 * nodeID + i;
 			}
-			if (nodeID == NumNodes - 1)
+			if (nodeID == NumComputeNodes - 1)
 			{
 				x[x.Length - 1] = 0;
 			}
@@ -425,8 +425,8 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 		private static Vector GetWAfterSumOverlapping(int nodeID)
 		{
-			int previous = nodeID - 1 >= 0 ? nodeID - 1 : NumNodes - 1;
-			int next = (nodeID + 1) % NumNodes;
+			int previous = nodeID - 1 >= 0 ? nodeID - 1 : NumComputeNodes - 1;
+			int next = (nodeID + 1) % NumComputeNodes;
 
 			Vector w = GetWBeforeSumOverlapping(nodeID);
 			Vector wPrevious = GetWBeforeSumOverlapping(previous);

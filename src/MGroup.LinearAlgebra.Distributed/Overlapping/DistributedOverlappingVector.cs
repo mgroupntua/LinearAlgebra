@@ -7,6 +7,7 @@ using MGroup.Environments;
 using System.Collections.Concurrent;
 using MGroup.MSolve.Solution.LinearSystem;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Distributed.Utilities;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
@@ -24,7 +25,7 @@ using MGroup.LinearAlgebra.Commons;
 //      round it to the nearest integer (and pray the precision errors are negligible).
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
-	public class DistributedOverlappingVector : IGlobalVector
+	public class DistributedOverlappingVector : IGlobalVector//, IIndexable1D
 	{
 		private ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>	cachedBuffers = 
 			new ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>();
@@ -60,6 +61,25 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public IDictionary<int, Vector> LocalVectors { get; }
 
 		public bool CheckForCompatibility { get; set; } = true;
+
+		//public double this[int index]
+		//{
+		//	get
+		//	{
+		//		// TODO: Only break if an overlapping entry is requested and that one is not the same across all vectors.
+		//		// TODO: Do this after gathering all local vectors.
+		//		if (!AreOverlappingEntriesEqual(1E-12))
+		//		{
+		//			throw new InvalidOperationException(
+		//				"The entry requested does not have the same value across all local vectors.");
+		//		}
+
+		//		// Temporarily gather all local vectors from all compute nodes
+		//		Dictionary<int, double[]> allRawArrays = // possibly avoid redundant serializations by working with double[]
+		//			Environment.AllGather<double[]>(nodeID => LocalVectors[nodeID].RawData); 
+		//		Dictionary<int, Vector> allLocalVectors = allRawArrays.MapDictionary(x => Vector.CreateFromArray(x));
+		//	}
+		//}
 
 		public bool AreOverlappingEntriesEqual(double tolerance)
 		{

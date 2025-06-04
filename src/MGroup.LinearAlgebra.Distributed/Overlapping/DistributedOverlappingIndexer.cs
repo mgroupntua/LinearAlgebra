@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 					return localCount;
 				});
 				double globalCount = Environment.AllReduceSum(countPerNode);
-				numUniqueEntries = (int)globalCount;
+				numUniqueEntries = (int)Math.Round(globalCount);
 			}
 			return numUniqueEntries;
 		}
