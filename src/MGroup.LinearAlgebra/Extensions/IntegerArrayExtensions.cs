@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
-namespace MGroup.LinearAlgebra
+namespace MGroup.LinearAlgebra.Extensions
 {
     /// <summary>
     /// Defines conversions from vectors, matrices, single- and multi-dimensional double arrays to integer arrays of the same 
@@ -19,7 +20,7 @@ namespace MGroup.LinearAlgebra
         public static int[] ToIntArray(this double[] array)
         {
             var result = new int[array.Length];
-            for (int i = 0; i < array.Length; ++i) result[i] = (int)array[i];
+            for (var i = 0; i < array.Length; ++i) result[i] = (int)array[i];
             return result;
         }
 
@@ -29,9 +30,9 @@ namespace MGroup.LinearAlgebra
         public static int[,] ToIntArray(this double[,] array)
         {
             var result = new int[array.GetLength(0), array.GetLength(1)];
-            for (int i = 0; i < array.GetLength(0); ++i)
+            for (var i = 0; i < array.GetLength(0); ++i)
             {
-                for (int j = 0; j < array.GetLength(1); ++j) result[i, j] = (int)array[i, j];
+                for (var j = 0; j < array.GetLength(1); ++j) result[i, j] = (int)array[i, j];
             }
             return result;
         }
@@ -42,11 +43,11 @@ namespace MGroup.LinearAlgebra
         public static int[,,] ToIntArray(this double[,,] array)
         {
             var result = new int[array.GetLength(0), array.GetLength(1), array.GetLength(2)];
-            for (int i = 0; i < array.GetLength(0); ++i)
+            for (var i = 0; i < array.GetLength(0); ++i)
             {
-                for (int j = 0; j < array.GetLength(1); ++j)
+                for (var j = 0; j < array.GetLength(1); ++j)
                 {
-                    for (int k = 0; k < array.GetLength(2); ++k)  result[i, j, k] = (int)array[i, j, k];
+                    for (var k = 0; k < array.GetLength(2); ++k)  result[i, j, k] = (int)array[i, j, k];
                 }
             }
             return result;

@@ -1,10 +1,12 @@
-﻿using System;
+using System;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Should I reimplement the methods to avoid allocating and deallocating vectors?
-namespace MGroup.LinearAlgebra.Matrices
+namespace MGroup.LinearAlgebra.Extensions
 {
     public static class RawArrayVectorExtensions
     {
@@ -50,7 +52,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="otherVector">A vector with the same Length as this.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
+        /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static void AxpyIntoThis(this double[] thisVector, double[] otherVector, double otherCoefficient)
@@ -130,9 +132,9 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             var comparer = new ValueComparer(tolerance);
             if (matrix.GetLength(0) != matrix.GetLength(1)) return false;
-            for (int i = 0; i < matrix.GetLength(0); ++i)
+            for (var i = 0; i < matrix.GetLength(0); ++i)
             {
-                for (int j = 0; j < i; ++j)
+                for (var j = 0; j < i; ++j)
                 {
                     if (!comparer.AreEqual(matrix[i, j], matrix[j, i])) return false;
                 }
@@ -215,7 +217,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// result[i] = this[i] - <paramref name="otherVector"/>[i].
         /// </summary>
         /// <param name="otherVector">A vector with the same Length as this.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
+        /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static double[] Subtract(this double[] thisVector, double[] otherVector)
@@ -227,7 +229,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// The resulting vector overwrites the entries of this.
         /// </summary>
         /// <param name="otherVector">A vector with the same Length as this.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
+        /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static void SubtractIntoThis(this double[] thisVector, double[] otherVector)
@@ -243,9 +245,9 @@ namespace MGroup.LinearAlgebra.Matrices
             //TODO: perhaps I should store them directly in a 1D col major array. That is more efficient but then I should move 
             //      this method elsewhere, so that it doesn't break the encapsulation of Matrix.
             var result = Matrix.CreateZero(thisVector.Length, otherVector.Length);
-            for (int i = 0; i < thisVector.Length; ++i)
+            for (var i = 0; i < thisVector.Length; ++i)
             {
-                for (int j = 0; j < otherVector.Length; ++j) result[i, j] = thisVector[i] * otherVector[j];
+                for (var j = 0; j < otherVector.Length; ++j) result[i, j] = thisVector[i] * otherVector[j];
             }
             return result;
         }
