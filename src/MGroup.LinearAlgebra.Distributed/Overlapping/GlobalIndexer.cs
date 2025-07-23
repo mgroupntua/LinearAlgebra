@@ -41,7 +41,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			{
 				globalToLocal.Add(new Dictionary<int, int>());
 			}
-			
 
 			// Allocate memory for local-to-global maps and initialize to -1. 
 			localToGlobal = new Dictionary<int, int[]>();
@@ -104,6 +103,32 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public int NumGlobalIndices { get; }
 
 		public int FindGlobalIndexOf(int nodeID, int localIdx) => localToGlobal[nodeID][localIdx];
+
+		/// <summary>
+		/// Returns -1 if no such index exists
+		/// </summary>
+		/// <param name="globalIdx"></param>
+		/// <param name="nodeID"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException">Invalid global index</exception>
+		public int FindLocalIndexOf(int globalIdx, int nodeID)
+		{
+			if (globalIdx < 0 || globalIdx > globalToLocal.Count)
+			{
+				throw new ArgumentException(
+					$"The are {globalToLocal.Count} global indices, but {globalIdx} was requested.");
+			}
+
+			Dictionary<int, int> nodeToLocal = globalToLocal[globalIdx];
+			if (nodeToLocal.TryGetValue(nodeID, out int localIdx))
+			{
+				return localIdx;
+			}
+			else
+			{
+				return -1;
+			}
+		}
 
 		public List<(int nodeID, int localIdx)> FindLocalIndicesOf(int globalIdx)
 		{

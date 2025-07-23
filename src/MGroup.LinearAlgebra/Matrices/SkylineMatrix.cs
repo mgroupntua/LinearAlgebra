@@ -13,6 +13,7 @@ using MGroup.LinearAlgebra.Matrices.Builders;
 using System.Linq;
 using MGroup.LinearAlgebra.Reordering;
 using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Extensions;
 
 //TODO: Also linear combinations with other matrix types may be useful, e.g. Skyline (K) with diagonal (M), but I think 
 //      that for global matrices, this should be done through concrete class to use DoEntrywiseIntoThis methods. 

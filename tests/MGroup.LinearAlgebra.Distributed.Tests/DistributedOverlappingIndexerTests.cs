@@ -9,9 +9,11 @@ using MGroup.Environments;
 using MGroup.Environments.Mpi;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Vectors;
+using MGroup.MSolve.Discretization.Entities;
 
 using Xunit;
 
+using static MGroup.LinearAlgebra.Distributed.Overlapping.DistributedOverlappingIndexer;
 using static MGroup.LinearAlgebra.Distributed.Tests.Hexagon1DTestCase;
 
 namespace MGroup.LinearAlgebra.Distributed.Tests
@@ -73,6 +75,35 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			=> TestGlobalToLocalIndex(env.CreateEnvironment());
 
 		internal static void TestGlobalToLocalIndex(IComputeEnvironment environment)
+		{
+			environment.Initialize(CreateNodeTopology());
+			DistributedOverlappingIndexer distributedIndexer = CreateIndexer(environment);
+			var globalIndexer = new GlobalIndexer(distributedIndexer);
+
+			for (int globalIdx = 0; globalIdx < globalIndexer.NumGlobalIndices; globalIdx++)
+			{
+				for (int node = 0; node <= NumComputeNodes; node++)
+				{
+					int localIdxComputed = globalIndexer.FindLocalIndexOf(globalIdx, node);
+
+					int localIdxExpected = -1;
+					if (GlobalToLocalIndices[globalIdx].ContainsKey(node))
+					{
+						localIdxExpected = GlobalToLocalIndices[globalIdx][node];
+					}
+
+					Assert.Equal(localIdxExpected, localIdxComputed);
+				}
+			}
+		}
+
+		[Theory]
+		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
+		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
+		public static void TestGlobalToLocalIndicesManaged(EnvironmentChoice env)
+			=> TestGlobalToLocalIndices(env.CreateEnvironment());
+
+		internal static void TestGlobalToLocalIndices(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
 			DistributedOverlappingIndexer distributedIndexer = CreateIndexer(environment);
@@ -207,7 +238,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 				TestLocalNeighbors(mpiEnvironment);
 				TestLocalNumEntries(mpiEnvironment);
 				TestLocalMultiplicities(mpiEnvironment);
-				TestGlobalToLocalIndex(mpiEnvironment);
+				TestGlobalToLocalIndices(mpiEnvironment);
 				TestLocalToGlobalIndex(mpiEnvironment);
 
 				MpiDebugUtilities.DoSerially(MPI.Communicator.world,

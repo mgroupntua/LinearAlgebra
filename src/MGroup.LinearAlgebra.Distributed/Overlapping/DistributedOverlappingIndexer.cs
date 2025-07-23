@@ -11,10 +11,10 @@ using MGroup.MSolve.Solution.LinearSystem;
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
 	/// <summary>
-	/// Manages the indices for a <see cref="DistributedOverlappingVector"/>, <see cref="DistributedOverlappingVector"/>, etc.
-	/// Supports multiple local vectors, each of which may have none, some or all its entries in common with other local vectors.
-	/// Specifies the relationships between these common entries. When dealing with multiple distributed vectors that have the 
-	/// same indexing pattern, reuse the same instance of <see cref="DistributedOverlappingIndexer"/>.
+	/// Manages the indices for a <see cref="DistributedOverlappingVector"/>, <see cref="DistributedOverlappingMatrix{TMatrix}"/>, 
+	/// etc. Supports multiple local vectors, each of which may have none, some or all its entries in common with other local 
+	/// vectors. Specifies the relationships between these common entries. When dealing with multiple distributed vectors that 
+	/// have the same indexing pattern, reuse the same instance of <see cref="DistributedOverlappingIndexer"/>.
 	/// </summary>
 	/// <remarks>
 	/// In interface problems of PSM and related DDMs, local vectors have all their entries in common with other local vectors, 
