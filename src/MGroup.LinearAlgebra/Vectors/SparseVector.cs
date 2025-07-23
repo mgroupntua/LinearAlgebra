@@ -563,6 +563,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
+		/// <inheritdoc/>
+		/// </summary>
+		public bool HasSameFormat(IIndexable1D other)
+		{
+			if (other is SparseVector casted && casted.indices == this.indices)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
 		/// </summary>
 		public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
@@ -670,6 +685,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			int sparseIdx = FindSparseIndexOf(index);
 			CheckMutatedIndex(index, sparseIdx);
 			values[sparseIdx] = value;
+		}
+
+		/// <summary>
+		/// <inheritdoc/>
+		/// </summary>
+		public void SetAll(double value)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>

@@ -615,6 +615,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
+		/// <inheritdoc/>
+		/// </summary>
+		public bool HasSameFormat(IIndexable1D other)
+		{
+			if (other is Vector casted && casted.Length == this.Length)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Returns true if this[i] &lt;= <paramref name="tolerance"/> for 0 &lt;= i &lt; this.<see cref="Length"/>. 
 		/// Otherwise false is returned.
 		/// </summary>
@@ -861,15 +876,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(Length, scalar, data, 0, 1);
 
 		/// <summary>
+		/// See <see cref="IVector.Set(int, double)"/>.
+		/// </summary>
+		public void Set(int index, double value) => data[index] = value;
+
+		/// <summary>
 		/// Sets all entries of this vector to be equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="value">The value that all entries of the this vector will be equal to.</param>
 		public void SetAll(double value) => ArrayUtilities.MemSet(data, value);
-
-		/// <summary>
-		/// See <see cref="IVector.Set(int, double)"/>.
-		/// </summary>
-		public void Set(int index, double value) => data[index] = value;
 
 		/// <summary>
 		/// Calculates the tensor product of this vector with <paramref name="vector"/>:

@@ -435,10 +435,25 @@ namespace MGroup.LinearAlgebra.Vectors
             return comparer.AreEqual(this.data[0], other.data[0]) && comparer.AreEqual(this.data[1], other.data[1]);
         }
 
-        /// <summary>
-        /// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
-        /// </summary>
-        public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		/// <summary>
+		/// <inheritdoc/>
+		/// </summary>
+		public bool HasSameFormat(IIndexable1D other)
+		{
+			if (other is Vector2)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
+		/// </summary>
+		public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
         {
             if (otherVector is Vector2 casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
             else if (thisCoefficient == 1.0) return Axpy(otherVector, otherCoefficient);
