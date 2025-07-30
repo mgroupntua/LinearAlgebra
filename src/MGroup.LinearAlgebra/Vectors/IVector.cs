@@ -70,7 +70,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.SparsityPatternModifiedException"> 
 		/// Thrown if a structural zero entry of a sparse vector format is written to.
 		/// </exception>
-		void AddToIndex(int index, double value);
+		void AddToIndex(int index, double value); //TODO: Also update value at index, with this being a special case
 
 		/// <summary>
 		/// Performs the following operation for all i:

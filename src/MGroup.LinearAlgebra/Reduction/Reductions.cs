@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Perhaps I should delete Norm2() from here. It is implemented by concrete classes much more efficiently.

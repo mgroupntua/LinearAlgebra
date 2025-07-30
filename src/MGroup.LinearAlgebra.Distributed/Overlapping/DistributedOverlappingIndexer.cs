@@ -6,6 +6,7 @@ using System.Text;
 using MGroup.Environments;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Vectors;
 using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
@@ -25,6 +26,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	public class DistributedOverlappingIndexer : IDistributedIndexer
 	{
 		private readonly Dictionary<int, Local> localIndexers;
+		private readonly object myLock = new();
 		private int numUniqueEntries = int.MinValue;
 
 		public DistributedOverlappingIndexer(IComputeEnvironment environment)
@@ -36,10 +38,43 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public IComputeEnvironment Environment { get; }
 
-		public int CountUniqueEntries()
-		{
-			if (numUniqueEntries == int.MinValue)
+		public int NumUniqueEntries 
+		{ 
+			get
 			{
+				if (numUniqueEntries == int.MinValue) // If it has not already been computed
+				{
+					CountUniqueEntries();
+				}
+
+				return numUniqueEntries;
+			}
+		}
+
+		public DistributedOverlappingIndexer DeepCopy()
+		{
+			var clone = new DistributedOverlappingIndexer(this.Environment);
+			Environment.DoPerNode(node =>
+			{
+				clone.localIndexers[node] = this.localIndexers[node].DeepCopy();
+			});
+			clone.numUniqueEntries = this.numUniqueEntries;
+			return clone;
+		}
+
+		public DistributedOverlappingIndexer.Local GetLocalComponent(int nodeID) => localIndexers[nodeID];
+
+		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
+
+		private void CountUniqueEntries()
+		{
+			lock (myLock)
+			{
+				if (numUniqueEntries != int.MinValue) // in case another thread calculated it before the lock was acquired
+				{
+					return;
+				}
+
 				Dictionary<int, double> countPerNode = Environment.CalcNodeData(node =>
 				{
 					double[] inverseMultiplicities = localIndexers[node].InverseMultiplicities;
@@ -55,44 +90,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				double globalCount = Environment.AllReduceSum(countPerNode);
 				numUniqueEntries = (int)Math.Round(globalCount);
 			}
-			return numUniqueEntries;
 		}
-
-		public DistributedOverlappingIndexer.Local GetLocalComponent(int nodeID) => localIndexers[nodeID];
-
-		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
-
-		public DistributedOverlappingMatrix<TMatrix> CheckCompatibleMatrix<TMatrix>(IGlobalMatrix matrix)
-			where TMatrix : class, IMatrix
-		{
-			if (matrix is DistributedOverlappingMatrix<TMatrix> distributedMatrix)
-			{
-				if (matrix.CheckForCompatibility == false || distributedMatrix.Indexer == this)
-				{
-					return distributedMatrix;
-				}
-			}
-
-			throw new NonMatchingFormatException("The provided matrix has a different format than this indexer. " +
-				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
-		}
-
-		public DistributedOverlappingVector CheckCompatibleVector(IGlobalVector vector)
-		{
-			if (vector is DistributedOverlappingVector distributedVector)
-			{
-				if (vector.CheckForCompatibility == false || distributedVector.Indexer == this)
-				{
-					return distributedVector;
-				}
-			}
-
-			//TODO: Perhaps the error msg or even the whole check can be injected into the constructor.
-			throw new NonMatchingFormatException("The provided vector has a different format than this indexer. " +
-				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
-		}
-
-		public bool IsCompatibleVector(DistributedOverlappingVector vector) => vector.Indexer == this;
 
 		/// <summary>
 		/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 
@@ -144,6 +142,26 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 					}
 				}
 				return (local, remote);
+			}
+
+			public Local DeepCopy()
+			{
+				var clone = new Local(this.Node);
+				clone.NumEntries = this.NumEntries;
+				clone.ActiveNeighborsOfNode = new SortedSet<int>(this.ActiveNeighborsOfNode);
+
+				clone.InverseMultiplicities = new double[this.InverseMultiplicities.Length];
+				Array.Copy(this.InverseMultiplicities, clone.InverseMultiplicities, this.InverseMultiplicities.Length);
+
+				clone.commonEntriesWithNeighbors = new Dictionary<int, int[]>();
+				foreach((int nodeID, int[] data) in this.commonEntriesWithNeighbors)
+				{
+					var clonedData = new int[data.Length];
+					Array.Copy(data, clonedData, data.Length);
+					clone.commonEntriesWithNeighbors[nodeID] = clonedData;
+				}
+
+				return clone;
 			}
 
 			//TODO: cache a buffer for sending and a buffer for receiving inside Indexer (lazily or not) and just return them. 

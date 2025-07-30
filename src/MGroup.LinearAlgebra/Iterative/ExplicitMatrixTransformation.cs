@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
@@ -33,9 +33,9 @@ namespace MGroup.LinearAlgebra.Iterative
         /// </summary>
         public int NumRows => matrix.NumRows;
 
-        /// <summary>
-        /// See <see cref="ILinearTransformation.Multiply(IVectorView, IVector)"/>
-        /// </summary>
-        public void Multiply(IVectorView lhsVector, IVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
+		/// <summary>
+		/// See <see cref="ILinearTransformation.Multiply(IVectorView, IVector)"/>
+		/// </summary>
+		public void Multiply(IVectorView lhsVector, IVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
     }
 }

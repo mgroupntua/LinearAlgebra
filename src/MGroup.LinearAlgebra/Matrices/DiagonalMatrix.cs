@@ -179,7 +179,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The vector that will be multiplied. Constraints: 
 		/// <paramref name="vector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="IIndexable2D.NumColumns"/>.
 		/// </param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="vector"/> violates the described constraint.
 		/// </exception>
 		public Vector Multiply(Vector vector)

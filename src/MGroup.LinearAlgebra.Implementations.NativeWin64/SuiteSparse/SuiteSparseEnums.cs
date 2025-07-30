@@ -11,7 +11,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.SuiteSparse
 	{
 		/// <summary>
 		/// No reordering. This allows the most control, as you can first find a fill-reducing ordering for the sparsity pattern,
-		/// apply it and finally factorize using <see cref="SuiteSparseOrdering.Natural"/>.
+		/// apply it and finally factorize using <see cref="Natural"/>.
 		/// </summary>
 		Natural = 0,
 

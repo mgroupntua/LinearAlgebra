@@ -395,7 +395,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Copies all entries from <paramref name="sourceVector"/> to this <see cref="IVector"/>.
 		/// </summary>
 		/// <param name="sourceVector">The vector containing the entries to be copied.</param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="sourceVector"/> has different <see cref="IIndexable1D.Length"/> than this.
 		/// </exception>
 		public void CopyFrom(Vector sourceVector)
@@ -812,7 +812,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
 		/// </summary>
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{

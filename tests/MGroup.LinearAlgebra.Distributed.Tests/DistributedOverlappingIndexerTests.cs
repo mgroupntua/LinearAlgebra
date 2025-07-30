@@ -111,7 +111,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 			for (int gi = 0; gi < globalIndexer.NumGlobalIndices; gi++)
 			{
-				List<(int nodeID, int localIdx)> localIndicesComputed = globalIndexer.FindLocalIndicesOf(gi);
+				IReadOnlyDictionary<int, int> localIndicesComputed = globalIndexer.FindLocalIndicesOf(gi);
 				Dictionary<int, int> localIndicesExpected = GlobalToLocalIndices[gi];
 				Assert.Equal(localIndicesExpected.Count, localIndicesComputed.Count);
 				foreach ((int nodeID, int localIdx) in localIndicesComputed)

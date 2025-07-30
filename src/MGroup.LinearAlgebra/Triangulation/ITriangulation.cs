@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
 // Inversion is best handled by the matrix object itself, since the original should overwrite the factorized data in most cases, 
@@ -21,22 +21,22 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// </summary>
         double CalcDeterminant();
 
-        /// <summary>
-        /// Solves the linear system A * x = b, where A is the original matrix (before the factorization), 
-        /// b = <paramref name="rhs"/> and x is the solution vector, which will overwrite the provided 
-        /// <paramref name="solution"/>.
-        /// </summary>
-        /// <param name="rhs">
-        /// The right hand side vector. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="Matrices.IIndexable2D.NumRows"/> of the original matrix A.
-        /// </param>
-        /// <param name="solution">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
-        /// must be equal to <see cref="Matrices.IIndexable2D.NumColumns"/> of the original matrix A.
-        /// </param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
-        /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
-        /// </exception>
-        void SolveLinearSystem(Vector rhs, Vector solution);
+		/// <summary>
+		/// Solves the linear system A * x = b, where A is the original matrix (before the factorization), 
+		/// b = <paramref name="rhs"/> and x is the solution vector, which will overwrite the provided 
+		/// <paramref name="solution"/>.
+		/// </summary>
+		/// <param name="rhs">
+		/// The right hand side vector. Its <see cref="IIndexable1D.Length"/> must be equal to 
+		/// <see cref="IIndexable2D.NumRows"/> of the original matrix A.
+		/// </param>
+		/// <param name="solution">
+		/// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
+		/// must be equal to <see cref="IIndexable2D.NumColumns"/> of the original matrix A.
+		/// </param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
+		/// </exception>
+		void SolveLinearSystem(Vector rhs, Vector solution);
     }
 }

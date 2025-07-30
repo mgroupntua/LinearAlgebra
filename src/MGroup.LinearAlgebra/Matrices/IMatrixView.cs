@@ -14,19 +14,19 @@ namespace MGroup.LinearAlgebra.Matrices
     public interface IMatrixView: 
 		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, IDiagonalAccessible
 	{
-        /// <summary>
-        /// Performs the following operation for all (i, j):
-        /// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-        /// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/> and 
-        /// <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>. Named after BLAS axpy (y = a * x plus y).
-        /// The resulting matrix is written in a new object and then returned.
-        /// </summary>
-        /// <param name="otherMatrix">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
-        ///     <see cref="IIndexable2D.NumColumns"/> as this.</param>
-        /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-        IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient) => LinearCombination(1.0, otherMatrix, otherCoefficient);
+		/// <summary>
+		/// Performs the following operation for all (i, j):
+		/// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
+		/// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombination(double, IMatrixView, double)"/>. Named after BLAS axpy (y = a * x plus y).
+		/// The resulting matrix is written in a new object and then returned.
+		/// </summary>
+		/// <param name="otherMatrix">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
+		///     <see cref="IIndexable2D.NumColumns"/> as this.</param>
+		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
+		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
+		IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient) => LinearCombination(1.0, otherMatrix, otherCoefficient);
 
 		/// <summary>
 		/// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Reduction;
 
 //TODO: perhaps I should return IVectorView instead of IVector. By returning IVectorView I can have classes that only implement
@@ -14,18 +14,18 @@ namespace MGroup.LinearAlgebra.Vectors
     /// </summary>
     public interface IVectorView: IIndexable1D, IReducible, IEntrywiseOperableView1D<IVectorView, IVector>
     {
-        /// <summary>
-        /// Performs the following operation for all i:
-        /// result[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
-        /// Optimized version of <see cref="IVectorView.DoEntrywise(IVectorView, Func{double, double, double})"/> and 
-        /// <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
-        /// The resulting vector is written in a new object and then returned.
-        /// </summary>
-        /// <param name="otherVector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
-        /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
-        ///     <see cref="IIndexable1D.Length"/> than this.</exception>
-        IVector Axpy(IVectorView otherVector, double otherCoefficient);
+		/// <summary>
+		/// Performs the following operation for all i:
+		/// result[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
+		/// Optimized version of <see cref="IVectorView.DoEntrywise(IVectorView, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
+		/// The resulting vector is written in a new object and then returned.
+		/// </summary>
+		/// <param name="otherVector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
+		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
+		///     <see cref="IIndexable1D.Length"/> than this.</exception>
+		IVector Axpy(IVectorView otherVector, double otherCoefficient);
 
         /// <summary>
         /// Copies this <see cref="IVectorView"/> object. A new vector of the same type as this object is initialized and 

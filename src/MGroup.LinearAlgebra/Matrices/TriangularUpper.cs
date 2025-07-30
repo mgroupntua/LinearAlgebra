@@ -431,10 +431,10 @@ namespace MGroup.LinearAlgebra.Matrices
             return DenseStrategies.Multiply(this, matrix, transposeThis, transposeOther);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
-        /// </summary>
-        public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// </summary>
+		public IVector Multiply(IVectorView vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
             else throw new NotImplementedException();
@@ -458,10 +458,10 @@ namespace MGroup.LinearAlgebra.Matrices
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// </summary>
+		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
             if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {
@@ -501,10 +501,10 @@ namespace MGroup.LinearAlgebra.Matrices
                 this.data, 0, rhsVector.RawData, 0, 1);
         }
 
-        /// <summary>
-        /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-        /// </summary>
-        public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		/// <summary>
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
+		/// </summary>
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
         {
             double aggregator = identityValue;
             int nnz = data.Length;

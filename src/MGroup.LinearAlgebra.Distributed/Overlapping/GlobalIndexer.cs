@@ -8,6 +8,8 @@ using System.Text;
 using MGroup.Environments;
 using MGroup.MSolve.Discretization.Entities;
 
+//TODO: The methods of this should be accessed through the DistributedOverlappingIndexer.
+//		Also DistributedOverlappingIndexer should manage its lazy initialization.
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
 	/// <summary>
@@ -35,7 +37,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			int numNodes = localIndexers.Count;
 
 			// Allocate memory for global-to-local maps. 
-			NumGlobalIndices = mainIndexer.CountUniqueEntries();
+			NumGlobalIndices = mainIndexer.NumUniqueEntries;
 			globalToLocal = new List<Dictionary<int, int>>(NumGlobalIndices);
 			for (int i = 0; i < NumGlobalIndices; i++)
 			{
@@ -102,6 +104,29 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public int NumGlobalIndices { get; }
 
+		public void CheckGlobalIndex1D(int index)
+		{
+			if (index < 0 || index >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException($"The index must be in the range [0, {NumGlobalIndices}), but was {index}");
+			}
+		}
+
+		public void CheckGlobalIndex2D(int rowIdx, int colIdx)
+		{
+			if (rowIdx < 0 || rowIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The row index must be in the range [0, {NumGlobalIndices}), but was {rowIdx}");
+			}
+
+			if (colIdx < 0 || colIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The column index must be in the range [0, {NumGlobalIndices}), but was {colIdx}");
+			}
+		}
+
 		public int FindGlobalIndexOf(int nodeID, int localIdx) => localToGlobal[nodeID][localIdx];
 
 		/// <summary>
@@ -130,22 +155,26 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public List<(int nodeID, int localIdx)> FindLocalIndicesOf(int globalIdx)
+		/// <summary>
+		/// Returns a dictionary where: a) the keys are the ids of the nodes containing <paramref name="globalIdx"/>,
+		/// b) the values are the local indices for the corresponding nodes.
+		/// </summary>
+		public IReadOnlyDictionary<int, int> FindLocalIndicesOf(int globalIdx)
 		{
 			if (globalIdx < 0 || globalIdx > globalToLocal.Count)
 			{
-				throw new ArgumentException(
+				throw new IndexOutOfRangeException(
 					$"The are {globalToLocal.Count} global indices, but {globalIdx} was requested.");
 			}
 
 			Dictionary<int, int> nodeToLocal = globalToLocal[globalIdx];
-			var result = new List<(int nodeID, int localIdx)>(nodeToLocal.Count);
-			foreach (var nodeId_localIdxPair in nodeToLocal)
-			{
-				result.Add((nodeId_localIdxPair.Key, nodeId_localIdxPair.Value));
-			}
+			//var result = new List<(int nodeID, int localIdx)>(nodeToLocal.Count);
+			//foreach (var nodeId_localIdxPair in nodeToLocal)
+			//{
+			//	result.Add((nodeId_localIdxPair.Key, nodeId_localIdxPair.Value));
+			//}
 
-			return result;
+			return nodeToLocal;
 		}
 
 		private Dictionary<int, DistributedOverlappingIndexer.Local> AllGatherLocalIndexers(DistributedOverlappingIndexer mainIndexer)

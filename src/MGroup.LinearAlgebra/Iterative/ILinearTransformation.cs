@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Iterative
 {

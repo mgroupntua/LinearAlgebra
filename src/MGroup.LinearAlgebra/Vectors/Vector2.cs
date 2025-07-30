@@ -525,10 +525,10 @@ namespace MGroup.LinearAlgebra.Vectors
         /// </summary>
         public double Norm2() => Math.Sqrt(data[0] * data[0] + data[1] * data[1]);
 
-        /// <summary>
-        /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-        /// </summary>
-        public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		/// <summary>
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
+		/// </summary>
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
         {
             double accumulator = identityValue; // no zeros implied
             accumulator = processEntry(data[0], accumulator);

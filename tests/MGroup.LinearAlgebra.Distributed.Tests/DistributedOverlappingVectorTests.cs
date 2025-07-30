@@ -160,7 +160,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			var distributedAxExpected = new DistributedOverlappingVector(indexer, localAxExpected);
 
 			var distributedAx = new DistributedOverlappingVector(indexer);
-			distributedA.MultiplyVector(distributedX, distributedAx);
+			distributedA.Multiply(distributedX, distributedAx);
 
 			double tol = 1E-13;
 			Assert.True(distributedAxExpected.Equals(distributedAx, tol));

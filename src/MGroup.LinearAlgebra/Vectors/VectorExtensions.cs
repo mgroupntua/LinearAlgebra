@@ -88,10 +88,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     <paramref name="sourceIndex"/> + <paramref name="length"/> &lt;= 
 		///     <paramref name="sourceVector"/>.<see cref="IIndexable1D.Length"/>.</param>
 		/// <param name="length">The number of entries to copy.</param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="length"/> and 
+		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="length"/> and 
 		///     <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/> violate the described constraints.
 		///     </exception>
-		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
+		/// <exception cref="PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
 		///     is not permitted by the vector storage format.</exception>
 		public static void AddSubvectorIntoThis(this IVector destinationVector, int destinationIndex, IVectorView sourceVector,
 			int sourceIndex, int length) 

@@ -32,7 +32,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 		internal virtual void CheckMultiplication(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
-			IVectorView lhs = CreateLhsVectorFunc(lhsVector);
+			var lhs = CreateLhsVectorFunc(lhsVector);
 			IVector rhs = matrix.Multiply(lhs, transposeMatrix);
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}
@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 		internal virtual void CheckMultiplicationIntoResult(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
-			IVectorView lhs = CreateLhsVectorFunc(lhsVector);
+			var lhs = CreateLhsVectorFunc(lhsVector);
 			IVector rhs = CreateZeroRhsVectorFunc(rhsVectorExpected.Length);
 			matrix.MultiplyIntoResult(lhs, rhs, transposeMatrix);
 			comparer.AssertEqual(rhsVectorExpected, rhs);

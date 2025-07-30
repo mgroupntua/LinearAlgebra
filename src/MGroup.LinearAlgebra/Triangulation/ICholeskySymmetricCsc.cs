@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// Matrix containing the right hand side vectors as columns. Its <see cref="Matrix.NumRows"/> must be equal to the
 		/// number of rows of the original matrix A.
 		/// </param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
 		/// <returns>Matrix containing the solution vectos as columns.</returns>

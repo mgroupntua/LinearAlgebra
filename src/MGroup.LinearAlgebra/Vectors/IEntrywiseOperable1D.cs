@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 //TODO: Should Axpy() and LinearCombination be here as well? 
 //TODO: Should this extend IEntrywiseOperableView1D?

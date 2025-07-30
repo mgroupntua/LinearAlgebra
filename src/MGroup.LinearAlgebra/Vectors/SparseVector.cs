@@ -84,7 +84,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			bool verifiedSorted = false;
 			if (sortInput)
 			{
-				Array.Sort<int, double>(indices, values);
+				Array.Sort(indices, values);
 				verifiedSorted = true;
 			}
 
@@ -641,7 +641,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double Norm2() => GlobalProvider.Blas.Dnrm2(values.Length, values, 0, 1);
 
 		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
 		/// </summary>
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
@@ -703,7 +703,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		private int FindSparseIndexOf(int denseIdx)
 		{
 			Preconditions.CheckIndex1D(this, denseIdx);
-			return Array.BinarySearch<int>(indices, denseIdx); // only works if indices are sorted!!!
+			return Array.BinarySearch(indices, denseIdx); // only works if indices are sorted!!!
 		}
 
 		private bool HasSameIndexer(SparseVector other)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -281,7 +281,7 @@ namespace MGroup.LinearAlgebra.Commons
             {
                 int col = rowsColsToKeep[i];
                 int fromRow = col - skyDiagOffsets[col + 1] + skyDiagOffsets[col] + 1; // top non zero entry of this col
-                var newRows = rowsColsToKeep.Where(x => x >= fromRow && x <= col).OrderByDescending(x => x).ToArray<int>();
+                var newRows = rowsColsToKeep.Where(x => x >= fromRow && x <= col).OrderByDescending(x => x).ToArray();
                 for (int j = 0; j < newRows.Length; j++)
                 {
                     subValues[offset] = skyValues[skyDiagOffsets[col] + col - newRows[j]];

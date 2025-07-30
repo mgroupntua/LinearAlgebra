@@ -24,13 +24,13 @@ using MGroup.LinearAlgebra.Extensions;
 //TODO: Most algorithms implemented here should be moved to a class the holds the implementations and called from there.
 namespace MGroup.LinearAlgebra.Matrices
 {
-    /// <summary>
-    /// Symmetric sparse matrix stored in Skyline format (3-array version). Only the non-zero entries of the upper triangle are 
-    /// stored. The Skyline format is optimized for Cholesky factorizations. To build a <see cref="SkylineMatrix"/> conveniently, 
-    /// use <see cref="Builders.SkylineBuilder"/>.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public class SkylineMatrix: IMatrix, ISparseMatrix, ISymmetricMatrix
+	/// <summary>
+	/// Symmetric sparse matrix stored in Skyline format (3-array version). Only the non-zero entries of the upper triangle are 
+	/// stored. The Skyline format is optimized for Cholesky factorizations. To build a <see cref="SkylineMatrix"/> conveniently, 
+	/// use <see cref="SkylineBuilder"/>.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	public class SkylineMatrix: IMatrix, ISparseMatrix, ISymmetricMatrix
     {
         /// <summary>
         /// Contains the non-zero entries of the matrix's upper triangle in column major order, starting from the diagonal and 
@@ -1010,13 +1010,13 @@ namespace MGroup.LinearAlgebra.Matrices
             return DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
-        /// </summary>
-        /// <remarks>
-        /// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
-        /// </remarks>
-        public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// </summary>
+		/// <remarks>
+		/// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
+		/// </remarks>
+		public IVector Multiply(IVectorView vector, bool transposeThis = false)
         {
             if (vector is Vector casted) return Multiply(casted);
             else throw new NotImplementedException();
@@ -1037,10 +1037,10 @@ namespace MGroup.LinearAlgebra.Matrices
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// </summary>
+		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{
@@ -1087,10 +1087,10 @@ namespace MGroup.LinearAlgebra.Matrices
                 NumColumns, values, diagOffsets, lhsVector.RawData, rhsVector.RawData);
         }
 
-        /// <summary>
-        /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-        /// </summary>
-        public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		/// <summary>
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
+		/// </summary>
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
         {
             double aggregator = identityValue;
             int nnz = values.Length;

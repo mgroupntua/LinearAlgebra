@@ -686,7 +686,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <see cref="IIndexable2D.NumColumns"/> of oper(this).
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IIndexable2D.NumRows"/> than the 
 		/// <see cref="IIndexable2D.NumColumns"/> of oper(this).
 		/// </exception>
@@ -828,7 +828,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
 		/// </summary>
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{

@@ -778,10 +778,10 @@ namespace MGroup.LinearAlgebra.Matrices
             return new Matrix3by3(result);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
-        /// </summary>
-        public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// </summary>
+		public IVector Multiply(IVectorView vector, bool transposeThis = false)
         {
             if (vector is Vector3 casted) return Multiply(casted, transposeThis);
 
@@ -832,10 +832,10 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		/// <summary>
+		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// </summary>
+		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
         {
             if ((lhsVector is Vector2 lhsDense) && (rhsVector is Vector2 rhsDense))
             {
@@ -893,10 +893,10 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-        /// </summary>
-        public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		/// <summary>
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
+		/// </summary>
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
         {
             double aggregator = identityValue;
             double accumulator = identityValue; // no zeros implied

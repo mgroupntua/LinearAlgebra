@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Vectors;
 using MGroup.MSolve.Solution.LinearSystem;
 
 //TODO: See B5 of painless CG. We can avoid a vector copy per iteration, by doing the old-new dot product before updating s.

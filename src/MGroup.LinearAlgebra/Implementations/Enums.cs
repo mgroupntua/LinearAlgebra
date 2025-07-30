@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Implementations
 
 	/// <summary>
 	/// Describes whether a matrix will be transposed or not, during a BLAS or LAPACK operation. Note that if 
-	/// <see cref="TransposeMatrix.Transpose"/> is selected, they matrix is not explicitly transposed (usually). Instead access
+	/// <see cref="Transpose"/> is selected, they matrix is not explicitly transposed (usually). Instead access
 	/// to the matrix entries is transposed, e.g. A[j, i] instead of A[i, j].
 	/// Authors: Serafeim Bakalakos
 	/// </summary>

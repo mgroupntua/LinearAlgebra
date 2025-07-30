@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;

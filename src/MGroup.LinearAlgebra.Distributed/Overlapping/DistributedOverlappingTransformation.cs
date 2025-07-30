@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
-using MGroup.MSolve.Solution.LinearSystem;
+
+using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities;
+using MGroup.LinearAlgebra.Iterative;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
@@ -44,17 +46,21 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public DistributedOverlappingIndexer Indexer { get; }
 
-		public void MultiplyVector(IGlobalVector input, IGlobalVector output)
+		public int NumColumns => Indexer.NumUniqueEntries;
+
+		public int NumRows => Indexer.NumUniqueEntries;
+
+		public void Multiply(IVectorView lhsVector, IVector rhsVector)
 		{
-			DistributedOverlappingVector distributedInput = Indexer.CheckCompatibleVector(input);
-			DistributedOverlappingVector distributedOutput = Indexer.CheckCompatibleVector(output);
-			MultiplyVector(distributedInput, distributedOutput);
+			DistributedOverlappingVector distributedInput = CastToDistributed(lhsVector);
+			DistributedOverlappingVector distributedOutput = CastToDistributed(rhsVector);
+			Multiply(distributedInput, distributedOutput);
 		}
 
-		public void MultiplyVector(DistributedOverlappingVector input, DistributedOverlappingVector output)
+		public void Multiply(DistributedOverlappingVector input, DistributedOverlappingVector output)
 		{
-			Indexer.CheckCompatibleVector(input);
-			Indexer.CheckCompatibleVector(output);
+			CheckSameFormat(this, input);
+			CheckSameFormat(this, output);
 
 			Action<int> multiplyLocal = nodeID =>
 			{

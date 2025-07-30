@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MGroup.LinearAlgebra.Matrices
 {
@@ -68,6 +68,6 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     the described constraints.</exception>
         /// <exception cref="Exceptions.SparsityPatternModifiedException"> Thrown if a structural zero entry of a sparse matrix 
         ///     format is written to.</exception>
-        void SetEntryRespectingPattern(int rowIdx, int colIdx, double value);
+        void SetEntryRespectingPattern(int rowIdx, int colIdx, double value); //TODO: rename to Set()
     }
 }

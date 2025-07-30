@@ -199,7 +199,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
 			// the least squares approximation.
 			// TODO: I do not really need to discard the extra m-n terms of c2, but I think it is unsafe to carry them around and
 			// risk some method of Vector using the length of the internal buffer, instead of its Length propert.
-			if (NumRows > NumColumns) Array.Resize<double>(ref c, NumColumns);
+			if (NumRows > NumColumns) Array.Resize(ref c, NumColumns);
 			int n = NumColumns; // Order of matrix R1
 			int ldR = NumRows; // R1 is stored in the upper trapezoid of a NumRows * NumColumns col major array.
 			int incC = 1; // step in rhs array, which is the same c used for Q^T * b

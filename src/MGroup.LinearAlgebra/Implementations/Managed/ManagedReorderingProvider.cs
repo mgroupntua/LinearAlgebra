@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 
 			var dummyCscValues = new double[cscRowIndices.Length]; //TODO: too expensive 
 			var matrixCSparse = new SparseMatrix(order, order, dummyCscValues, cscRowIndices, cscColOffsets);
-			int[] permutation = AMD.Generate<double>(matrixCSparse, ColumnOrdering.MinimumDegreeAtPlusA);
+			int[] permutation = AMD.Generate(matrixCSparse, ColumnOrdering.MinimumDegreeAtPlusA);
 
 			// It is possible that CSparse.NET AMD algorithm returns more entries than the matrix order (so far I have found 1 
 			// extra). In that case, make sure the first ones are valid and return only them.

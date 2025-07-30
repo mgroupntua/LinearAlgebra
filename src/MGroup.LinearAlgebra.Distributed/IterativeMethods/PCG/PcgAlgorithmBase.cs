@@ -4,8 +4,9 @@ using System.Text;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
-using MGroup.MSolve.Solution.LinearSystem;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Vectors;
 
 //TODOMPI: common IIterativeMethod interface for PCG, MINRES, GMRES. It is necessary so that the user of a DDM can choose the 
 //  correct algorithm for his problem. 
@@ -19,15 +20,15 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		protected readonly IPcgResidualUpdater residualUpdater;
 		protected readonly bool throwIfNotConvergence;
 
-		protected IGlobalVector direction;
+		protected IVector direction;
 		protected int iteration;
-		protected IGlobalVector matrixTimesDirection;
+		protected IVector matrixTimesDirection;
 		protected double paramBeta;
-		protected IGlobalVector precondResidual;
+		protected IVector precondResidual;
 		protected double resDotPrecondRes;
 		protected double resDotPrecondResOld;
-		protected IGlobalVector residual;
-		protected IGlobalVector solution;
+		protected IVector residual;
+		protected IVector solution;
 		protected double stepSize;
 
 		protected PcgAlgorithmBase(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
@@ -156,7 +157,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public virtual IterativeStatistics Solve(MSolve.Solution.LinearSystem.ILinearTransformation matrix, IPreconditioner preconditioner,
+		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner,
 			IGlobalVector rhs, IGlobalVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
 		{
 			this.Matrix = matrix;
