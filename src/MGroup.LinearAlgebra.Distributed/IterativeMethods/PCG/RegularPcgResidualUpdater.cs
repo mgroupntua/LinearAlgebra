@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 //TODO: Duplication between this and the CG version
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
@@ -16,7 +15,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
         /// <summary>
         /// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
         /// </summary>
-        public void UpdateResidual(PcgAlgorithmBase pcg, IGlobalVector residual)
+        public void UpdateResidual(PcgAlgorithmBase pcg, IVector residual)
         {
             // Normally the residual vector is updated as: r = r - α * A*d
             residual.AxpyIntoThis(pcg.MatrixTimesDirection, -pcg.StepSize);

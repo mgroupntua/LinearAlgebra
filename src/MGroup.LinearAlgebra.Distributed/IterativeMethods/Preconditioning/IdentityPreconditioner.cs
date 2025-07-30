@@ -1,6 +1,5 @@
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 {
@@ -27,11 +26,11 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
         /// doesn't have to define the dimensions of the linear system, which is useful when testing or benchmarking, at the 
         /// expense of little extra safety.
         /// </remarks>
-        public void Apply(IGlobalVector rhsVector, IGlobalVector lhsVector) 
+        public void Apply(IVector rhsVector, IVector lhsVector) 
             => lhsVector.CopyFrom(rhsVector);
 
 		public IPreconditioner CopyWithInitialSettings() => new IdentityPreconditioner();
 
-		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified) { }
+		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified) { }
     }
 }

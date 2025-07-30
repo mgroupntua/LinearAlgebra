@@ -1,5 +1,4 @@
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 //TODO: See B5 of painless CG. We can avoid a vector copy per iteration, by doing the old-new dot product before updating s.
 //      Not sure if that is correct.
@@ -13,7 +12,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
     /// </summary>
     public class PolakRibiereBeta : IPcgBetaParameterCalculation
     {
-        private IGlobalVector residualOld;
+        private IVector residualOld;
 
         /// <summary>
         /// See <see cref="IPcgBetaParameterCalculation.Initialize(IVectorView)"/>.

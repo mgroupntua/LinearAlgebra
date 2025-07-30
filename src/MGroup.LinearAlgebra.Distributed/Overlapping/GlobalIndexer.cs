@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 using System.Text;
 
 using MGroup.Environments;
-using MGroup.MSolve.Discretization.Entities;
 
 //TODO: The methods of this should be accessed through the DistributedOverlappingIndexer.
 //		Also DistributedOverlappingIndexer should manage its lazy initialization.

@@ -5,7 +5,7 @@ using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
-using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Matrices;
 
 //TODOMPI: Needs testing
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 		/// </summary>
 		/// <param name="environment">
 		/// The computing environment that will be used for the operations during this constructor and during 
-		/// <see cref="Apply(IGlobalVector, IGlobalVector)"/>.
+		/// <see cref="Apply(IVector, IVector)"/>.
 		/// </param>
 		/// <param name="diagonal">
 		/// A distributed vector that contains the diagonal entries of each local matrix that corresponds to a 
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 
 		public Dictionary<int, Vector> LocalInverseDiagonals { get; }
 
-		public void Apply(IGlobalVector input, IGlobalVector output)
+		public void Apply(IVector input, IVector output)
 		{
 			if ((input is DistributedOverlappingVector lhsCasted) && (output is DistributedOverlappingVector rhsCasted))
 			{
@@ -78,6 +78,6 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 			//      LocalInverseDiagonals already have the total stiffnesses?
 		}
 
-		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified) { } 
+		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified) { } 
 	}
 }

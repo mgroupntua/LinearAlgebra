@@ -1,18 +1,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+
 using MGroup.Environments;
-using MGroup.MSolve.Solution.LinearSystem;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Implementations;
+using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Reduction;
+using MGroup.LinearAlgebra.Vectors;
 
 using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Commons;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
@@ -298,7 +296,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public IVector Multiply(IVectorView vector, bool transposeThis = false) //TODO: Rename to MultiplyVector
+		public IVector Multiply(IVectorView vector, bool transposeThis = false) //TODO: Rename to MultiplyVector. Also IMatrixView must implement ILinearTransformation
 		{
 			DistributedOverlappingVector distributedLhs = CastToDistributed(vector);
 			DistributedOverlappingVector result = distributedLhs.CreateZeroVectorWithSameFormat();

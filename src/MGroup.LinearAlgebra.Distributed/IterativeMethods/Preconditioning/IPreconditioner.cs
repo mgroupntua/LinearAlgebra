@@ -4,7 +4,7 @@ using System.Text;
 
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Matrices;
-using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Vectors;
 
 //TODOMPI: Make it generic, fix comments. IIndexable1D is no longer valid for iterative method vectors, since random access does 
 //      not make sense for distributed vectors. IBounded1D would be better here, but I do not know if forcing distributed vectors
@@ -26,8 +26,8 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
         /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="input"/> or <paramref name="output"/> 
         /// is different than the number of rows of this <see cref="IPreconditioner"/>.
         /// </exception>
-        void Apply(IGlobalVector input, IGlobalVector output);
+        void Apply(IVector input, IVector output);
 
-		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified);
+		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified);
 	}
 }

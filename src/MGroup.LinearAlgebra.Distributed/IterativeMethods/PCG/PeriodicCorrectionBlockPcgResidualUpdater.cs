@@ -2,7 +2,8 @@
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
 	using System;
-	using MGroup.MSolve.Solution.LinearSystem;
+
+	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
 	/// The exact residual (r = b - A*x) is calculated with a fixed frequency to remove the floating point error accumulated by
@@ -17,12 +18,12 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IGlobalVector)"/>
 		/// </summary>
-		public void UpdateResidual(BlockPcgAlgorithm pcg, IGlobalVector residual)
+		public void UpdateResidual(BlockPcgAlgorithm pcg, IVector residual)
 		{
 			//TODO: perhaps this should be done in an Initialize() method
 			if (numIterationsBeforeCorrection == int.MinValue)
 			{
-				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length()));
+				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length));
 			}
 
 			if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
@@ -40,12 +41,12 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IGlobalVector residual)
+		public void UpdateResidual(PcgAlgorithmBase pcg, IVector residual)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length()));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length));
             }
 
             if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.

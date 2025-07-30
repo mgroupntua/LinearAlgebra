@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="MGroup.Environments" Version="0.2.0-unstable.12" />
-    <PackageReference Include="MGroup.MSolve.Core" Version="0.2.0-unstable.94" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 

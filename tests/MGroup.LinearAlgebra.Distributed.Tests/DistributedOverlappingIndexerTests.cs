@@ -9,7 +9,6 @@ using MGroup.Environments;
 using MGroup.Environments.Mpi;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Discretization.Entities;
 
 using Xunit;
 

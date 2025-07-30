@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
-using MGroup.MSolve.Solution.LinearSystem;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods

@@ -48,7 +48,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// The direction vector d, used to update the solution vector: x = x + α * d
 		/// </summary>
-		public IGlobalVector Direction => direction;
+		public IVector Direction => direction;
 
 		/// <summary>
 		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -58,12 +58,12 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// The matrix A of the linear system or another object that implements matrix-vector multiplications.
 		/// </summary>
-		public MSolve.Solution.LinearSystem.ILinearTransformation Matrix { get; protected set; }
+		public ILinearTransformation Matrix { get; protected set; }
 
 		/// <summary>
 		/// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
 		/// </summary>
-		public IGlobalVector MatrixTimesDirection => matrixTimesDirection;
+		public IVector MatrixTimesDirection => matrixTimesDirection;
 
 		/// <summary>
 		/// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -78,7 +78,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// The vector s = inv(M) * r
 		/// </summary>
-		public IGlobalVector PrecondResidual => precondResidual;
+		public IVector PrecondResidual => precondResidual;
 
 		/// <summary>
 		/// The dot product r(t) * (inv(M) * r(t)) of the current iteration t.
@@ -93,17 +93,17 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <summary>
 		/// The residual vector r = b - A * x.
 		/// </summary>
-		public IGlobalVector Residual => residual;
+		public IVector Residual => residual;
 
 		/// <summary>
 		/// The right hand side of the linear system b = A * x.
 		/// </summary>
-		public IGlobalVector Rhs { get; protected set; }
+		public IVector Rhs { get; protected set; }
 
 		/// <summary>
 		/// The current approximation to the solution of the linear system A * x = b
 		/// </summary>
-		public IGlobalVector Solution => solution;
+		public IVector Solution => solution;
 
 		/// <summary>
 		/// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -158,7 +158,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
 		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner,
-			IGlobalVector rhs, IGlobalVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
+			IVector rhs, IVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
 		{
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -174,13 +174,13 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 			// r = b - A * x
 			if (initialGuessIsZero) residual = rhs.Copy();
 			else residual = ExactResidual.Calculate(matrix, rhs, solution);
-			return SolveInternal(maxIterations, solution.CreateZero);
+			return SolveInternal(maxIterations, solution.CreateZeroVectorWithSameFormat);
 
 			//return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero,
 			//    zeroVectorInitializer);
 		}
 
 		protected abstract IterativeStatistics SolveInternal(int maxIterations, 
-			Func<IGlobalVector> initializeZeroVector);
+			Func<IVector> initializeZeroVector);
 	}
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalization
 {
@@ -15,7 +14,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		/// <summary>
 		/// The conjugate direction vectors stored so far.
 		/// </summary>
-		public List<IGlobalVector> Directions { get; } = new List<IGlobalVector>();
+		public List<IVector> Directions { get; } = new List<IVector>();
 
 		/// <summary>
 		/// The products <see cref="Directions"/> * systemMatrix * <see cref="Directions"/> stored so far.
@@ -32,7 +31,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		/// <summary>
 		/// The products systemMatrix * <see cref="Directions"/> stored so far.
 		/// </summary>
-		public List<IGlobalVector> MatrixTimesDirections { get; } = new List<IGlobalVector>();
+		public List<IVector> MatrixTimesDirections { get; } = new List<IVector>();
 
 		public bool AreAllDirectionsConjugate(double tolerance)
 		{

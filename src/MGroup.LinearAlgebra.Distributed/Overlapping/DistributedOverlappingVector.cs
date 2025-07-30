@@ -5,7 +5,6 @@ using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using System.Collections.Concurrent;
-using MGroup.MSolve.Solution.LinearSystem;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Distributed.Utilities;
 using MGroup.LinearAlgebra.Exceptions;

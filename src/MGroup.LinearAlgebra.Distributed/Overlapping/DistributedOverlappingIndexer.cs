@@ -7,7 +7,6 @@ using MGroup.Environments;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {

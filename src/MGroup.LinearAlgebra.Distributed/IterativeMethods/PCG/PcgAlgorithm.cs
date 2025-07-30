@@ -3,7 +3,6 @@ using System.Diagnostics;
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.LinearAlgebra.Distributed.Exceptions;
-using MGroup.MSolve.Solution.LinearSystem;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 //TODO: In regular CG, there is a check to prevent premature convergence, by correcting the residual. Can this be done for PCG 
@@ -30,7 +29,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		}
 
 		protected override IterativeStatistics SolveInternal(int maxIterations, 
-			Func<IGlobalVector> initializeZeroVector)
+			Func<IVector> initializeZeroVector)
 		{
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
@@ -56,7 +55,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
 				// q = A * d
-				Matrix.MultiplyVector(direction, matrixTimesDirection);
+				Matrix.Multiply(direction, matrixTimesDirection);
 
 				// α = δnew / (d * q)
 				stepSize = resDotPrecondRes / direction.DotProduct(matrixTimesDirection);

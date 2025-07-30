@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 
-using MGroup.MSolve.Solution.LinearSystem;
 //TODO: Duplication between this and the CG version
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
@@ -20,7 +19,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
         /// <summary>
         /// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
         /// </summary>
-        public void UpdateResidual(PcgAlgorithmBase pcg, IGlobalVector residual)
+        public void UpdateResidual(PcgAlgorithmBase pcg, IVector residual)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)

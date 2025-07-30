@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
@@ -18,6 +17,6 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
         /// </summary>
         ///<param name="pcg">The Preconditioned Conjugate Gradient algorithm that uses this object.</param>
         /// <param name="residual">The current residual vector r to modify.</param>
-        void UpdateResidual(PcgAlgorithmBase pcg, IGlobalVector residual);
+        void UpdateResidual(PcgAlgorithmBase pcg, IVector residual);
     }
 }

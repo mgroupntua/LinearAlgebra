@@ -3,7 +3,8 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 	using System;
 	using System.Collections.Generic;
 	using System.Text;
-	using MGroup.MSolve.Solution.LinearSystem;
+
+	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
 	/// This class handles linear combination calculation pertaining to the block operations of the Krylov subspaces R and P.
@@ -121,9 +122,9 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 		/// <param name="residualKernels">The r_coefficients.</param>
 		/// <param name="directionKernels">The p_coefficients.</param>
 		/// <returns>The result of x = p_coefficients * P + r_coefficients * R</returns>
-		public IGlobalVector EvaluateVector(IGlobalVector[] residualKernels, IGlobalVector[] directionKernels)
+		public IVector EvaluateVector(IVector[] residualKernels, IVector[] directionKernels)
 		{
-			var x = residualKernels[0].CreateZero();
+			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
 			for (var i = 0; i < r.Count; ++i)
 			{
 				x.AxpyIntoThis(residualKernels[i], r[i]);

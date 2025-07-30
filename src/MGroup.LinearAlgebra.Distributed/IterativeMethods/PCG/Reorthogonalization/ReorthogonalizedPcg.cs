@@ -7,7 +7,6 @@ using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
 using MGroup.LinearAlgebra.Vectors;
-using MGroup.MSolve.Solution.LinearSystem;
 
 //TODO: I would rather implement reorthogonalization as an alternative strategy, rather than a different class.
 //TODO: needs builder
@@ -60,7 +59,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IGlobalVector rhsNew, IGlobalVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IVector rhsNew, IVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
@@ -91,8 +90,8 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			ReorthoCache.Clear();
 		}
 
-		public override IterativeStatistics Solve(MSolve.Solution.LinearSystem.ILinearTransformation matrix, IPreconditioner preconditioner, IGlobalVector rhs,
-			IGlobalVector solution, bool initialGuessIsZero)
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVector rhs,
+			IVector solution, bool initialGuessIsZero)
 		{
 			////TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
 			//Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
@@ -125,9 +124,9 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 
 			// Initialize vectors 
 			//TODO: Pehaps I can just clear them from previous iterations 
-			precondResidual = solution.CreateZero();
-			direction = solution.CreateZero();
-			matrixTimesDirection = solution.CreateZero();
+			precondResidual = solution.CreateZeroVectorWithSameFormat();
+			direction = solution.CreateZeroVectorWithSameFormat();
+			matrixTimesDirection = solution.CreateZeroVectorWithSameFormat();
 
 			//TODOMPI: With distributed vectors/matrices, the dimensions may not be straightforward to calculate. In fact they
 			//      may not be necessary in order to get the max iterations. E.g. In FETI methods, max iterations do not depend
@@ -137,13 +136,13 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			ReorthoCache.StartGeneration();
 			DirectionVectorsRetention.Intialize(this);
 
-			IterativeStatistics stats = SolveInternal(maxIterations, solution.CreateZero);
+			IterativeStatistics stats = SolveInternal(maxIterations, solution.CreateZeroVectorWithSameFormat);
 
 			DirectionVectorsRetention.DiscardDirectionVectors();
 			return stats;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IGlobalVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
 		{
 			iteration = 0;
 
@@ -217,7 +216,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			};
 		}
 
-		private void UpdateDirectionVector(IGlobalVector preconditionedResidual, IGlobalVector direction)
+		private void UpdateDirectionVector(IVector preconditionedResidual, IVector direction)
 		{
 			bool useReortho = DirectionVectorsRetention.KeepUsingReorthogonalization();
 
@@ -234,7 +233,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 				}
 
 				// q = A * d
-				Matrix.MultiplyVector(direction, matrixTimesDirection);
+				Matrix.Multiply(direction, matrixTimesDirection);
 				DirectionTimesMatrixTimesDirection = direction.DotProduct(matrixTimesDirection);
 
 				// Update the direction vectors cache
@@ -250,7 +249,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 				direction.LinearCombinationIntoThis(paramBeta, precondResidual, 1.0);
 
 				// q = A * d
-				Matrix.MultiplyVector(direction, matrixTimesDirection);
+				Matrix.Multiply(direction, matrixTimesDirection);
 				DirectionTimesMatrixTimesDirection = direction.DotProduct(matrixTimesDirection);
 			}
 		}
