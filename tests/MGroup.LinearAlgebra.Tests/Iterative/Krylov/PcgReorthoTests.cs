@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reorthogonalization;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
@@ -23,7 +24,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-5);
 
 		//[Fact]
-		private static void InvestigateNoiseStagnation()
+		public static void InvestigateNoiseStagnation()
 		{
 			double noiseWidth = 100;
 
@@ -61,15 +62,15 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			var b0 = A * x0Expected;
 
 			var xA = Vector.CreateZero(A.NumRows);
-			var statsA = pcg.Solve(A, M, b0, xA, true, () => Vector.CreateZero(order));
+			var statsA = pcg.Solve(A, M, b0, xA, true);
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
 			var xB = Vector.CreateZero(A.NumRows);
-			var statsB = pcgReorthoRestart.Solve(A, M, b0, xB, true, () => Vector.CreateZero(order));
+			var statsB = pcgReorthoRestart.Solve(A, M, b0, xB, true);
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
 			var xC = Vector.CreateZero(A.NumRows);
-			var statsC = pcgReortho.Solve(A, M, b0, xC, true, () => Vector.CreateZero(order));
+			var statsC = pcgReortho.Solve(A, M, b0, xC, true);
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 
 			// Perturbed rhs
@@ -80,21 +81,21 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			var b1 = A * x1Expected;
 
 			xA = Vector.CreateZero(A.NumRows);
-			statsA = pcg.Solve(A, M, b1, xA, true, () => Vector.CreateZero(order));
+			statsA = pcg.Solve(A, M, b1, xA, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method A: iterations = {statsA.NumIterationsRequired}");
 
 			xB = Vector.CreateZero(A.NumRows);
 			pcgReorthoRestart.ReorthoCache.Clear();
-			statsB = pcgReorthoRestart.Solve(A, M, b1, xB, true, () => Vector.CreateZero(order));
+			statsB = pcgReorthoRestart.Solve(A, M, b1, xB, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method B iterations = {statsB.NumIterationsRequired}");
 
 			xC = Vector.CreateZero(A.NumRows);
-			statsC = pcgReortho.Solve(A, M, b1, xC, true, () => Vector.CreateZero(order));
+			statsC = pcgReortho.Solve(A, M, b1, xC, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method C: iterations = {statsC.NumIterationsRequired}");
 		}
 
 		//[Fact]
-		private static void InvestigatePFetiDPCoarseProblem2D()
+		public static void InvestigatePFetiDPCoarseProblem2D()
 		{
 			var order = PFetiDPCoarseProblem2D.Order;
 			var A = Matrix.CreateFromArray(PFetiDPCoarseProblem2D.MatrixScc);
@@ -123,17 +124,17 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			var xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[0]);
 
 			var xA = Vector.CreateZero(A.NumRows);
-			var statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			var statsA = pcg.Solve(A, M, b, xA, true);
 			Assert.True(xExpected.Equals(xA, 1E-10));
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
 			var xB = Vector.CreateZero(A.NumRows);
-			var statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			var statsB = pcgReorthoRestart.Solve(A, M, b, xB, true);
 			Assert.True(xExpected.Equals(xB, 1E-10));
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
 			var xC = Vector.CreateZero(A.NumRows);
-			var statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			var statsC = pcgReortho.Solve(A, M, b, xC, true);
 			Assert.True(xExpected.Equals(xC, 1E-10));
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 
@@ -142,18 +143,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[1]);
 
 			xA = Vector.CreateZero(A.NumRows);
-			statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			statsA = pcg.Solve(A, M, b, xA, true);
 			Assert.True(xExpected.Equals(xA, 1E-10));
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
 			xB = Vector.CreateZero(A.NumRows);
 			pcgReorthoRestart.ReorthoCache.Clear();
-			statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			statsB = pcgReorthoRestart.Solve(A, M, b, xB, true);
 			Assert.True(xExpected.Equals(xB, 1E-10));
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
 			xC = Vector.CreateZero(A.NumRows);
-			statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			statsC = pcgReortho.Solve(A, M, b, xC, true);
 			Assert.True(xExpected.Equals(xC, 1E-10));
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 		}
@@ -161,7 +162,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 		[Theory]
 		[InlineData(0.1, 5, 10)]
 		[InlineData(0.01, 5, 20)]
-		private static void TestNearbyProblems(double noiseWidth, int maxIterations, int numRhsVectors)
+		public static void TestNearbyProblems(double noiseWidth, int maxIterations, int numRhsVectors)
 		{
 			var order = SymmPosDef10by10.Order;
 			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
@@ -178,7 +179,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			var x0Expected = x0.Copy();
 			var b0 = A * x0Expected;
 			var x0Computed = Vector.CreateZero(A.NumRows);
-			var stats0 = pcg.Solve(A, M, b0, x0Computed, true, () => Vector.CreateZero(order));
+			var stats0 = pcg.Solve(A, M, b0, x0Computed, true);
 			Debug.WriteLine($"Initial run: iterations = {stats0.NumIterationsRequired}");
 			comparer.AssertEqual(x0Expected, x0Computed);
 
@@ -194,7 +195,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 							 //pcg.ReorthoCache.Clear();
 
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+				var stats = pcg.Solve(A, M, b, xComputed, true);
 				Debug.WriteLine($"Subsequent run: iterations = {stats.NumIterationsRequired}");
 				comparer.AssertEqual(xExpected, xComputed);
 				Assert.InRange(stats.NumIterationsRequired, 1, maxIterations);
@@ -202,38 +203,38 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 		}
 
 		[Fact]
-		private static void TestPosDefDenseSystem()
+		public static void TestPosDefDenseSystem()
 		{
 			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 			var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
 
-			var builder = new ReorthogonalizedPcg.Factory();
-			builder.ResidualTolerance = 1E-7;
-			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-			var pcg = builder.Build();
+			var factory = new ReorthogonalizedPcg.Factory();
+			factory.ResidualTolerance = 1E-7;
+			factory.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
+			var pcg = factory.Build();
 			var M = new JacobiPreconditioner();
 			M.UpdateMatrix(A, true);
 			var xComputed = Vector.CreateZero(A.NumRows);
-			var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			var stats = pcg.Solve(A, M, b, xComputed, true);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 
 		[Fact]
-		private static void TestPosDefSparseSystem()
+		public static void TestPosDefSparseSystem()
 		{
 			var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
-			var builder = new ReorthogonalizedPcg.Factory();
-			builder.ResidualTolerance = 1E-7;
-			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-			var pcg = builder.Build();
+			var factory = new ReorthogonalizedPcg.Factory();
+			factory.ResidualTolerance = 1E-7;
+			factory.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
+			var pcg = factory.Build();
 			var M = new JacobiPreconditioner();
 			M.UpdateMatrix(A, true);
 			var xComputed = Vector.CreateZero(A.NumRows);
-			var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			var stats = pcg.Solve(A, M, b, xComputed, true);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 	}

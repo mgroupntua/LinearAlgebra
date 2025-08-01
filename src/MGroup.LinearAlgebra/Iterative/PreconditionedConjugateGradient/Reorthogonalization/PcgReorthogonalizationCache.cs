@@ -1,11 +1,12 @@
-using System.Collections.Generic;
-using MGroup.LinearAlgebra.Vectors;
-
-namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
+namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reorthogonalization
 {
+	using System;
+	using System.Collections.Generic;
+
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Manages the insertion and removal of PCG direction vectors and related data, that will be used for reorthogonalization.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public class PcgReorthogonalizationCache
 	{
@@ -20,9 +21,60 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		public List<double> DirectionsTimesMatrixTimesDirections { get; } = new List<double>();
 
 		/// <summary>
+		/// The index into <see cref="Directions"/> of the first vector of each generation. A generation is defined as all
+		/// direction vectors (and related data) stored when solving the linear system for a specific rhs. Thus solving for 2
+		/// consecutive rhs vectors will generate direction vectors belonging to 2 generations.
+		/// </summary>
+		public List<int> GenerationStartIndices { get; } = new List<int>();
+
+		/// <summary>
 		/// The products systemMatrix * <see cref="Directions"/> stored so far.
 		/// </summary>
 		public List<IVectorView> MatrixTimesDirections { get; } = new List<IVectorView>();
+
+		public bool AreAllDirectionsConjugate(double tolerance)
+		{
+			int numVectors = Directions.Count;
+
+			// Examine the newest direction first, since it is the most probable to be affected by error build-up
+			for (int i = numVectors - 1; i >= 1; --i)
+			{
+				for (int j = i - 1; j >= 0; --j)
+				{
+					// Conjugate if di * A * dj = 0.
+					double dot = Directions[i].DotProduct(MatrixTimesDirections[j]);
+					if (dot > tolerance)
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		public List<double> CalcMaxConjugacyFactorPerIteration()
+		{
+			int numVectors = Directions.Count;
+			var factors = new List<double>(numVectors);
+			factors.Add(double.NaN); // No other vector yet
+			for (int i = 1; i < numVectors; ++i)
+			{
+				double max = -1.0;
+				for (int j = i - 1; j >= 0; --j)
+				{
+					double dot = Math.Abs(Directions[i].DotProduct(MatrixTimesDirections[j]));
+					if (dot > max)
+					{
+						max = dot;
+					}
+				}
+
+				factors.Add(max);
+			}
+
+			return factors;
+		}
 
 		public void Clear()
 		{
@@ -34,7 +86,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// Discards the direction vectors and any corresponding data of the newest PCG iterations.
 		/// </summary>
-		/// <param name="numOldVectorsToRemove">
+		/// <param name="numNewVectorsToRemove">
 		/// The number of the newest entries (direction vectors and corresponding data) to discard. If it exceeds the number of
 		/// entries currently stored, they will all be discarded without throwing any exceptions.
 		/// </param>
@@ -48,7 +100,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			}
 			else
 			{
-				int start = Directions.Count - numNewVectorsToRemove;
+				var start = Directions.Count - numNewVectorsToRemove;
 				Directions.RemoveRange(start, numNewVectorsToRemove);
 				MatrixTimesDirections.RemoveRange(start, numNewVectorsToRemove);
 				DirectionsTimesMatrixTimesDirections.RemoveRange(start, numNewVectorsToRemove);
@@ -76,6 +128,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				MatrixTimesDirections.RemoveRange(0, numOldVectorsToRemove);
 				DirectionsTimesMatrixTimesDirections.RemoveRange(0, numOldVectorsToRemove);
 			}
+		}
+
+		public void StartGeneration()
+		{
+			GenerationStartIndices.Add(Directions.Count);
 		}
 
 		/// <summary>

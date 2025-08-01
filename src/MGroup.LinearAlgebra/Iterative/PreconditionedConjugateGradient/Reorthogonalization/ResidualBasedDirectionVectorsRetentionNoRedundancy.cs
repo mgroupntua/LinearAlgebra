@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalization
+namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reorthogonalization
 {
 	public class ResidualBasedDirectionVectorsRetentionNoRedundancy : IDirectionVectorsRetention
 	{
@@ -15,9 +11,12 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			this.minResidualNormRatioToKeep = minResidualNormRatioToKeep;
 		}
 
+		public IDirectionVectorsRetention CopyWithInitialSettings()
+			=> new ResidualBasedDirectionVectorsRetentionNoRedundancy(minResidualNormRatioToKeep);
+
 		public void DiscardDirectionVectors() { }
 
-		public void Intialize(ReorthogonalizedPcg pcg)
+		public void Initialize(ReorthogonalizedPcg pcg)
 		{
 			this.pcg = pcg;
 		}

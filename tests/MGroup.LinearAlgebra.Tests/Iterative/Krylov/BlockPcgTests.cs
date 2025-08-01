@@ -1,6 +1,6 @@
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Iterative;
-using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPcg;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestPosDefDenseSystem(IImplementationProvider provider)
+		public static void TestPosDefDenseSystem(IImplementationProvider provider)
 		{
 			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
@@ -38,14 +38,14 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				var M = new JacobiPreconditioner();
 				M.UpdateMatrix(A, true);
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+				var stats = pcg.Solve(A, M, b, xComputed, true);
 				comparer.AssertEqual(xExpected, xComputed);
 			});
 		}
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestPosDefSparseSystem(IImplementationProvider provider)
+		public static void TestPosDefSparseSystem(IImplementationProvider provider)
 		{
 			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				var M = new JacobiPreconditioner();
 				M.UpdateMatrix(A, true);
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+				var stats = pcg.Solve(A, M, b, xComputed, true);
 				comparer.AssertEqual(xExpected, xComputed);
 			});
 		}

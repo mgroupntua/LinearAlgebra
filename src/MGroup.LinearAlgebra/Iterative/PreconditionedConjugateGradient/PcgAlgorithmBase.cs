@@ -1,20 +1,19 @@
-using System;
-
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Iterative.Preconditioning;
-using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Vectors;
-
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Base abstract class for Preconditioned Conjugate Gradient implementations.
 	/// </summary>
 	public abstract class PcgAlgorithmBase
 	{
 		protected readonly IPcgResidualConvergence convergence;
+		protected readonly bool throwIfNotConvergence;
 
 		protected IVector direction;
 		protected int iteration;
@@ -27,12 +26,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		protected IVector solution;
 		protected double stepSize;
 
+		//TODO: Also needs logging at certain points (before/after checking convergence, before/after matrix-vector mult, before/after precond)
 		protected PcgAlgorithmBase(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence convergence)
+			IPcgResidualConvergence convergence, bool throwIfNotConvergence)
 		{
 			this.ResidualTolerance = residualTolerance;
 			this.MaxIterationsProvider = maxIterationsProvider;
 			this.convergence = convergence;
+			this.throwIfNotConvergence = throwIfNotConvergence;
 		}
 
 		public IMaxIterationsProvider MaxIterationsProvider { get; set; }
@@ -40,7 +41,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		public double ResidualTolerance { get; set; }
 
 		/// <summary>
-		/// The direction vector d, used to update the solution vector: x = x + α * d
+		/// The direction vector d, used to update the solution vector: x = x + α * d.
 		/// </summary>
 		public IVectorView Direction => direction;
 
@@ -152,11 +153,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
 		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
-			bool initialGuessIsZero, Func<IVector> zeroVectorInitializer) //TODO: find a better way to handle the case x0=0
-		{
-			return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero,
-				zeroVectorInitializer);
-		}
+			bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
+			=> Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero);
 
 		/// <summary>
 		/// Solves the linear system A * x = b by solving the preconditioned system inv(P) * A * inv(P)^T * y = inv(P) * b, 
@@ -188,10 +186,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
 		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
-			IVector solution, bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+			IVector solution, bool initialGuessIsZero)
 		{
-			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
-
 			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
 			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
@@ -201,11 +197,24 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			this.solution = solution;
 
 			// r = b - A * x
-			if (initialGuessIsZero) residual = rhs.Copy();
-			else residual = ExactResidual.Calculate(matrix, rhs, solution);
-			return SolveInternal(MaxIterationsProvider.GetMaxIterations(matrix.NumColumns), zeroVectorInitializer);
+			if (initialGuessIsZero)
+			{
+				//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag.
+				//		Probably using a dedicated interface that handles initial guesses, has state and can answer this question.
+				residual = rhs.Copy();
+			}
+			else
+			{
+				residual = ExactResidual.Calculate(matrix, rhs, solution);
+			}
+
+			//TODOMPI: With distributed vectors/matrices, the dimensions may not be straightforward to calculate. In fact they
+			//      may not be necessary in order to get the max iterations. E.g. In FETI methods, max iterations do not depend
+			//      on the size of the global matrix of the interface problem, but are user defined usually.
+			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
+			return SolveInternal(maxIterations);
 		}
 
-		protected abstract IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer);
+		protected abstract IterativeStatistics SolveInternal(int maxIterations);
 	}
 }

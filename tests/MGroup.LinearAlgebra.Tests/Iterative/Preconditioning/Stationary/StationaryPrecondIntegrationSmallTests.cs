@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		[Theory]
 		[InlineData(true)]
 		[InlineData(false)]
-		private static void TestSorGmres(bool forwardDirection)
+		public static void TestSorGmres(bool forwardDirection)
 		{
 			RunGmres(new SorPreconditionerCsr(1.2, forwardDirection, numApplications: 1));
 		}
@@ -25,31 +25,31 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		[Theory]
 		[InlineData(true)]
 		[InlineData(false)]
-		private static void TestGaussSeidelGmres(bool forwardDirection)
+		public static void TestGaussSeidelGmres(bool forwardDirection)
 		{
 			RunGmres(new GaussSeidelPreconditionerCsr(forwardDirection, numApplications: 1));
 		}
 
 		[Fact]
-		private static void TestJacobiGmres()
+		public static void TestJacobiGmres()
 		{
 			RunGmres(new JacobiPreconditioner(1E-10));
 		}
 
 		[Fact]
-		private static void TestJacobiPcg()
+		public static void TestJacobiPcg()
 		{
 			RunPcg(new JacobiPreconditioner(1E-10));
 		}
 
 		[Fact]
-		private static void TestSsorGmres()
+		public static void TestSsorGmres()
 		{
 			RunGmres(new SsorPreconditionerCsr(1.2, numApplications: 1));
 		}
 
 		[Fact]
-		private static void TestSsorPcg()
+		public static void TestSsorPcg()
 		{
 			RunPcg(new SsorPreconditionerCsr(1.2, numApplications: 1));
 		}
@@ -86,7 +86,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
 			preconditioner.UpdateMatrix(A, true);
-			var stats = pcg.Solve(A, preconditioner, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			var stats = pcg.Solve(A, preconditioner, b, xComputed, true);
 
 			var comparer = new MatrixComparer(1E-5);
 			comparer.AssertEqual(xExpected, xComputed);

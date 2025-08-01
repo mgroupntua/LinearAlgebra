@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 	public class StationaryPrecondUnitTests
 	{
 		[Fact]
-		private static void TestGaussSeidelBackPreconditioner()
+		public static void TestGaussSeidelBackPreconditioner()
 		{
 			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: false);
 			RunTwoApplications(preconditioner, (decomp, rhs) =>
@@ -29,7 +29,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestGaussSeidelForwardPreconditioner()
+		public static void TestGaussSeidelForwardPreconditioner()
 		{
 			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: true);
 			RunTwoApplications(preconditioner, (decomp, rhs) =>
@@ -41,7 +41,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestJacobiPreconditioner()
+		public static void TestJacobiPreconditioner()
 		{
 			var preconditioner = new JacobiPreconditioner(1E-10);
 			RunTwoApplications(preconditioner, (decomp, rhs) =>
@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestJacobiPreconditioner1Application()
+		public static void TestJacobiPreconditioner1Application()
 		{
 			var comparer = new MatrixComparer(1E-10);
 			var matrix = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestSorBackPreconditioner()
+		public static void TestSorBackPreconditioner()
 		{
 			var omega = 1.2;
 			var preconditioner = new SorPreconditionerCsr(omega, forwardDirection: false);
@@ -85,7 +85,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestSorForwardPreconditioner()
+		public static void TestSorForwardPreconditioner()
 		{
 			var omega = 1.2;
 			var preconditioner = new SorPreconditionerCsr(omega, forwardDirection: true);
@@ -98,7 +98,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		}
 
 		[Fact]
-		private static void TestSsorPreconditioner()
+		public static void TestSsorPreconditioner()
 		{
 			var omega = 1.2;
 			var preconditioner = new SsorPreconditionerCsr(omega);

@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestDenseSystem(IImplementationProvider provider)
+		public static void TestDenseSystem(IImplementationProvider provider)
 		{
 			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 
 		[Theory]
 		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
-		private static void TestSparseSystem(IImplementationProvider provider)
+		public static void TestSparseSystem(IImplementationProvider provider)
 		{
 			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{

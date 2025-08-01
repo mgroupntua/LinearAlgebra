@@ -1,46 +1,43 @@
-using System;
-using System.Diagnostics;
-
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
-using MGroup.LinearAlgebra.Iterative;
-using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
-using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
-using MGroup.LinearAlgebra.Vectors;
-
 //TODO: I would rather implement reorthogonalization as an alternative strategy, rather than a different class.
-//TODO: needs builder
-namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalization
+namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reorthogonalization
 {
+	using System;
+	using System.Diagnostics;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+	using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. The implementation is based on the algorithm presented in pages 51-54 of the PhD dissertation 
 	/// "Seismic soil-structure interaction with finite elements and the method of substructures", George Stavroulakis, 2014
-	/// Authors: Serafeim Bakalakos, George Stavroulakis 
 	/// </summary>
 	public class ReorthogonalizedPcg : PcgAlgorithmBase
 	{
 		private const string name = "Reorthogonalized PCG";
+		private readonly IPcgResidualUpdater residualUpdater;
 		private readonly bool useDirectionVectorsOnlyForInitialSolution;
 
 		private ReorthogonalizedPcg(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence residualConvergence, IPcgResidualUpdater residualCorrection, bool throwIfNotConvergence,
-			IDirectionVectorsRetention directionVectorsRetention, bool useDirectionVectorsOnlyForInitialSolution) :
-			base(residualTolerance, maxIterationsProvider, residualConvergence, residualCorrection, throwIfNotConvergence)
+			IPcgResidualConvergence residualConvergence, IPcgResidualUpdater residualUpdater, bool throwIfNotConvergence,
+			IDirectionVectorsRetention directionVectorsRetention, bool useDirectionVectorsOnlyForInitialSolution)
+			: base(residualTolerance, maxIterationsProvider, residualConvergence, throwIfNotConvergence)
 		{
-			Convergence = residualConvergence; //TODO: Now there are 2 convergence properties. One here and one in base class. Fix it.
-			DirectionVectorsRetention = directionVectorsRetention;
+			this.residualUpdater = residualUpdater;
 			this.useDirectionVectorsOnlyForInitialSolution = useDirectionVectorsOnlyForInitialSolution;
+			DirectionVectorsRetention = directionVectorsRetention;
 		}
-
-		public IPcgResidualConvergence Convergence { get; set; }
-
-		public IDirectionVectorsRetention DirectionVectorsRetention { get; }
 
 		/// <summary>
 		/// The dot product d * (A*d), where d is the direction vector <see cref="PcgAlgorithmBase.Direction"/>.
 		/// </summary>
 		public double DirectionTimesMatrixTimesDirection { get; private set; }
+
+		public IDirectionVectorsRetention DirectionVectorsRetention { get; }
 
 		//TODO: this could be abstracted to use a cyclic cache.
 		public PcgReorthogonalizationCache ReorthoCache { get; set; } = new PcgReorthogonalizationCache();
@@ -59,17 +56,17 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IVector rhsNew, IVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IVectorView rhsNew, IVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
 
 			// x0 = D_nd * x_d, x_d = inv(Q_nd * D_nd) * D_nd^T * b
 			// D_nd = [d_1 ... d_nd], Q_nd = A * D_nd = [q_1 ... q_nd], Q_nd * D_nd = diag([d1*A*d1 ... d_nd*A*d_nd])
-			for (int i = 0; i < ReorthoCache.Directions.Count; ++i)
+			for (var i = 0; i < ReorthoCache.Directions.Count; ++i)
 			{
 				// x_d[i] = (d_i * b) / (d_i * q_i) 
-				double xd = ReorthoCache.Directions[i].DotProduct(rhsNew) / ReorthoCache.DirectionsTimesMatrixTimesDirections[i];
+				var xd = ReorthoCache.Directions[i].DotProduct(rhsNew) / ReorthoCache.DirectionsTimesMatrixTimesDirections[i];
 
 				Debug.Assert(!double.IsNaN(xd));
 				Debug.Assert(!double.IsPositiveInfinity(xd));
@@ -81,7 +78,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		}
 
 		/// <summary>
-		/// See <see cref="PcgAlgorithmBase.Clear"/>
+		/// <inheritdoc/>
 		/// </summary>
 		public override void Clear()
 		{
@@ -90,22 +87,25 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			ReorthoCache.Clear();
 		}
 
-		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVector rhs,
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
 			IVector solution, bool initialGuessIsZero)
 		{
-			////TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
-			//Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
-			//Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
+			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
+			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
+			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
-			this.Matrix = matrix;
-			this.Preconditioner = preconditioner;
-			this.Rhs = rhs;
+			Matrix = matrix;
+			Preconditioner = preconditioner;
+			Rhs = rhs;
 
 			// Initial solution and rhs (r = b - A * x)
 			this.solution = solution;
 			if (ReorthoCache.Directions.Count > 0)
 			{
-				if (!initialGuessIsZero) solution.Clear();
+				if (!initialGuessIsZero)
+				{
+					solution.Clear();
+				}
 
 				CalculateInitialSolutionFromStoredDirections(rhs, solution);
 				if (useDirectionVectorsOnlyForInitialSolution)
@@ -118,50 +118,52 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			else // preferably call base method
 			{
 				// r = b - A * x
-				if (initialGuessIsZero) residual = rhs.Copy();
-				else residual = ExactResidual.Calculate(matrix, rhs, solution);
+				if (initialGuessIsZero)
+				{
+					residual = rhs.Copy();
+				}
+				else
+				{
+					residual = ExactResidual.Calculate(matrix, rhs, solution);
+				}
 			}
 
-			// Initialize vectors 
+			// Initialize vectors
 			//TODO: Pehaps I can just clear them from previous iterations 
-			precondResidual = solution.CreateZeroVectorWithSameFormat();
-			direction = solution.CreateZeroVectorWithSameFormat();
-			matrixTimesDirection = solution.CreateZeroVectorWithSameFormat();
+			precondResidual = Rhs.CreateZeroVectorWithSameFormat();
+			direction = Solution.CreateZeroVectorWithSameFormat();
+			matrixTimesDirection = Rhs.CreateZeroVectorWithSameFormat();
 
-			//TODOMPI: With distributed vectors/matrices, the dimensions may not be straightforward to calculate. In fact they
-			//      may not be necessary in order to get the max iterations. E.g. In FETI methods, max iterations do not depend
-			//      on the size of the global matrix of the interface problem, but are user defined usually.
-			//int maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumColumns); 
-			int maxIterations = ((FixedMaxIterationsProvider)MaxIterationsProvider).GetMaxIterations(-1);
+			var maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
 			ReorthoCache.StartGeneration();
-			DirectionVectorsRetention.Intialize(this);
+			DirectionVectorsRetention.Initialize(this);
 
-			IterativeStatistics stats = SolveInternal(maxIterations, solution.CreateZeroVectorWithSameFormat);
+			IterativeStatistics stats = SolveInternal(maxIterations);
 
 			DirectionVectorsRetention.DiscardDirectionVectors();
 			return stats;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations)
 		{
 			iteration = 0;
 
 			// This is also used as output
 			ResidualNormRatio = double.NaN;
 
-			Preconditioner.Apply(residual, precondResidual);
+			Preconditioner.SolveLinearSystem(residual, precondResidual);
 
-			// Update direction vector d and q
+			// Update the direction vector (d) and matrix-times-direction vector (q) and the stored vectors cache
 			UpdateDirectionVector(precondResidual, direction);
 
 			// δnew = δ0 = r0 * s0 = r0 * d0
 			resDotPrecondRes = residual.DotProduct(direction);
 
 			// The convergence strategy must be initialized immediately after the first r and r*inv(M)*r are computed.
-			Convergence.Initialize(this);
-			Stagnation.StoreInitialError(Convergence.EstimateResidualNormRatio(this));
+			convergence.Initialize(this);
+			Stagnation.StoreInitialError(convergence.EstimateResidualNormRatio(this));
 
-			// α0 = (d0 * r0) / (d0 * q0) = (s0 * r0) / (d0 * (A * d0)) 
+			// α0 = (d0 * r0) / (d0 * q0) = (s0 * r0) / (d0 * (A * d0))
 			stepSize = resDotPrecondRes / DirectionTimesMatrixTimesDirection;
 
 			for (iteration = 1; iteration < maxIterations; ++iteration)
@@ -173,32 +175,32 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 				residualUpdater.UpdateResidual(this, residual);
 
 				// s = inv(M) * r
-				Preconditioner.Apply(residual, precondResidual);
+				Preconditioner.SolveLinearSystem(residual, precondResidual);
 
 				// δold = δnew
 				resDotPrecondResOld = resDotPrecondRes;
 
-				// δnew = r * s 
+				// δnew = r * s
 				resDotPrecondRes = residual.DotProduct(precondResidual);
 
-				/// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
-				ResidualNormRatio = Convergence.EstimateResidualNormRatio(this);
+				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
+				ResidualNormRatio = convergence.EstimateResidualNormRatio(this);
 				//Debug.WriteLine($"Reorthogonalized PCG iteration = {iteration}: residual norm ratio = {residualNormRatio}");
 				Stagnation.StoreNewError(ResidualNormRatio);
 				bool hasStagnated = Stagnation.HasStagnated();
-				if (hasStagnated)
+				if (hasStagnated || (ResidualNormRatio <= ResidualTolerance))
 				{
 					return new IterativeStatistics
 					{
 						AlgorithmName = name,
-						HasConverged = false,
-						HasStagnated = true,
+						HasConverged = true,
+						HasStagnated = hasStagnated,
 						NumIterationsRequired = iteration + 1,
-						ResidualNormRatioEstimation = ResidualNormRatio
+						ResidualNormRatioEstimation = ResidualNormRatio,
 					};
 				}
 
-				// Update direction vector d and q
+				// Update the direction vector (d) and matrix-times-direction vector (q) and the stored vectors cache
 				UpdateDirectionVector(precondResidual, direction);
 
 				// α = (d * r) / (d * q) = (d * r) / (d * (A * d)) 
@@ -206,17 +208,28 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			}
 
 			// We reached the max iterations before PCG converged
-			return new IterativeStatistics
+			if (throwIfNotConvergence)
 			{
-				AlgorithmName = name,
-				HasConverged = false,
-				HasStagnated = false,
-				NumIterationsRequired = maxIterations,
-				ResidualNormRatioEstimation = ResidualNormRatio
-			};
+				throw new IterativeMethodDidNotConvergeException(
+					"Reorthogonalized-PCG terminated after the max allowable number of iterations =" +
+					$" {maxIterations}, without reaching the required residual norm ratio tolerance = {ResidualTolerance}." +
+					$" In contrast the final residual norm ratio is {ResidualNormRatio}. To accept solutions without convergence" +
+					$" set ReorthogonalizedPcg.Factory.ThrowExceptionIfNotConvergence = false");
+			}
+			else
+			{
+				return new IterativeStatistics
+				{
+					AlgorithmName = name,
+					HasConverged = false,
+					HasStagnated = false,
+					NumIterationsRequired = maxIterations,
+					ResidualNormRatioEstimation = ResidualNormRatio,
+				};
+			}
 		}
 
-		private void UpdateDirectionVector(IVector preconditionedResidual, IVector direction)
+		private void UpdateDirectionVector(IVectorView preconditionedResidual, IVector direction)
 		{
 			bool useReortho = DirectionVectorsRetention.KeepUsingReorthogonalization();
 
@@ -257,11 +270,10 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 		/// <summary>
 		/// Constructs <see cref="ReorthogonalizedPcg"/> instances, allows the user to specify some or all of the 
 		/// required parameters and provides defaults for the rest.
-		/// Author: Serafeim Bakalakos
 		/// </summary>
-		public class Builder : PcgBuilderBase
+		public class Factory : PcgFactoryBase
 		{
-			public Builder()
+			public Factory()
 			{
 				Convergence = new PureResidualConvergence();
 				DirectionVectorsRetention = new PercentageDirectionVectorsRetention(1.1);
@@ -270,6 +282,11 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 
 			public IDirectionVectorsRetention DirectionVectorsRetention { get; set; }
 
+			/// <summary>
+			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
+			/// </summary>
+			public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new DefaultPcgResidualUpdater();
+
 			public bool UseDirectionVectorsOnlyForInitialSolution { get; set; }
 
 			/// <summary>
@@ -277,8 +294,10 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			/// </summary>
 			public ReorthogonalizedPcg Build()
 			{
-				return new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider, Convergence, ResidualUpdater,
-					ThrowExceptionIfNotConvergence, DirectionVectorsRetention, UseDirectionVectorsOnlyForInitialSolution);
+				return new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
+					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(),
+					ThrowExceptionIfNotConvergence, DirectionVectorsRetention.CopyWithInitialSettings(),
+					UseDirectionVectorsOnlyForInitialSolution);
 			}
 		}
 	}

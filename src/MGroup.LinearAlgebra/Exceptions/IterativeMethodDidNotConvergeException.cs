@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MGroup.LinearAlgebra.Distributed.Exceptions
+namespace MGroup.LinearAlgebra.Exceptions
 {
+	using System;
+
 	/// <summary>
 	/// The exception that is thrown when an iterative method for solving linear systems terminates without reaching 
 	/// the desired accuracy. This usually indicates that the linear system is not well defined or that the iterative method 

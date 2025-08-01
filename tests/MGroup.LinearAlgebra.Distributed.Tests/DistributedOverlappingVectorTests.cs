@@ -5,10 +5,11 @@ using System.Linq;
 
 using MGroup.Environments;
 using MGroup.Environments.Mpi;
-using MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG;
-using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPcg;
+using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
@@ -185,11 +186,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			Dictionary<int, Vector> localXExpected = environment.CalcNodeData(n => GetX(n));
 			var distributedXExpected = new DistributedOverlappingVector(indexer, localXExpected);
 
-			var pcgBuilder = new PcgAlgorithm.Builder();
+			var pcgFactory = new PcgAlgorithm.Factory();
 			int maxIterations = 12;
-			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(maxIterations);
-			pcgBuilder.ResidualTolerance = 1E-10;
-			PcgAlgorithm pcg = pcgBuilder.Build();
+			pcgFactory.MaxIterationsProvider = new FixedMaxIterationsProvider(maxIterations);
+			pcgFactory.ResidualTolerance = 1E-10;
+			PcgAlgorithm pcg = pcgFactory.Build();
 			var distributedX = new DistributedOverlappingVector(indexer);
 			IterativeStatistics stats = pcg.Solve(distributedA, new IdentityPreconditioner(), distributedAx, distributedX, true);
 
@@ -217,11 +218,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			Dictionary<int, Vector> localXExpected = environment.CalcNodeData(n => GetX(n));
 			var distributedXExpected = new DistributedOverlappingVector(indexer, localXExpected);
 
-			var pcgBuilder = new BlockPcgAlgorithm.Builder();
+			var pcgFactory = new BlockPcgAlgorithm.Factory();
 			int maxIterations = 12;
-			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(maxIterations);
-			pcgBuilder.ResidualTolerance = 1E-10;
-			BlockPcgAlgorithm pcg = pcgBuilder.Build();
+			pcgFactory.MaxIterationsProvider = new FixedMaxIterationsProvider(maxIterations);
+			pcgFactory.ResidualTolerance = 1E-10;
+			BlockPcgAlgorithm pcg = pcgFactory.Build();
 			var distributedX = new DistributedOverlappingVector(indexer);
 			IterativeStatistics stats = pcg.Solve(distributedA, new IdentityPreconditioner(), distributedAx, distributedX, true);
 

@@ -1,10 +1,3 @@
-using System;
-
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Vectors;
-
 //TODO: Use a dedicated DiagonalMatrix class, instead of passing in double[] or Vector. It will implement the inverse and 
 //      multiplication routines. It will also handle distributed matrices. E.g. IDiagonal IMatrixView.GetDiagonal() which will 
 //      then have an IDiagonalMatrix.Inverse(). The problem is how we will go from CSR to DiagonalMatrix. Perhaps it would be 
@@ -13,6 +6,13 @@ using MGroup.LinearAlgebra.Vectors;
 //      its diagonal. I think this alternative is less flexible and more difficult to implement.
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 {
+	using System;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Implements the Jacobi or diagonal preconditioner for a square matrix. If A is the original matrix, the Jacobi  
 	/// preconditioner is a matrix M, such that it oncly contains the diagonal of A and inverse(M) is also diagonal with 
@@ -39,7 +39,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		public IPreconditioner CopyWithInitialSettings() => new JacobiPreconditioner(tolerance);
 
 		/// <summary>
-		/// See <see cref="IPreconditioner.SolveLinearSystem(Vector)"/>
+		/// <inheritdoc/>
 		/// </summary>
 		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
 		{
@@ -68,7 +68,11 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 			for (int i = 0; i < inverseDiagonal.Length; ++i)
 			{
 				double val = inverseDiagonal[i];
-				if (Math.Abs(val) <= tolerance) throw new SingularMatrixException($"Zero diagonal entry at index {i}");
+				if (Math.Abs(val) <= tolerance)
+				{
+					throw new SingularMatrixException($"Zero diagonal entry at index {i}");
+				}
+
 				this.inverseDiagonal[i] = 1.0 / val;
 			}
 		}

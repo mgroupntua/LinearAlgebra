@@ -1,7 +1,7 @@
-using MGroup.LinearAlgebra.Vectors;
-
 namespace MGroup.LinearAlgebra.Iterative
 {
+	using MGroup.LinearAlgebra.Vectors;
+
 	public static class ExactResidual
 	{
 		public static IVector Calculate(ILinearTransformation matrix, IVectorView rhs, IVectorView solution)

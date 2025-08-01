@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalization
+namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reorthogonalization
 {
 	public class FixedDirectionVectorsRetention : IDirectionVectorsRetention
 	{
@@ -17,6 +13,9 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			this.keepFirstVectors = keepOldestVectors;
 		}
 
+		public IDirectionVectorsRetention CopyWithInitialSettings()
+			=> new FixedDirectionVectorsRetention(numVectorsToKeep, keepFirstVectors);
+
 		public void DiscardDirectionVectors()
 		{
 			int numVectorsToDiscard = pcg.ReorthoCache.Directions.Count - numVectorsToKeep;
@@ -30,7 +29,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG.Reorthogonalizat
 			}
 		}
 
-		public void Intialize(ReorthogonalizedPcg pcg)
+		public void Initialize(ReorthogonalizedPcg pcg)
 		{
 			this.pcg = pcg;
 		}

@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using MGroup.LinearAlgebra.Vectors;
-using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.Overlapping;
-using MGroup.LinearAlgebra.Matrices;
-
 //TODOMPI: Needs testing
-namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
+namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Text;
+	using MGroup.LinearAlgebra.Vectors;
+	using MGroup.Environments;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+
 	public class DistributedOverlappingJacobiPreconditioner : IPreconditioner
 	{
 		private readonly IComputeEnvironment environment;
@@ -32,43 +32,27 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 		{
 			this.environment = environment;
 			this.diagonal = diagonal;
-			this.Indexer = diagonal.Indexer;
+			Indexer = diagonal.Indexer;
 
 			Func<int, Vector> invertDiagonal = nodeID => diagonal.LocalVectors[nodeID].DoToAllEntries(x => 1 / x);
-			this.LocalInverseDiagonals = environment.CalcNodeData(invertDiagonal);
+			LocalInverseDiagonals = environment.CalcNodeData(invertDiagonal);
 		}
 
 		public IDistributedIndexer Indexer { get; }
 
 		public Dictionary<int, Vector> LocalInverseDiagonals { get; }
 
-		public void Apply(IVector input, IVector output)
-		{
-			if ((input is DistributedOverlappingVector lhsCasted) && (output is DistributedOverlappingVector rhsCasted))
-			{
-				Multiply(lhsCasted, rhsCasted);
-			}
-			else
-			{
-				throw new ArgumentException(
-					"This operation is legal only if the left-hand-side and righ-hand-side vectors are distributed" +
-					" with overlapping entries.");
-			}
-		}
-
-		public IPreconditioner CopyWithInitialSettings() => new DistributedOverlappingJacobiPreconditioner(environment, diagonal);
-
-		public void Multiply(DistributedOverlappingVector input, DistributedOverlappingVector output)
+		public void Apply(DistributedOverlappingVector input, DistributedOverlappingVector output)
 		{
 			//TODOMPI: also check that environment is the same between M,x and M,y
-			Debug.Assert(this.Indexer.IsCompatibleWith(input.Indexer) /*&& (this.environment == lhs.environment)*/);
-			Debug.Assert(this.Indexer.IsCompatibleWith(output.Indexer) /*&& (this.environment == rhs.environment)*/);
+			Debug.Assert(Indexer.IsCompatibleWith(input.Indexer) /*&& (this.environment == lhs.environment)*/);
+			Debug.Assert(Indexer.IsCompatibleWith(output.Indexer) /*&& (this.environment == rhs.environment)*/);
 
 			Action<int> multiplyLocal = nodeID =>
 			{
-				Vector localX = input.LocalVectors[nodeID];
-				Vector localY = output.LocalVectors[nodeID];
-				Vector localDiagonal = this.LocalInverseDiagonals[nodeID];
+				var localX = input.LocalVectors[nodeID];
+				var localY = output.LocalVectors[nodeID];
+				var localDiagonal = LocalInverseDiagonals[nodeID];
 				localY.CopyFrom(localX);
 				localY.MultiplyEntrywiseIntoThis(localDiagonal);
 			};
@@ -76,6 +60,23 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 
 			//TODOMPI: do we need to call output.SumOverlappingEntries() here? Is this need covered by the fact that 
 			//      LocalInverseDiagonals already have the total stiffnesses?
+		}
+
+		public IPreconditioner CopyWithInitialSettings() => new DistributedOverlappingJacobiPreconditioner(environment, diagonal);
+
+
+		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		{
+			if (rhsVector is DistributedOverlappingVector rhsCasted && lhsVector is DistributedOverlappingVector lhsCasted)
+			{
+				Apply(rhsCasted, lhsCasted);
+			}
+			else
+			{
+				throw new ArgumentException(
+					"This operation is legal only if the left-hand-side and righ-hand-side vectors are distributed" +
+					" with overlapping entries.");
+			}
 		}
 
 		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified) { } 

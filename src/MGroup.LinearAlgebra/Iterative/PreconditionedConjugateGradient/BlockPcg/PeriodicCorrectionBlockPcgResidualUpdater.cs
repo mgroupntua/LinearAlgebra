@@ -1,8 +1,9 @@
 //TODO: Duplication between this and the CG version
-namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
+namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPcg
 {
 	using System;
 
+	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -10,22 +11,22 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// the more efficient formula used by the iterative algorithm. This approach is presented in section B1 of
 	/// "An Introduction to the Conjugate Gradient Method Without the Agonizing Pain", Jonathan Richard Shewchuk, 1994
 	/// </summary>
-	public class PeriodicCorrectionPcgResidualUpdater : IPcgResidualUpdater
+	public class PeriodicCorrectionBlockPcgResidualUpdater : IBlockPcgResidualUpdater
 	{
 		private int numIterationsBeforeCorrection = int.MinValue;
 
-		public PeriodicCorrectionPcgResidualUpdater(int numIterationsBeforeCorrection = int.MinValue)
+		public PeriodicCorrectionBlockPcgResidualUpdater(int numIterationsBeforeCorrection)
 		{
 			this.numIterationsBeforeCorrection = numIterationsBeforeCorrection;
 		}
 
-		public IPcgResidualUpdater CopyWithInitialSettings() 
-			=> new PeriodicCorrectionPcgResidualUpdater(numIterationsBeforeCorrection);
+		public IBlockPcgResidualUpdater CopyWithInitialSettings()
+			=> new PeriodicCorrectionBlockPcgResidualUpdater(numIterationsBeforeCorrection);
 
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>.
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IVector residual)
+		public void UpdateResidual(BlockPcgAlgorithm pcg, IVector residual)
 		{
 			//TODO: perhaps this should be done in an Initialize() method
 			if (numIterationsBeforeCorrection == int.MinValue)
@@ -33,7 +34,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length));
 			}
 
-			if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
+			if (pcg.Iteration % numIterationsBeforeCorrection == 0 && pcg.Iteration != 0) //The first iteration uses the correct residual.
 			{
 				// Calculate the exact residual: r = b - A * x
 				ExactResidual.Calculate(pcg.Matrix, pcg.Rhs, pcg.Solution, residual);
@@ -41,7 +42,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			else
 			{
 				// Normally the residual vector is updated as: r = r - α * A*d
-				residual.AxpyIntoThis(pcg.MatrixTimesDirection, -pcg.StepSize);
+				residual.CopyFrom(pcg.ResidualOperator.EvaluateVector(pcg.ResidualKernels, pcg.DirectionKernels));  // It didn't multiplied with M, because it shouldn't be
 			}
 		}
 	}

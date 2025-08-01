@@ -123,7 +123,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
 			preconditioner.UpdateMatrix(csrA, true);
-			var stats = pcg.Solve(csrA, preconditioner, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			var stats = pcg.Solve(csrA, preconditioner, b, xComputed, true);
 
 			var comparer = new MatrixComparer(1E-5);
 			comparer.AssertEqual(xExpected, xComputed);

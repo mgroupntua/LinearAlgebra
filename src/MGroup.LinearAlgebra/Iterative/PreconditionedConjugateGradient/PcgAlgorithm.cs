@@ -1,17 +1,8 @@
-using System;
-using System.Diagnostics;
-
-using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
-using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
-using MGroup.LinearAlgebra.Vectors;
-
-//TODO: Needs Builder pattern
-//TODO: perhaps all quantities should be stored as mutable fields, exposed as readonly properties and the various strategies 
-//      should read them from a reference of CG/PCG/PCPG, instead of having them injected.
-//TODO: In regular CG, there is a check to perevent premature convergence, by correcting the residual. Can this be done for PCG 
-//      as well? Would the preconditioned residual be updated as well?
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+
 	/// <summary>
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. This implementation is based on the algorithm presented in section B3 of 
@@ -24,24 +15,22 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private readonly IPcgResidualUpdater residualUpdater;
 
 		private PcgAlgorithm(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence pcgConvergence, IPcgResidualUpdater residualUpdater, 
-			IPcgBetaParameterCalculation betaCalculation)
-			: base(residualTolerance, maxIterationsProvider, pcgConvergence)
+			IPcgResidualConvergence pcgConvergence, IPcgResidualUpdater residualUpdater,
+			IPcgBetaParameterCalculation betaCalculation, bool throwIfNotConvergence)
+			: base(residualTolerance, maxIterationsProvider, pcgConvergence, throwIfNotConvergence)
 		{
 			this.betaCalculation = betaCalculation;
 			this.residualUpdater = residualUpdater;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations)
 		{
-			//CalculateAndPrintExactResidual();
-
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
-			precondResidual = zeroVectorInitializer();
+			precondResidual = Rhs.CreateZeroVectorWithSameFormat();
 
 			// d = inv(M) * r
-			direction = zeroVectorInitializer();
+			direction = Solution.CreateZeroVectorWithSameFormat();
 			Preconditioner.SolveLinearSystem(residual, direction);
 
 			// δnew = δ0 = r * d
@@ -55,7 +44,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			double residualNormRatio = double.NaN;
 
 			// Allocate memory for other vectors, which will be reused during each iteration
-			matrixTimesDirection = zeroVectorInitializer();
+			matrixTimesDirection = Rhs.CreateZeroVectorWithSameFormat();
 
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
@@ -79,7 +68,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				// δold = δnew
 				resDotPrecondResOld = resDotPrecondRes;
 
-				// δnew = r * s 
+				// δnew = r * s
 				resDotPrecondRes = residual.DotProduct(precondResidual);
 
 				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
@@ -92,7 +81,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 						AlgorithmName = name,
 						HasConverged = true,
 						NumIterationsRequired = iteration + 1,
-						ResidualNormRatioEstimation = residualNormRatio
+						ResidualNormRatioEstimation = residualNormRatio,
 					};
 				}
 
@@ -107,22 +96,23 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			}
 
 			// We reached the max iterations before PCG converged
-			return new IterativeStatistics
+			if (throwIfNotConvergence)
 			{
-				AlgorithmName = name,
-				HasConverged = false,
-				NumIterationsRequired = maxIterations,
-				ResidualNormRatioEstimation = residualNormRatio
-			};
-		}
-
-		private void CalculateAndPrintExactResidual()
-		{
-			var res = Vector.CreateZero(Rhs.Length);
-			Matrix.Multiply(solution, res);
-			res.SubtractIntoThis(Rhs);
-			double norm = res.Norm2();
-			Debug.WriteLine($"Iteration {iteration}: norm(r) = {norm}");
+				throw new IterativeMethodDidNotConvergeException("PCG terminated after the max allowable number of iterations =" +
+					$" {maxIterations}, without reaching the required residual norm ratio tolerance = {ResidualTolerance}." +
+					$" In contrast the final residual norm ratio is {residualNormRatio}. To accept solutions without convergence" +
+					$" set PcgAlgorithm.Factory.ThrowExceptionIfNotConvergence = false");
+			}
+			else
+			{
+				return new IterativeStatistics
+				{
+					AlgorithmName = name,
+					HasConverged = false,
+					NumIterationsRequired = maxIterations,
+					ResidualNormRatioEstimation = residualNormRatio,
+				};
+			}
 		}
 
 		/// <summary>
@@ -139,16 +129,16 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			/// <summary>
 			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
 			/// </summary>
-			public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
+			public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new DefaultPcgResidualUpdater();
 
 			/// <summary>
 			/// Creates a new instance of <see cref="PcgAlgorithm"/>.
 			/// </summary>
 			public PcgAlgorithm Build()
 			{
-				return new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(), 
-					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(), 
-					BetaCalculation.CopyWithInitialSettings());
+				return new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
+					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(),
+					BetaCalculation.CopyWithInitialSettings(), ThrowExceptionIfNotConvergence);
 			}
 		}
 	}
