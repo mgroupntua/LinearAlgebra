@@ -229,18 +229,6 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
-		/// </summary>
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
-
-		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
-		/// </summary>
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
-			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
-
-		/// <summary>
 		/// See <see cref="IVector.AddToIndex(int, double)"/>.
 		/// </summary>
 		public void AddToIndex(int index, double value)
@@ -376,19 +364,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
-		/// </summary>
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.CopyNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
-
-		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
-		/// </summary>
-		public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.CopyNonContiguouslyFrom(this, otherVector, otherIndices);
-
-		/// <summary>
-		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
+		/// <inheritdoc/>
 		/// </summary>
 		public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
 		{

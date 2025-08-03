@@ -273,7 +273,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
         /// </summary>
         public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
-            => DenseStrategies.CopyNonContiguouslyFrom(this, otherVector, otherIndices);
+            => DenseStrategies.CopyNonContiguously(this, otherVector, otherIndices);
 
         /// <summary>
         /// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
@@ -297,7 +297,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
         /// </summary>
         public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-            => DenseStrategies.CopyNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
+            => DenseStrategies.CopyNonContiguously(this, thisIndices, otherVector, otherIndices);
 
         /// <summary>
         /// See <see cref="IVectorView.CopyToArray"/>.

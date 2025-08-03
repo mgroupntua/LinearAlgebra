@@ -1,11 +1,13 @@
-using System;
-
 //TODO: perhaps some of these methods should only belong to a few concrete classes.
 //TODO: perhaps the NonContiguously where one of the two vectors is contiguous, must be bidirectional by setting a flag.
 namespace MGroup.LinearAlgebra.Vectors
 {
+	using System;
+
+	using MGroup.LinearAlgebra.Commons;
+
 	/// <summary>
-	/// Operations specified by this interface modify the vector. Therefore it is possible that they may throw exceptions if they 
+	/// Operations specified by this interface modify the vector. Therefore it is possible that they may throw exceptions if they
 	/// are used on sparse vector formats and the zero entries are overwritten.
 	/// </summary>
 	public interface IVector : IVectorView, IEntrywiseOperable1D<IVectorView>
@@ -16,13 +18,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// for 0 &lt;= i &lt; <paramref name="thisIndices"/>.Length = <paramref name="otherIndices"/>.Length.
 		/// </summary>
 		/// <param name="thisIndices">
-		/// The indices of this vector, where entries will be added to. Constraints: 
+		/// The indices of this vector, where entries will be added to. Constraints:
 		/// 1) <paramref name="thisIndices"/>.Length == <paramref name="otherIndices"/>.Length,
 		/// 2) 0 &lt;= <paramref name="thisIndices"/>[i] &lt; this.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
 		/// <param name="otherVector">The vector from which entries will be added.</param>
 		/// <param name="otherIndices">
-		/// The indices of <paramref name="otherVector"/>, from where entries will be added. Constraints: 
+		/// The indices of <paramref name="otherVector"/>, from where entries will be added. Constraints:
 		/// 1) <paramref name="otherIndices"/>.Length == <paramref name="thisIndices"/>.Length,
 		/// 2) 0 &lt;= <paramref name="otherIndices"/>[i] &lt; otherVector.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
@@ -32,17 +34,18 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
 		/// <summary>
 		/// Adds selected entries from <paramref name="otherVector"/> to this vector:
 		/// this[<paramref name="thisIndices"/>[i]] += <paramref name="otherVector"/>[i], for 0 &lt;= i
 		/// &lt; <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/> = <paramref name="thisIndices"/>.Length.
-		/// Contrary to <see cref="AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>, access to the entries of 
+		/// Contrary to <see cref="AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>, access to the entries of
 		/// <paramref name="otherVector"/> is contiguous.
 		/// </summary>
 		/// <param name="thisIndices">
-		/// The indices of this vector, where entries will be added to. Constraints: 
+		/// The indices of this vector, where entries will be added to. Constraints:
 		/// 1) <paramref name="thisIndices"/>.Length == <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/>,
 		/// 2) 0 &lt;= <paramref name="thisIndices"/>[i] &lt; this.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
@@ -53,11 +56,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
+			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
 		/// <summary>
-		/// Similar to <see cref="Set(int, double)"/>, but will add <paramref name="value"/> to the existing entry at <paramref name="index"/>. 
-		/// Will work as expected for general dense vectors. For sparse vectors it will throw a 
+		/// Similar to <see cref="Set(int, double)"/>, but will add <paramref name="value"/> to the existing entry at <paramref name="index"/>.
+		/// Will work as expected for general dense vectors. For sparse vectors it will throw a
 		/// <see cref="Exceptions.SparsityPatternModifiedException"/>, if a structural zero entry is written to.
 		/// </summary>
 		/// <param name="index">
@@ -67,15 +71,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="index"/> violates the described constraints.
 		/// </exception>
-		/// <exception cref="Exceptions.SparsityPatternModifiedException"> 
+		/// <exception cref="Exceptions.SparsityPatternModifiedException">
 		/// Thrown if a structural zero entry of a sparse vector format is written to.
 		/// </exception>
 		void AddToIndex(int index, double value); //TODO: Also update value at index, with this being a special case
 
 		/// <summary>
 		/// Performs the following operation for all i:
-		/// this[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
-		/// Optimized version of <see cref="IVector.DoEntrywise(IVectorView, Func{double, double, double})"/> and 
+		/// this[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i].
+		/// Optimized version of <see cref="IVector.DoEntrywise(IVectorView, Func{double, double, double})"/> and
 		/// <see cref="IVector.LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
 		/// The resulting vector overwrites the entries of this.
 		/// </summary>
@@ -86,11 +90,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
-		/// </exception> 
+		/// </exception>
 		void AxpyIntoThis(IVectorView otherVector, double otherCoefficient);
 
 		/// <summary>
-		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided 
+		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided
 		/// indices: this[i] = <paramref name="sourceCoefficient"/> * <paramref name="sourceVector"/>[i] + this[i].
 		/// </summary>
 		/// <param name="destinationIndex">
@@ -100,24 +104,25 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="sourceVector">The other vector operand.</param>
 		/// <param name="sourceCoefficient">A scalar that multiplies each entry of <paramref name="sourceVector"/>.</param>
 		/// <param name="sourceIndex">
-		/// The index into <paramref name="sourceVector"/> where to start operating. 
-		/// Constraints: <paramref name="sourceIndex"/> + <paramref name="length"/> 
+		/// The index into <paramref name="sourceVector"/> where to start operating.
+		/// Constraints: <paramref name="sourceIndex"/> + <paramref name="length"/>
 		/// &lt;= <paramref name="sourceVector"/>.<see cref="IIndexable1D.Length"/>.
 		/// </param>
 		/// <param name="length">The number of entries to copy.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="length"/> and <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/> 
+		/// Thrown if <paramref name="length"/> and <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/>
 		/// violate the described constraints.
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
 		void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient, int sourceIndex,
-			int length);
+			int length)
+			=> DenseStrategies.AxpySubvector(this, destinationIndex, sourceVector, sourceIndex, sourceCoefficient, length);
 
 		/// <summary>
-		/// Sets all entries to 0. For sparse or block vectors: the indexing arrays will not be mutated. Therefore the sparsity  
-		/// pattern will be preserved. The non-zero entries will be set to 0, but they will still be stored explicitly. 
+		/// Sets all entries to 0. For sparse or block vectors: the indexing arrays will not be mutated. Therefore the sparsity
+		/// pattern will be preserved. The non-zero entries will be set to 0, but they will still be stored explicitly.
 		/// </summary>
 		void Clear();
 
@@ -139,13 +144,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// for 0 &lt;= i &lt; <paramref name="thisIndices"/>.Length = <paramref name="otherIndices"/>.Length.
 		/// </summary>
 		/// <param name="thisIndices">
-		/// The indices of this vector, where entries will be copied to. Constraints: 
+		/// The indices of this vector, where entries will be copied to. Constraints:
 		/// 1) <paramref name="thisIndices"/>.Length == <paramref name="otherIndices"/>.Length,
 		/// 2) 0 &lt;= <paramref name="thisIndices"/>[i] &lt; this.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
 		/// <param name="otherVector">The vector from which entries will be copied.</param>
 		/// <param name="otherIndices">
-		/// The indices of <paramref name="otherVector"/>, from where entries will be copied. Constraints: 
+		/// The indices of <paramref name="otherVector"/>, from where entries will be copied. Constraints:
 		/// 1) <paramref name="otherIndices"/>.Length == <paramref name="thisIndices"/>.Length,
 		/// 2) 0 &lt;= <paramref name="otherIndices"/>[i] &lt; otherVector.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
@@ -155,7 +160,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
+		void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+			=> DenseStrategies.CopyNonContiguously(this, thisIndices, otherVector, otherIndices);
 
 		/// <summary>
 		/// Copies selected entries from <paramref name="otherVector"/> to this vector:
@@ -166,7 +172,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="otherVector">The vector from which entries will be copied.</param>
 		/// <param name="otherIndices">
-		/// The indices of <paramref name="otherVector"/>, from where entries will be copied. Constraints: 
+		/// The indices of <paramref name="otherVector"/>, from where entries will be copied. Constraints:
 		/// 1) <paramref name="otherIndices"/>.Length == this.<see cref="IIndexable1D.Length"/>,
 		/// 2) 0 &lt;= <paramref name="otherIndices"/>[i] &lt; otherVector.<see cref="IIndexable1D.Length"/>, for all valid i
 		/// </param>
@@ -176,10 +182,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="otherIndices"/> violates the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices);
+		void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
+			=> DenseStrategies.CopyNonContiguously(this, otherVector, otherIndices);
 
 		/// <summary>
-		/// Copies <paramref name="length"/> consecutive entries from <paramref name="sourceVector"/> to this 
+		/// Copies <paramref name="length"/> consecutive entries from <paramref name="sourceVector"/> to this
 		/// <see cref="IVector"/> starting from the provided indices.
 		/// </summary>
 		/// <param name="destinationIndex">
@@ -188,23 +195,24 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </param>
 		/// <param name="sourceVector">The vector containing the entries to be copied.</param>
 		/// <param name="sourceIndex">
-		/// The index into <paramref name="sourceVector"/> where to start copying from. 
-		/// Constraints: <paramref name="sourceIndex"/> + <paramref name="length"/> 
+		/// The index into <paramref name="sourceVector"/> where to start copying from.
+		/// Constraints: <paramref name="sourceIndex"/> + <paramref name="length"/>
 		/// &lt;= <paramref name="sourceVector"/>.<see cref="IIndexable1D.Length"/>.
 		/// </param>
 		/// <param name="length">The number of entries to copy.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="length"/> and <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/> 
+		/// Thrown if <paramref name="length"/> and <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/>
 		/// violate the described constraints.
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length);
+		void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+			=> DenseStrategies.CopySubvector(this, destinationIndex, sourceVector, sourceIndex, length);
 
 		/// <summary>
 		/// Performs the following operation for all i:
-		/// this[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> * 
+		/// this[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> *
 		/// <paramref name="otherMatrix"/>[i].
 		/// Optimized version of <see cref="DoEntrywiseIntoThis(IVectorView, Func{double, double, double})"/>.
 		/// The resulting vector overwrites the entries of this.
@@ -217,7 +225,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
-		/// </exception> 
+		/// </exception>
 		void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient);
 
 		/// <summary>
@@ -228,7 +236,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		void ScaleIntoThis(double scalar);
 
 		/// <summary>
-		/// Setter that will work as expected for general dense vectors. For sparse vectors it will throw a 
+		/// Setter that will work as expected for general dense vectors. For sparse vectors it will throw a
 		/// <see cref="Exceptions.SparsityPatternModifiedException"/>, if a structural zero entry is written to.
 		/// </summary>
 		/// <param name="index">
@@ -238,7 +246,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="index"/> violates the described constraints.
 		/// </exception>
-		/// <exception cref="Exceptions.SparsityPatternModifiedException"> 
+		/// <exception cref="Exceptions.SparsityPatternModifiedException">
 		/// Thrown if a structural zero entry of a sparse vector format is written to.
 		/// </exception>
 		void Set(int index, double value);

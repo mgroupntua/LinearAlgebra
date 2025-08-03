@@ -85,12 +85,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			=> throw new NotImplementedException();
-
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
-			=> throw new NotImplementedException();
-
 		public void AddToIndex(int index, double value)
 		{
 			IReadOnlyDictionary<int, int> localIndices = FindLocalIndicesFromGlobal(index);
@@ -168,9 +162,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			);
 		}
 
-		public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
-			int sourceIndex, int length) => throw new NotImplementedException();
-
 		public void Clear()
 		{
 			Environment.DoPerNode(node => LocalVectors[node].Clear());
@@ -193,14 +184,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			CheckSameFormat(this, otherVector);
 			Environment.DoPerNode(node => this.LocalVectors[node].CopyFrom(otherVector.LocalVectors[node]));
 		}
-
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			 => throw new NotImplementedException();
-
-		public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices) => throw new NotImplementedException();
-
-		public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
-			=> throw new NotImplementedException();
 
 		public double[] CopyToArray()
 		{
@@ -359,9 +342,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Dictionary<int, double> dotPerNode = Environment.CalcNodeData(calcLocalDot);
 			return Math.Sqrt(Environment.AllReduceSum(dotPerNode));
 		}
-
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-			=> throw new NotImplementedException("Environment must define these reductions");
 
 		//TODOMPI: A ReduceOverlappingEntries(IReduction), which would cover sum and regularization would be more useful. 
 		//      However the implementation should not be slower than the current SumOverlappingEntries(), since that is a very

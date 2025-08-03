@@ -62,25 +62,52 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
+		public static void AxpySubvector(IVector destinationVector, int destinationIndex, 
+			IVectorView sourceVector, int sourceIndex, double sourceCoefficient, int length)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
-			for (int i = 0; i < thisVector.Length; ++i)
+			Debug.Assert(destinationIndex + length <= destinationVector.Length);
+			Debug.Assert(sourceIndex + length <= sourceVector.Length);
+			for (int i = 0; i < length; ++i)
 			{
-				thisVector.Set(i, otherVector[otherIndices[i]]);
+				double newValue = destinationVector[destinationIndex + i] + sourceCoefficient * sourceVector[sourceIndex + i];
+				destinationVector.Set(destinationIndex + i, newValue);
 			}
 		}
 
-		public static void CopyNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector,
-			int[] otherIndices)
+		public static void CopyNonContiguously(IVector destinationVector, IVectorView sourceVector, int[] sourceIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
-			Debug.Assert(thisIndices.Length == otherIndices.Length);
-			for (int i = 0; i < thisIndices.Length; ++i)
+			for (int i = 0; i < destinationVector.Length; ++i)
 			{
-				thisVector.Set(thisIndices[i], otherVector[otherIndices[i]]);
+				destinationVector.Set(i, sourceVector[sourceIndices[i]]);
+			}
+		}
+
+		public static void CopyNonContiguously(
+			IVector destinationVector, int[] destinationIndices, IVectorView sourceVector, int[] sourceIndices)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			Debug.Assert(destinationIndices.Length == sourceIndices.Length);
+			for (int i = 0; i < destinationIndices.Length; ++i)
+			{
+				destinationVector.Set(destinationIndices[i], sourceVector[sourceIndices[i]]);
+			}
+		}
+
+		public static void CopySubvector(
+			IVector destinationVector, int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			Debug.Assert(destinationIndex + length <= destinationVector.Length);
+			Debug.Assert(sourceIndex + length <= sourceVector.Length);
+			for (int i = 0; i < length; ++i)
+			{
+				destinationVector.Set(destinationIndex + i, sourceVector[sourceIndex + i]);
 			}
 		}
 
