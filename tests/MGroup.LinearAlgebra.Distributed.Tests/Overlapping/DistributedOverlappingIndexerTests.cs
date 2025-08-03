@@ -13,9 +13,9 @@ using MGroup.LinearAlgebra.Vectors;
 using Xunit;
 
 using static MGroup.LinearAlgebra.Distributed.Overlapping.DistributedOverlappingIndexer;
-using static MGroup.LinearAlgebra.Distributed.Tests.Hexagon1DTestCase;
+using static MGroup.LinearAlgebra.Distributed.Tests.Overlapping.Hexagon1DTestCase;
 
-namespace MGroup.LinearAlgebra.Distributed.Tests
+namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 {
 	public static class DistributedOverlappingIndexerTests
 	{
@@ -28,19 +28,19 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestCreateAllToAllBuffers(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				DistributedOverlappingIndexer.Local localIndexer = indexer.GetLocalComponent(nodeID);
+				var localIndexer = indexer.GetLocalComponent(nodeID);
 
-				ConcurrentDictionary<int, double[]> buffers = localIndexer.CreateBuffersForAllToAllWithNeighbors();
-				int[] neighborIDs = GetNeighborsOfNode(nodeID);
+				var buffers = localIndexer.CreateBuffersForAllToAllWithNeighbors();
+				var neighborIDs = GetNeighborsOfNode(nodeID);
 				Assert.Equal(neighborIDs.Length, buffers.Count);
 
-				foreach (int neighborID in neighborIDs)
+				foreach (var neighborID in neighborIDs)
 				{
-					int bufferSizeExpected = 1; // = num common entries between target node and ONE of its neighbors 
+					var bufferSizeExpected = 1; // = num common entries between target node and ONE of its neighbors 
 					Assert.Equal(bufferSizeExpected, buffers[neighborID].Length);
 				}
 			});
@@ -54,14 +54,14 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestCountCommonEntries(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				DistributedOverlappingIndexer.Local localIndexer = indexer.GetLocalComponent(nodeID);
+				var localIndexer = indexer.GetLocalComponent(nodeID);
 
 				(int local, int remote) numCommonEntriesExpected = (1, 1);
-				(int local, int remote) numCommonEntriesComputed = localIndexer.CountCommonEntries();
+				var numCommonEntriesComputed = localIndexer.CountCommonEntries();
 				Assert.Equal(numCommonEntriesExpected.local, numCommonEntriesComputed.local);
 				Assert.Equal(numCommonEntriesExpected.remote, numCommonEntriesComputed.remote);
 			});
@@ -76,16 +76,16 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestGlobalToLocalIndex(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer distributedIndexer = CreateIndexer(environment);
+			var distributedIndexer = CreateIndexer(environment);
 			var globalIndexer = new GlobalIndexer(distributedIndexer);
 
-			for (int globalIdx = 0; globalIdx < globalIndexer.NumGlobalIndices; globalIdx++)
+			for (var globalIdx = 0; globalIdx < globalIndexer.NumGlobalIndices; globalIdx++)
 			{
-				for (int node = 0; node <= NumComputeNodes; node++)
+				for (var node = 0; node <= NumComputeNodes; node++)
 				{
-					int localIdxComputed = globalIndexer.FindLocalIndexOf(globalIdx, node);
+					var localIdxComputed = globalIndexer.FindLocalIndexOf(globalIdx, node);
 
-					int localIdxExpected = -1;
+					var localIdxExpected = -1;
 					if (GlobalToLocalIndices[globalIdx].ContainsKey(node))
 					{
 						localIdxExpected = GlobalToLocalIndices[globalIdx][node];
@@ -105,15 +105,15 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestGlobalToLocalIndices(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer distributedIndexer = CreateIndexer(environment);
+			var distributedIndexer = CreateIndexer(environment);
 			var globalIndexer = new GlobalIndexer(distributedIndexer);
 
-			for (int gi = 0; gi < globalIndexer.NumGlobalIndices; gi++)
+			for (var gi = 0; gi < globalIndexer.NumGlobalIndices; gi++)
 			{
-				IReadOnlyDictionary<int, int> localIndicesComputed = globalIndexer.FindLocalIndicesOf(gi);
-				Dictionary<int, int> localIndicesExpected = GlobalToLocalIndices[gi];
+				var localIndicesComputed = globalIndexer.FindLocalIndicesOf(gi);
+				var localIndicesExpected = GlobalToLocalIndices[gi];
 				Assert.Equal(localIndicesExpected.Count, localIndicesComputed.Count);
-				foreach ((int nodeID, int localIdx) in localIndicesComputed)
+				foreach ((var nodeID, var localIdx) in localIndicesComputed)
 				{
 					Assert.True(localIndicesExpected.ContainsKey(nodeID));
 					Assert.Equal(localIndicesExpected[nodeID], localIdx);
@@ -130,15 +130,15 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestLocalToGlobalIndex(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer distributedIndexer = CreateIndexer(environment);
+			var distributedIndexer = CreateIndexer(environment);
 			var globalIndexer = new GlobalIndexer(distributedIndexer);
 
 			environment.DoPerNode(nodeID =>
 			{
-				int numLocalIndices = distributedIndexer.GetLocalComponent(nodeID).NumEntries;
-				int[] localIndices = Enumerable.Range(0, numLocalIndices).ToArray();
-				int[] globalIndicesComputed = localIndices.Select(li => globalIndexer.FindGlobalIndexOf(nodeID, li)).ToArray();
-				int[] globalIndicesExpected = localIndices.Select(li => LocalToGlobalIndices[nodeID][li]).ToArray();
+				var numLocalIndices = distributedIndexer.GetLocalComponent(nodeID).NumEntries;
+				var localIndices = Enumerable.Range(0, numLocalIndices).ToArray();
+				var globalIndicesComputed = localIndices.Select(li => globalIndexer.FindGlobalIndexOf(nodeID, li)).ToArray();
+				var globalIndicesExpected = localIndices.Select(li => LocalToGlobalIndices[nodeID][li]).ToArray();
 				Assert.Equal(globalIndicesExpected, globalIndicesComputed);
 			});
 		}
@@ -151,7 +151,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestLocalNumEntries(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
@@ -167,13 +167,13 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestLocalNeighbors(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				DistributedOverlappingIndexer.Local localIndexer = indexer.GetLocalComponent(nodeID);
+				var localIndexer = indexer.GetLocalComponent(nodeID);
 
-				int[] neighborsExpected = GetNeighborsOfNode(nodeID);
+				var neighborsExpected = GetNeighborsOfNode(nodeID);
 				Assert.Equal(neighborsExpected, localIndexer.ActiveNeighborsOfNode.ToArray());
 			});
 		}
@@ -187,16 +187,16 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestLocalCommonEntries(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				DistributedOverlappingIndexer.Local localIndexer = indexer.GetLocalComponent(nodeID);
+				var localIndexer = indexer.GetLocalComponent(nodeID);
 
-				Dictionary<int, int[]> commonEntriesExpected = CreateCommonEntriesWithNeighbors(nodeID);
-				foreach (int neighborID in GetNeighborsOfNode(nodeID))
+				var commonEntriesExpected = CreateCommonEntriesWithNeighbors(nodeID);
+				foreach (var neighborID in GetNeighborsOfNode(nodeID))
 				{
-					int[] commonEntriesComputed = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					var commonEntriesComputed = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
 					Assert.Equal(commonEntriesExpected[neighborID], commonEntriesComputed);
 				}
 			});
@@ -211,11 +211,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 		internal static void TestLocalMultiplicities(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				DistributedOverlappingIndexer.Local localIndexer = indexer.GetLocalComponent(nodeID);
+				var localIndexer = indexer.GetLocalComponent(nodeID);
 
 				var inverseMultiplicitiesExpected = Vector.CreateFromArray(new double[] { 0.5, 1, 0.5 });
 				var inverseMultiplicitiesComputed = Vector.CreateFromArray(localIndexer.InverseMultiplicities);

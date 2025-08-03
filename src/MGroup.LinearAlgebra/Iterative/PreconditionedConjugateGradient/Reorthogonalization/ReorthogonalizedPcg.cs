@@ -133,6 +133,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 			precondResidual = Rhs.CreateZeroVectorWithSameFormat();
 			direction = Solution.CreateZeroVectorWithSameFormat();
 			matrixTimesDirection = Rhs.CreateZeroVectorWithSameFormat();
+			DirectionTimesMatrixTimesDirection = 0.0;
 
 			var maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
 			ReorthoCache.StartGeneration();
@@ -185,7 +186,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 
 				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
 				ResidualNormRatio = convergence.EstimateResidualNormRatio(this);
-				//Debug.WriteLine($"Reorthogonalized PCG iteration = {iteration}: residual norm ratio = {residualNormRatio}");
+				//Debug.WriteLine($"Reorthogonalized PCG iteration = {iteration}: residual norm ratio = {ResidualNormRatio}");
 				Stagnation.StoreNewError(ResidualNormRatio);
 				bool hasStagnated = Stagnation.HasStagnated();
 				if (hasStagnated || (ResidualNormRatio <= ResidualTolerance))
@@ -275,7 +276,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 		{
 			public Factory()
 			{
-				Convergence = new PureResidualConvergence();
+				Convergence = new RhsNormalizedConvergence();
 				DirectionVectorsRetention = new PercentageDirectionVectorsRetention(1.1);
 				UseDirectionVectorsOnlyForInitialSolution = false;
 			}

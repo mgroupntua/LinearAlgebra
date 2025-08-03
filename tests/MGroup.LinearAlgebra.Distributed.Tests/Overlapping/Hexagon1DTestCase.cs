@@ -23,7 +23,7 @@ using MGroup.LinearAlgebra.Distributed.Overlapping;
 //
 // Clusters:  c0 (s0, s1), c1 (s2, s3), c2 (s4, s5) 
 // Dofs: 1 per physical node
-namespace MGroup.LinearAlgebra.Distributed.Tests
+namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 {
     public static class Hexagon1DTestCase
     {
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			{
 				var result = new List<Dictionary<int, int>>();
 
-				for (int g = 0; g < 12; g++)
+				for (var g = 0; g < 12; g++)
 				{
 					result.Add(new Dictionary<int, int>());
 				}
@@ -99,8 +99,8 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 		public static Dictionary<int, int[]> CreateCommonEntriesWithNeighbors(int nodeID)
 		{
-			int previous = nodeID - 1 >= 0 ? nodeID - 1 : NumComputeNodes - 1;
-			int next = (nodeID + 1) % NumComputeNodes;
+			var previous = nodeID - 1 >= 0 ? nodeID - 1 : NumComputeNodes - 1;
+			var next = (nodeID + 1) % NumComputeNodes;
 			var commonEntries = new Dictionary<int, int[]>();
 			commonEntries[previous] = new int[] { 0 };
 			commonEntries[next] = new int[] { 2 };
@@ -112,8 +112,8 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			var indexer = new DistributedOverlappingIndexer(environment);
 			Action<int> initializeIndexer = n =>
 			{
-				Dictionary<int, int[]> commonEntries = CreateCommonEntriesWithNeighbors(n);
-				int numEntries = 3;
+				var commonEntries = CreateCommonEntriesWithNeighbors(n);
+				var numEntries = 3;
 				indexer.GetLocalComponent(n).Initialize(numEntries, commonEntries);
 			};
 			environment.DoPerNode(initializeIndexer);

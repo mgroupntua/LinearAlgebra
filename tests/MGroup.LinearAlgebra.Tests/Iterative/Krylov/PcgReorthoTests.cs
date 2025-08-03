@@ -184,19 +184,19 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 			comparer.AssertEqual(x0Expected, x0Computed);
 
 			// Subsequent runs
-			var seed = 345;
-			for (var i = 0; i < numRhsVectors; ++i)
+			int seed = 345;
+			for (int i = 0; i < numRhsVectors; ++i)
 			{
 				var dx = Vector.CreateFromArray(RandomMatrices.CreateRandomVector(order, seed));
 				var xExpected = x0 + noiseWidth * dx;
 				var b = A * xExpected;
 
-				pcg.Clear(); //TODO: preferably do not call this.
+				//pcg.Clear(); //TODO: preferably do not call this.
 							 //pcg.ReorthoCache.Clear();
 
 				var xComputed = Vector.CreateZero(A.NumRows);
 				var stats = pcg.Solve(A, M, b, xComputed, true);
-				Debug.WriteLine($"Subsequent run: iterations = {stats.NumIterationsRequired}");
+				Debug.WriteLine($"Subsequent run {i}: iterations = {stats.NumIterationsRequired}");
 				comparer.AssertEqual(xExpected, xComputed);
 				Assert.InRange(stats.NumIterationsRequired, 1, maxIterations);
 			}
