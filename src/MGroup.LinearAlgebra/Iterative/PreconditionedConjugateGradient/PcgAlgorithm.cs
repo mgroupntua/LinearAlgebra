@@ -1,6 +1,9 @@
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
+	using System.Collections.Generic;
+
 	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Logging;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 	/// <summary>
@@ -37,11 +40,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			resDotPrecondRes = residual.DotProduct(direction);
 
 			// The convergence and beta strategies must be initialized immediately after the first r and r*inv(M)*r are computed.
-			convergence.Initialize(this);
+			ConvergenceStrategy.Initialize(this);
 			betaCalculation.Initialize(this);
 
 			// This is also used as output
 			double residualNormRatio = double.NaN;
+			Logger.Log(this);
 
 			// Allocate memory for other vectors, which will be reused during each iteration
 			matrixTimesDirection = Rhs.CreateZeroVectorWithSameFormat();
@@ -72,7 +76,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				resDotPrecondRes = residual.DotProduct(precondResidual);
 
 				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
-				residualNormRatio = convergence.EstimateResidualNormRatio(this);
+				residualNormRatio = ConvergenceStrategy.EstimateResidualNormRatio(this);
+				Logger.Log(this);
 				//Debug.WriteLine($"PCG Iteration = {iteration}: residual norm ratio = {residualNormRatio}");
 				if (residualNormRatio <= ResidualTolerance)
 				{
@@ -116,13 +121,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// Constructs <see cref="PcgAlgorithm"/> instances, allows the user to specify some or all of the required parameters 
+		/// Constructs <see cref="PcgAlgorithm"/> instances, allows the user to specify some or all of the required parameters
 		/// and provides defaults for the rest.
 		/// </summary>
 		public class Factory : PcgFactoryBase
 		{
 			/// <summary>
-			/// Specifies how to calculate the beta parameter of PCG, which is used to update the direction vector. 
+			/// Specifies how to calculate the beta parameter of PCG, which is used to update the direction vector.
 			/// </summary>
 			public IPcgBetaParameterCalculation BetaCalculation { get; set; } = new FletcherReevesBeta();
 
@@ -136,9 +141,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			/// </summary>
 			public PcgAlgorithm Build()
 			{
-				return new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
+				var pcg = new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
 					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(),
 					BetaCalculation.CopyWithInitialSettings(), ThrowExceptionIfNotConvergence);
+				pcg.Logger = Logger;
+				return pcg;
 			}
 		}
 	}

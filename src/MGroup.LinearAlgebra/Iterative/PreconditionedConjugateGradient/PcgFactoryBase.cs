@@ -1,5 +1,6 @@
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
+	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Logging;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 	public abstract class PcgFactoryBase
@@ -8,6 +9,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Specifies how the PCG algorithm will check that convergence has been reached.
 		/// </summary>
 		public IPcgResidualConvergence Convergence { get; set; } = new DefaultPcgConvergence();
+
+		/// <summary>
+		/// Provides logging at selected points during the PCG algorithm.
+		/// </summary>
+		public IPcgLogger Logger { get; set; } = new NullPcgLoger();
 
 		/// <summary>
 		/// Specifies how to calculate the maximum iterations that the PCG algorithm will run for.

@@ -2,6 +2,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Logging;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
@@ -12,7 +13,6 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// </summary>
 	public abstract class PcgAlgorithmBase
 	{
-		protected readonly IPcgResidualConvergence convergence;
 		protected readonly bool throwIfNotConvergence;
 
 		protected IVector direction;
@@ -32,9 +32,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			this.ResidualTolerance = residualTolerance;
 			this.MaxIterationsProvider = maxIterationsProvider;
-			this.convergence = convergence;
+			this.ConvergenceStrategy = convergence;
 			this.throwIfNotConvergence = throwIfNotConvergence;
 		}
+
+		public IPcgResidualConvergence ConvergenceStrategy { get; }
+
+		public IPcgLogger Logger { get; protected set; }
 
 		public IMaxIterationsProvider MaxIterationsProvider { get; set; }
 

@@ -1,9 +1,13 @@
 namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 {
+	using System.Diagnostics;
+
+	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Implementations;
 	using MGroup.LinearAlgebra.Iterative;
 	using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Logging;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
@@ -30,14 +34,15 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
 				var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
 
-				var builder = new PcgAlgorithm.Factory();
-				builder.ResidualTolerance = 1E-7;
-				builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-				var pcg = builder.Build();
+				var factory = new PcgAlgorithm.Factory();
+				factory.ResidualTolerance = 1E-7;
+				factory.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
+				var pcg = factory.Build();
 				var M = new JacobiPreconditioner();
 				M.UpdateMatrix(A, true);
+
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = pcg.Solve(A, M, b, xComputed, true);
+				IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
 				comparer.AssertEqual(xExpected, xComputed);
 			});
 		}
@@ -52,15 +57,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 				var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
-				var builder = new PcgAlgorithm.Factory();
-				builder.ResidualTolerance = 1E-7;
-				builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-				var pcg = builder.Build();
+				var factory = new PcgAlgorithm.Factory();
+				factory.ResidualTolerance = 1E-7;
+				factory.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
+				factory.Logger = new ResidualNormRatioLogger();
+				var pcg = factory.Build();
 				var M = new JacobiPreconditioner();
 				M.UpdateMatrix(A, true);
+
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = pcg.Solve(A, M, b, xComputed, true);
+				IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
 				comparer.AssertEqual(xExpected, xComputed);
+				Debug.WriteLine(pcg.Logger.Report());
 			});
 		}
 
@@ -70,14 +78,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 		{
 			TestSettings.RunMultiproviderTest(provider, delegate ()
 			{
-				(var A, var b, var xExpected, var M) = DiagonalIndefinite.BuildIndefiniteSystem(20);
-				var builder = new CGAlgorithm.Builder();
-				builder.ResidualTolerance = 1E-6;
-				builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
-				var cg = builder.Build();
+				(Matrix A, Vector b, Vector xExpected, IPreconditioner M) = DiagonalIndefinite.BuildIndefiniteSystem(20);
+				var factory = new PcgAlgorithm.Factory();
+				factory.ResidualTolerance = 1E-6;
+				factory.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
+				factory.ThrowExceptionIfNotConvergence = true;
+				var pcg = factory.Build();
+
 				var xComputed = Vector.CreateZero(A.NumRows);
-				var stats = cg.Solve(A, b, xComputed, true);
-				Assert.False(comparer.AreEqual(xExpected, xComputed));
+				Assert.Throws<IterativeMethodDidNotConvergeException>(() =>
+				{
+					IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
+				});
 			});
 		}
 	}

@@ -1,6 +1,7 @@
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPcg
 {
 	using System;
+	using DotNumerics.LinearAlgebra.CSEispack;
 
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
@@ -164,11 +165,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPc
 			var initialResDotPrecondRes = resDotPrecondRes;
 
 			// The convergence and beta strategies must be initialized immediately after the first r and r*inv(M)*r are computed.
-			convergence.Initialize(this);
+			ConvergenceStrategy.Initialize(this);
 			betaCalculation.Initialize(this);
 
 			// This is also used as output
 			var residualNormRatio = double.NaN;
+			Logger.Log(this);
 
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
@@ -219,7 +221,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPc
 					paramBeta = betaCalculation.CalculateBeta(this);
 					directionOperator.UpdateP(residualOperator, paramBeta); // p = r + b * p, but in should be p = r + b * M * p
 
-					residualNormRatio = convergence.EstimateResidualNormRatio(this);
+					residualNormRatio = ConvergenceStrategy.EstimateResidualNormRatio(this);
+					Logger.Log(this);
 					if (residualNormRatio <= ResidualTolerance)
 					{
 						if (i != 0)
@@ -301,9 +304,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPc
 			/// </summary>
 			public BlockPcgAlgorithm Build()
 			{
-				return new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
+				var pcg =  new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
 					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(),
 					BetaCalculation.CopyWithInitialSettings(), ThrowExceptionIfNotConvergence);
+				pcg.Logger = Logger;
+				return pcg;
 			}
 		}
 	}

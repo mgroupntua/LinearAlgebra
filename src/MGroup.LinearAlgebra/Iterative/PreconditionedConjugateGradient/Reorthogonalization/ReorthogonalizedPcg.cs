@@ -3,6 +3,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 {
 	using System;
 	using System.Diagnostics;
+	using DotNumerics.LinearAlgebra.CSEispack;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
@@ -161,8 +162,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 			resDotPrecondRes = residual.DotProduct(direction);
 
 			// The convergence strategy must be initialized immediately after the first r and r*inv(M)*r are computed.
-			convergence.Initialize(this);
-			Stagnation.StoreInitialError(convergence.EstimateResidualNormRatio(this));
+			ConvergenceStrategy.Initialize(this);
+			Stagnation.StoreInitialError(ConvergenceStrategy.EstimateResidualNormRatio(this));
+			Logger.Log(this);
 
 			// α0 = (d0 * r0) / (d0 * q0) = (s0 * r0) / (d0 * (A * d0))
 			stepSize = resDotPrecondRes / DirectionTimesMatrixTimesDirection;
@@ -185,10 +187,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 				resDotPrecondRes = residual.DotProduct(precondResidual);
 
 				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
-				ResidualNormRatio = convergence.EstimateResidualNormRatio(this);
-				//Debug.WriteLine($"Reorthogonalized PCG iteration = {iteration}: residual norm ratio = {ResidualNormRatio}");
+				ResidualNormRatio = ConvergenceStrategy.EstimateResidualNormRatio(this);
 				Stagnation.StoreNewError(ResidualNormRatio);
 				bool hasStagnated = Stagnation.HasStagnated();
+				Logger.Log(this);
 				if (hasStagnated || (ResidualNormRatio <= ResidualTolerance))
 				{
 					return new IterativeStatistics
@@ -295,10 +297,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 			/// </summary>
 			public ReorthogonalizedPcg Build()
 			{
-				return new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
+				var pcg = new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(),
 					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(),
 					ThrowExceptionIfNotConvergence, DirectionVectorsRetention.CopyWithInitialSettings(),
 					UseDirectionVectorsOnlyForInitialSolution);
+				pcg.Logger = Logger;
+				return pcg;
 			}
 		}
 	}
