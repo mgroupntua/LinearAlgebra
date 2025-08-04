@@ -1,17 +1,17 @@
-using System;
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Vectors;
-
 //TODO: Perhaps Addition, Subtraction and Scaling must be done without using delegates, for performance
 //TODO: perhaps I should return IMatrixView instead of IMatrix. By returning IMatrixView I can have classes that only implement
 //      IMatrixView. On the other hand, I cannot mutate the returned type, so its usefulness is limited.
 namespace MGroup.LinearAlgebra.Matrices
 {
-    /// <summary>
-    /// It supports common operations that do not mutate the underlying matrix. If you need to store a matrix and then pass it
-    /// around or allow acceess to it, consider using this interface instead of <see cref="Matrix"/> for extra safety.
-    /// </summary>
-    public interface IMatrixView: 
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Reduction;
+	using MGroup.LinearAlgebra.Vectors;
+
+	/// <summary>
+	/// It supports common operations that do not mutate the underlying matrix. If you need to store a matrix and then pass it
+	/// around or allow acceess to it, consider using this interface instead of <see cref="Matrix"/> for extra safety.
+	/// </summary>
+	public interface IMatrixView :
 		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, IDiagonalAccessible
 	{
 		/// <summary>
@@ -42,98 +42,113 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		Matrix CopyToFullMatrix();
 
-        /// Performs the following operation for all (i, j):
-        /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
-        /// <paramref name="otherMatrix"/>[i, j]. 
-        /// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/>. 
-        /// The resulting matrix is written in a new object and then returned.
-        /// </summary>
-        /// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
-        /// <param name="otherMatrix">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
-        ///     <see cref="IIndexable2D.NumColumns"/> as this.</param>
-        /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-        IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient) 
+		/// Performs the following operation for all (i, j):
+		/// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
+		/// <paramref name="otherMatrix"/>[i, j]. 
+		/// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/>. 
+		/// The resulting matrix is written in a new object and then returned.
+		/// </summary>
+		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
+		/// <param name="otherMatrix">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
+		///     <see cref="IIndexable2D.NumColumns"/> as this.</param>
+		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
+		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
+		IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
 			=> DoEntrywise(otherMatrix, (x, y) => thisCoefficient * x + otherCoefficient * y);
 
-        /// <summary>
-        /// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
-        /// </summary>
-        /// <param name="other">A matrix such that the <see cref="IIndexable2D.NumColumns"/> of oper(<paramref name="other"/>) 
-        ///     are equal to the <see cref="IIndexable2D.NumRows"/> of oper(this).</param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
-        ///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
-        ///     different <see cref="IIndexable2D.NumColumns"/> than the <see cref="IIndexable2D.NumRows"/> of 
-        ///     oper(this).</exception>
-        Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
+		/// <summary>
+		/// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
+		/// </summary>
+		/// <param name="other">A matrix such that the <see cref="IIndexable2D.NumColumns"/> of oper(<paramref name="other"/>) 
+		///     are equal to the <see cref="IIndexable2D.NumRows"/> of oper(this).</param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
+		///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
+		///     different <see cref="IIndexable2D.NumColumns"/> than the <see cref="IIndexable2D.NumRows"/> of 
+		///     oper(this).</exception>
+		Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
 
-        /// <summary>
-        /// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="other"/>).
-        /// </summary>
-        /// <param name="other">A matrix such that the <see cref="IIndexable2D.NumRows"/> of oper(<paramref name="other"/>) 
-        ///     are equal to the <see cref="IIndexable2D.NumColumns"/> of oper(this).</param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
-        ///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
-        ///     different <see cref="IIndexable2D.NumRows"/> than the <see cref="IIndexable2D.NumColumns"/> of 
-        ///     oper(this).</exception>
-        Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
+		/// <summary>
+		/// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="other"/>).
+		/// </summary>
+		/// <param name="other">A matrix such that the <see cref="IIndexable2D.NumRows"/> of oper(<paramref name="other"/>) 
+		///     are equal to the <see cref="IIndexable2D.NumColumns"/> of oper(this).</param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
+		///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
+		///     different <see cref="IIndexable2D.NumRows"/> than the <see cref="IIndexable2D.NumColumns"/> of 
+		///     oper(this).</exception>
+		Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will be written in a new vector and returned.
-        /// </summary>
-        /// <param name="vector">
-        /// A vector with <see cref="IIndexable1D.Length"/> being equal to the <see cref="IIndexable2D.NumColumns"/> of 
-        /// oper(this).
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different than the 
-        /// <see cref="IIndexable2D.NumColumns"/> of oper(this).
-        /// </exception>
-        IVector Multiply(IVectorView vector, bool transposeThis = false);
+		/// <summary>
+		/// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// The resulting vector will be written in a new vector and returned.
+		/// </summary>
+		/// <param name="vector">
+		/// A vector with <see cref="IIndexable1D.Length"/> being equal to the <see cref="IIndexable2D.NumColumns"/> of 
+		/// oper(this).
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different than the 
+		/// <see cref="IIndexable2D.NumColumns"/> of oper(this).
+		/// </exception>
+		IVector Multiply(IVectorView vector, bool transposeThis = false);
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
-        /// </summary>
-        /// <param name="lhsVector">
-        /// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-        /// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="rhsVector">
-        /// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-        /// equation y = oper(A) * x. Constraints: <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
-        /// violate the described constraints.
-        /// </exception>
-        /// <exception cref="Exceptions.PatternModifiedException">
-        /// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
-        /// method will try to.
-        /// </exception>
-        void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false);
-        //TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
+		/// <summary>
+		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
+		/// </summary>
+		/// <param name="lhsVector">
+		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
+		/// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
+		/// </param>
+		/// <param name="rhsVector">
+		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
+		/// equation y = oper(A) * x. Constraints: <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> 
+		/// == oper(this).<see cref="IIndexable2D.NumRows"/>.
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// violate the described constraints.
+		/// </exception>
+		/// <exception cref="Exceptions.PatternModifiedException">
+		/// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
+		/// method will try to.
+		/// </exception>
+		void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false);
+		//TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
 
-        /// <summary>
-        /// Performs the following operation for all (i, j): result[i, j] = <paramref name="scalar"/> * this[i, j].
-        /// The resulting matrix is written in a new object and then returned.
-        /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
-        IMatrix Scale(double scalar) => DoToAllEntries(x => scalar * x);
+		double IReducible.Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		{
+			double accumulator = identityValue;
+			for (int i = 0; i < this.NumRows; ++i)
+			{
+				for (int j = 0; j < this.NumColumns; ++j)
+				{
+					accumulator = processEntry(this[i,j], accumulator);
+				}
+			}
+
+			// no zeros implied
+			return finalize(accumulator);
+		}
+
+		/// <summary>
+		/// Performs the following operation for all (i, j): result[i, j] = <paramref name="scalar"/> * this[i, j].
+		/// The resulting matrix is written in a new object and then returned.
+		/// </summary>
+		/// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
+		IMatrix Scale(double scalar) => DoToAllEntries(x => scalar * x);
 
 		/// <summary>
 		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
@@ -143,5 +158,5 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// effient generally.
 		/// </summary>
 		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.
-    }
+	}
 }

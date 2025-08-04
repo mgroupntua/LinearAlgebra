@@ -182,26 +182,28 @@ namespace MGroup.LinearAlgebra.Commons
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
-			var column = new double[matrix.NumRows];
+			Preconditions.CheckIndexCol(matrix, colIdx);
+			var columnVector = new double[matrix.NumRows];
 			for (int i = 0; i < matrix.NumRows; ++i)
 			{
-				column[i] = matrix[i, colIdx];
+				columnVector[i] = matrix[i, colIdx];
 			}
 
-			return Vector.CreateFromArray(column, false);
+			return Vector.CreateFromArray(columnVector, false);
 		}
 
 		public static Vector GetRow(IIndexable2D matrix, int rowIdx)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
-			var row = new double[matrix.NumColumns];
+			Preconditions.CheckIndexRow(matrix, rowIdx);
+			var rowVector = new double[matrix.NumColumns];
 			for (int j = 0; j < matrix.NumColumns; ++j)
 			{
-				row[j] = matrix[rowIdx, j];
+				rowVector[j] = matrix[rowIdx, j];
 			}
 
-			return Vector.CreateFromArray(row, false);
+			return Vector.CreateFromArray(rowVector, false);
 		}
 
 		public static Matrix GetSubmatrix(IIndexable2D matrix, int[] rowIndices, int[] colIndices)

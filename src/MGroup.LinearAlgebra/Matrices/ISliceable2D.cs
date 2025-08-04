@@ -20,7 +20,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="colIndex"/> violates the described constraints.
 		/// </exception>
-		Vector GetColumn(int colIndex);
+		Vector GetColumn(int colIndex)
+			=> DenseStrategies.GetColumn(this, colIndex);
 
 		/// <summary>
 		/// Returns a vector with the entries of the original matrix's row at index = <paramref name="rowIndex"/>.
@@ -32,7 +33,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="rowIndex"/> violates the described constraints.
 		/// </exception>
-		Vector GetRow(int rowIndex);
+		Vector GetRow(int rowIndex)
+			=> DenseStrategies.GetRow(this, rowIndex);
 
 		/// <summary>
 		/// Returns a submatrix with the rows and columns of the original matrix that correspond to the provided index arrays. 
@@ -52,7 +54,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Thrown if the entries of <paramref name="rowIndices"/> or <paramref name="colIndices"/> violate the described 
 		/// constraints.
 		/// </exception>
-		IMatrix GetSubmatrix(int[] rowIndices, int[] colIndices);
+		IMatrix GetSubmatrix(int[] rowIndices, int[] colIndices)
+			=> DenseStrategies.GetSubmatrix(this, rowIndices, colIndices);
 
 		/// <summary>
 		/// Returns a submatrix with entries (i, j) of the original matrix, such that 
@@ -80,6 +83,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Thrown if <paramref name="rowStartInclusive"/>, <paramref name="rowEndExclusive"/>, 
 		/// <paramref name="colStartInclusive"/> or <paramref name="colEndExclusive"/> violate the described constraints.
 		/// </exception>
-		IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive);
+		IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
+			=> DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
 	}
 }

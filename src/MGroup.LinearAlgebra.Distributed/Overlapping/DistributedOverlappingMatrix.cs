@@ -166,36 +166,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceAnd(flags);
 		}
 
-		public Vector GetColumn(int colIndex) //TODO: IVectorView should implement ISliceable1D. Use default interface implementations
-		{
-			Preconditions.CheckIndexCol(this, colIndex);
-			double[] columnVector = new double[NumRows];
-			for (int i = 0; i < NumRows; i++)
-			{
-				columnVector[i] = this[i, colIndex];
-			}
-
-			return Vector.CreateFromArray(columnVector, false);
-		}
-
-		public Vector GetRow(int rowIndex)
-		{
-			Preconditions.CheckIndexRow(this, rowIndex);
-			double[] rowVector = new double[NumColumns];
-			for (int j = 0; j < NumColumns; j++)
-			{
-				rowVector[j] = this[rowIndex, j];
-			}
-
-			return Vector.CreateFromArray(rowVector, false);
-		}
-
-		public IMatrix GetSubmatrix(int[] rowIndices, int[] colIndices)
-			=> DenseStrategies.GetSubmatrix(this, rowIndices, colIndices);
-		
-		public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
-			=> DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
-
 		public bool HasSameFormat(IIndexable2D other) //TODO: Move this to IMatrixView. Same for IVectorView
 		{
 			if (other is DistributedOverlappingVector casted)
@@ -333,9 +303,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 			rhsVector.SumOverlappingEntries();
 		}
-
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-			=> throw new NotImplementedException("Environment must define these reductions"); //TODO: use default implementation
 
 		public void ScaleIntoThis(double coefficient)
 		{
