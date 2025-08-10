@@ -15,9 +15,8 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// <summary>
 	/// A vector that only stores non-zero entries. Some zero entries can also be stored but they are  non-structural zeros 
 	/// and thus handled as non-zero entries.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	public class SparseVector : IVector
+	public sealed class SparseVector : DefaultVector
 	{
 		private readonly double[] values;
 
@@ -33,10 +32,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			this.indices = indices;
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable1D.Length"/>.
-		/// </summary>
-		public int Length { get; }
+		public override int Length { get; }
 
 		/// <summary>
 		/// The internal array that stores the indices of the non-zero entries of the vector. 
@@ -52,10 +48,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public double[] RawValues => values;
 
-		/// <summary>
-		/// See <see cref="IIndexable1D.this[int]"/>
-		/// </summary>
-		public double this[int index]
+		public override double this[int index]
 		{
 			get
 			{
@@ -228,20 +221,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			return new SparseVector(length, values, indices);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.AddToIndex(int, double)"/>.
-		/// </summary>
-		public void AddToIndex(int index, double value)
+		public override void AddToIndex(int index, double value)
 		{
 			int sparseIdx = FindSparseIndexOf(index);
 			CheckMutatedIndex(index, sparseIdx);
 			values[sparseIdx] = value;
 		}
 
-		/// <summary>
-		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
-		/// </summary>
-		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
+		public override IVector Axpy(IVectorView otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
@@ -261,14 +248,12 @@ namespace MGroup.LinearAlgebra.Vectors
 				GlobalProvider.SparseBlas.Daxpyi(this.indices.Length, 1.0, this.values, this.indices, 0, result, 0);
 				return Vector.CreateFromArray(result, false);
 			}
+
 			// All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this vector)
 			return DenseStrategies.LinearCombination(this, 1.0, otherVector, otherCoefficient);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.AxpyIntoThis(IVectorView, double)"/>.
-		/// </summary>
-		public void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
+		public override void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
 		{
 			if (otherVector is SparseVector otherSparse) AxpyIntoThis(otherSparse, otherCoefficient);
 			else throw new SparsityPatternModifiedException(
@@ -293,7 +278,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		/// <exception cref="SparsityPatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
-		/// </exception> 
+		/// </exception>
 		public void AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
@@ -303,10 +288,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherVector.values, 0, 1, this.values, 0, 1);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.AxpySubvectorIntoThis(int, IVectorView, double, int, int)"/>.
-		/// </summary>
-		public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
+		public override void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
 			int sourceIndex, int length)
 		{
 			//TODO: needs testing for off-by-1 bugs and extension to cases where source and destination indices are different.
@@ -326,20 +308,14 @@ namespace MGroup.LinearAlgebra.Vectors
 				"This operation is legal only if the other vector has the same sparsity pattern");
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.Clear"/>.
-		/// </summary>
-		public void Clear() => Array.Clear(values, 0, values.Length);
+		public override void Clear() => Array.Clear(values, 0, values.Length);
 
-		/// <summary>
-		/// See <see cref="IVector.Copy(bool)"/>.
-		/// </summary>
-		public IVector Copy(bool copyIndexingData) => Copy();
+		public override IVector Copy(bool copyIndexingData) => CopySparse();
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="SparseVector"/> by deep copying the entries as this instance.
 		/// </summary>
-		public SparseVector Copy()
+		public SparseVector CopySparse()
 		{
 			int n = values.Length;
 			double[] valuesCopy = new double[n];
@@ -349,24 +325,19 @@ namespace MGroup.LinearAlgebra.Vectors
 			return new SparseVector(n, valuesCopy, indicesCopy);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.CopyFrom(IVectorView)"/>
-		/// </summary>
-		public void CopyFrom(IVectorView sourceVector)
+		public override void CopyFrom(IVectorView sourceVector)
 		{
 			Preconditions.CheckVectorDimensions(this, sourceVector);
 			if ((sourceVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
 			{
 				Array.Copy(otherSparse.values, this.values, this.Length);
 			}
+
 			throw new SparsityPatternModifiedException(
 				 "This operation is legal only if the other vector has the same sparsity pattern");
 		}
 
-		/// <summary>
-		/// <inheritdoc/>
-		/// </summary>
-		public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+		public override void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
 		{
 			//TODO: needs testing for off-by-1 bugs and extension to cases where source and destination indices are different.
 			Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
@@ -384,10 +355,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				"This operation is legal only if the other vector has the same sparsity pattern");
 		}
 
-		/// <summary>
-		/// See <see cref="IVectorView.CopyToArray"/>.
-		/// </summary>
-		public double[] CopyToArray()
+		public override double[] CopyToArray()
 		{
 			double[] result = new double[Length];
 			for (int i = 0; i < values.Length; ++i) result[indices[i]] = values[i];
@@ -405,15 +373,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public int CountNonZeros() => values.Length;
 
-		/// <summary>
-		/// See <see cref="IVectorView.CreateZeroVectorWithSameFormat"/>
-		/// </summary>
-		public IVector CreateZeroVectorWithSameFormat() => new SparseVector(Length, new double[indices.Length], indices);
+		public override IVector CreateZeroVectorWithSameFormat() => CreateZeroVector();
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
-		/// </summary>
-		public IVector DoEntrywise(IVectorView otherVector, Func<double, double, double> binaryOperation)
+		public SparseVector CreateZeroVector() => new SparseVector(Length, new double[indices.Length], indices);
+
+		public override IVector DoEntrywise(IVectorView otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
@@ -434,10 +398,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return DenseStrategies.DoEntrywise(this, otherVector, binaryOperation);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
-		/// </summary>
-		public void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if ((otherVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
@@ -451,10 +412,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				 "This operation is legal only if the other vector has the same sparsity pattern");
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		public IVector DoToAllEntries(Func<double, double> unaryOperation)
+		public override IVector DoToAllEntries(Func<double, double> unaryOperation)
 		{
 			// Only apply the operation on non zero entries
 			double[] newValues = new double[values.Length];
@@ -473,10 +431,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoToAllEntriesIntoThis(Func{double, double})"/>
-		/// </summary>
-		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+		public override void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0))
 			{
@@ -485,10 +440,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else throw new SparsityPatternModifiedException("This operation will change the sparsity pattern");
 		}
 
-		/// <summary>
-		/// See <see cref="IVectorView.DotProduct(IVectorView)"/>.
-		/// </summary>
-		public double DotProduct(IVectorView vector)
+		public override double DotProduct(IVectorView vector)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
 
@@ -506,10 +458,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return sum;
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable1D.Equals(IIndexable1D, double)"/>.
-		/// </summary>
-		public bool Equals(IIndexable1D other, double tolerance = 1e-13)
+		public override bool Equals(IIndexable1D other, double tolerance = 1e-13)
 		{
 			if (this.Length != other.Length) return false;
 			var comparer = new ValueComparer(tolerance);
@@ -538,10 +487,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		/// <summary>
-		/// <inheritdoc/>
-		/// </summary>
-		public bool HasSameFormat(IIndexable1D other)
+		public override bool HasSameFormat(IVectorView other)
 		{
 			if (other is SparseVector casted && casted.indices == this.indices)
 			{
@@ -553,10 +499,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		/// <summary>
-		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
-		/// </summary>
-		public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public override IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
@@ -589,10 +532,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return DenseStrategies.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.LinearCombinationIntoThis(double, IVectorView, double)"/>
-		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if ((otherVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
@@ -607,19 +547,15 @@ namespace MGroup.LinearAlgebra.Vectors
 						thisCoefficient, this.values, 0, 1);
 				}
 			}
+
 			throw new SparsityPatternModifiedException(
 				 "This operation is legal only if the other vector has the same sparsity pattern");
 		}
 
-		/// <summary>
-		/// See <see cref="IVectorView.Norm2"/>
-		/// </summary>
-		public double Norm2() => GlobalProvider.Blas.Dnrm2(values.Length, values, 0, 1);
+		public override double Norm2() => GlobalProvider.Blas.Dnrm2(values.Length, values, 0, 1);
 
-		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
-		/// </summary>
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		public override double Reduce(
+			double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
 			double aggregator = identityValue;
 			int nnz = values.Length;
@@ -628,18 +564,15 @@ namespace MGroup.LinearAlgebra.Vectors
 			return finalize(aggregator);
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.Scale(double)"/>.
-		/// </summary>
-		IVector IVectorView.Scale(double scalar) => Scale(scalar);
+		public override IVector Scale(double scalar) => ScaleSparse(scalar);
 
 		/// <summary>
-		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
-		/// result[i] = <paramref name="scalar"/> * this[i]. 
+		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>:
+		/// result[i] = <paramref name="scalar"/> * this[i].
 		/// The resulting vector is written to a new <see cref="SparseVector"/> and then returned.
 		/// </summary>
 		/// <param name="scalar">The scalar value that multiplies all entries of the vector.</param>
-		public SparseVector Scale(double scalar)
+		public SparseVector ScaleSparse(double scalar)
 		{
 			int nnz = this.values.Length;
 			double[] resultValues = new double[nnz];
@@ -648,32 +581,30 @@ namespace MGroup.LinearAlgebra.Vectors
 			return new SparseVector(Length, resultValues, this.indices); //TODO: perhaps I should also copy the indices
 		}
 
-		/// <summary>
-		/// See <see cref="IVector.ScaleIntoThis(double)>
-		/// </summary>
-		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(values.Length, scalar, values, 0, 1);
+		public override void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(values.Length, scalar, values, 0, 1);
 
-		/// <summary>
-		/// See <see cref="IVector.Set(int, double)"/>
-		/// </summary>
-		public void Set(int index, double value)
+		public override void Set(int index, double value)
 		{
 			int sparseIdx = FindSparseIndexOf(index);
 			CheckMutatedIndex(index, sparseIdx);
 			values[sparseIdx] = value;
 		}
 
-		/// <summary>
-		/// <inheritdoc/>
-		/// </summary>
-		public void SetAll(double value)
+		public override void SetAll(double value)
 		{
-			throw new NotImplementedException();
+			if (value == 0.0)
+			{
+				Clear();
+			}
+			else
+			{
+				throw new SparsityPatternModifiedException("Cannot change structural zero entries.");
+			}
 		}
 
 		/// <summary>
-		/// Returns the index into <see cref="values"/> of the entry this[<paramref name="denseIdx"/>]. If this entry is a 
-		/// structural zero, -1 will be returned. 
+		/// Returns the index into <see cref="values"/> of the entry this[<paramref name="denseIdx"/>]. If this entry is a
+		/// structural zero, -1 will be returned.
 		/// </summary>
 		/// <param name="denseIdx"></param>
 		private int FindSparseIndexOf(int denseIdx)

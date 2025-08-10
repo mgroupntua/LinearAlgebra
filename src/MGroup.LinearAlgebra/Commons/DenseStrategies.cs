@@ -62,20 +62,6 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void AxpySubvector(IVector destinationVector, int destinationIndex, 
-			IVectorView sourceVector, int sourceIndex, double sourceCoefficient, int length)
-		{
-			WarnAboutPerformanceBottlenecks();
-			ProhibitPerformanceBottlenecks();
-			Debug.Assert(destinationIndex + length <= destinationVector.Length);
-			Debug.Assert(sourceIndex + length <= sourceVector.Length);
-			for (int i = 0; i < length; ++i)
-			{
-				double newValue = destinationVector[destinationIndex + i] + sourceCoefficient * sourceVector[sourceIndex + i];
-				destinationVector.Set(destinationIndex + i, newValue);
-			}
-		}
-
 		public static void CopyNonContiguously(IVector destinationVector, IVectorView sourceVector, int[] sourceIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -95,19 +81,6 @@ namespace MGroup.LinearAlgebra.Commons
 			for (int i = 0; i < destinationIndices.Length; ++i)
 			{
 				destinationVector.Set(destinationIndices[i], sourceVector[sourceIndices[i]]);
-			}
-		}
-
-		public static void CopySubvector(
-			IVector destinationVector, int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
-		{
-			WarnAboutPerformanceBottlenecks();
-			ProhibitPerformanceBottlenecks();
-			Debug.Assert(destinationIndex + length <= destinationVector.Length);
-			Debug.Assert(sourceIndex + length <= sourceVector.Length);
-			for (int i = 0; i < length; ++i)
-			{
-				destinationVector.Set(destinationIndex + i, sourceVector[sourceIndex + i]);
 			}
 		}
 
@@ -176,6 +149,22 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 
 			return result;
+		}
+
+		//DELETE
+		public static void DoEntrywiseIntoMatrix1(IMatrix matrix1, IMatrixView matrix2,
+			Func<double, double, double> binaryOperation)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			Preconditions.CheckSameMatrixDimensions(matrix1, matrix2);
+			for (int j = 0; j < matrix1.NumColumns; ++j)
+			{
+				for (int i = 0; i < matrix1.NumRows; ++i)
+				{
+					matrix1.SetEntryRespectingPattern(i, j, binaryOperation(matrix1[i, j], matrix2[i, j]));
+				}
+			}
 		}
 
 		public static Vector GetColumn(IIndexable2D matrix, int colIdx)
@@ -301,22 +290,6 @@ namespace MGroup.LinearAlgebra.Commons
 				for (int i = 0; i < matrix1.NumRows; ++i)
 				{
 					result[i, j] = coefficient1 * matrix1[i, j] + coefficient2 * matrix2[i, j];
-				}
-			}
-
-			return result;
-		}
-
-		public static Matrix Transpose(IMatrixView matrix)
-		{
-			WarnAboutPerformanceBottlenecks();
-			ProhibitPerformanceBottlenecks();
-			var result = Matrix.CreateZero(matrix.NumColumns, matrix.NumRows);
-			for (int j = 0; j < matrix.NumColumns; ++j)
-			{
-				for (int i = 0; i < matrix.NumRows; ++i)
-				{
-					result[j, i] = matrix[i, j];
 				}
 			}
 
@@ -893,6 +866,22 @@ namespace MGroup.LinearAlgebra.Commons
 					}
 				}
 			}
+		}
+
+		public static Matrix Transpose(IMatrixView matrix)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			var result = Matrix.CreateZero(matrix.NumColumns, matrix.NumRows);
+			for (int j = 0; j < matrix.NumColumns; ++j)
+			{
+				for (int i = 0; i < matrix.NumRows; ++i)
+				{
+					result[j, i] = matrix[i, j];
+				}
+			}
+
+			return result;
 		}
 
 		[Conditional("DEBUG")]

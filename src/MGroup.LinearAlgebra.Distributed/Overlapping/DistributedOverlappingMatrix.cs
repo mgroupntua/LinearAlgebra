@@ -168,7 +168,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public bool HasSameFormat(IIndexable2D other) //TODO: Move this to IMatrixView. Same for IVectorView
 		{
-			if (other is DistributedOverlappingVector casted)
+			if (other is DistributedOverlappingMatrix<TMatrix> casted)
 			{
 				return this.Indexer.IsCompatibleWith(casted.Indexer);
 			}
@@ -269,7 +269,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public IVector Multiply(IVectorView vector, bool transposeThis = false) //TODO: Rename to MultiplyVector. Also IMatrixView must implement ILinearTransformation
 		{
 			DistributedOverlappingVector distributedLhs = CastToDistributed(vector);
-			DistributedOverlappingVector result = distributedLhs.CreateZeroVectorWithSameFormat();
+			DistributedOverlappingVector result = distributedLhs.CreateZeroVector();
 			MultiplyIntoResult(distributedLhs, result, transposeThis);
 			return result;
 		}

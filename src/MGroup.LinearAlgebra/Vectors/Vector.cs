@@ -1,20 +1,21 @@
-using System;
-using System.Collections.Generic;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Reduction;
-using static MGroup.LinearAlgebra.LibrarySettings;
-
 //TODO: align data using mkl_malloc
 //TODO: tensor product, vector2D, vector3D
 //TODO: remove legacy vector conversions
 //TODO: add complete error checking for CopyNonContiguouslyFrom and AddNonContiguouslyFrom. Also update the documentation.
 namespace MGroup.LinearAlgebra.Vectors
 {
+	using System;
+	using System.Collections.Generic;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Reduction;
+
+	using static MGroup.LinearAlgebra.LibrarySettings;
+
 	/// <summary>
 	/// General purpose vector class with more functionality than other vectors. No sparsity is assumed.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
 	public class Vector : IVector, ISliceable1D, IEntrywiseOperableView1D<Vector, Vector>, IEntrywiseOperable1D<Vector>
@@ -617,7 +618,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public bool HasSameFormat(IIndexable1D other)
+		public bool HasSameFormat(IVectorView other)
 		{
 			if (other is Vector casted && casted.Length == this.Length)
 			{

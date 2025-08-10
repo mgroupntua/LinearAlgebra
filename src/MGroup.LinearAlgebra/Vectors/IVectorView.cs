@@ -54,6 +54,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		double DotProduct(IVectorView vector);
 
 		/// <summary>
+		/// Returns true if the only difference betweens this vector and <paramref name="other"/> is their values.
+		/// </summary>
+		/// <param name="other">The vector to compare.</param>
+		/// <returns>True if the vectors have the same format. False otherwise.</returns>
+		bool HasSameFormat(IVectorView other);
+
+		/// <summary>
 		/// Performs the following operation for all i:
 		/// result[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> * 
 		/// <paramref name="otherVector"/>[i].
@@ -72,18 +79,6 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// https://en.wikipedia.org/wiki/Norm_(mathematics)#Euclidean_norm.
 		/// </summary>
 		double Norm2();
-
-		double IReducible.Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-		{
-			double accumulator = identityValue;
-			for (int i = 0; i < this.Length; ++i)
-			{
-				accumulator = processEntry(this[i], accumulator);
-			}
-
-			// no zeros implied
-			return finalize(accumulator);
-		}
 
 		/// <summary>
 		/// Performs the following operation for all i: result[i] = <paramref name="scalar"/> * this[i].

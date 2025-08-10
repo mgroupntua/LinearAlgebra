@@ -34,8 +34,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Adds selected entries from <paramref name="otherVector"/> to this vector:
@@ -56,8 +55,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
-			=> DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector);
 
 		/// <summary>
 		/// Similar to <see cref="Set(int, double)"/>, but will add <paramref name="value"/> to the existing entry at <paramref name="index"/>.
@@ -117,8 +115,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
 		void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient, int sourceIndex,
-			int length)
-			=> DenseStrategies.AxpySubvector(this, destinationIndex, sourceVector, sourceIndex, sourceCoefficient, length);
+			int length);
 
 		/// <summary>
 		/// Sets all entries to 0. For sparse or block vectors: the indexing arrays will not be mutated. Therefore the sparsity
@@ -160,8 +157,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.CopyNonContiguously(this, thisIndices, otherVector, otherIndices);
+		void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Copies selected entries from <paramref name="otherVector"/> to this vector:
@@ -182,8 +178,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="otherIndices"/> violates the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
-			=> DenseStrategies.CopyNonContiguously(this, otherVector, otherIndices);
+		void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Copies <paramref name="length"/> consecutive entries from <paramref name="sourceVector"/> to this
@@ -207,8 +202,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
-			=> DenseStrategies.CopySubvector(this, destinationIndex, sourceVector, sourceIndex, length);
+		void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length);
 
 		/// <summary>
 		/// Performs the following operation for all i:

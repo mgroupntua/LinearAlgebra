@@ -42,6 +42,13 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		Matrix CopyToFullMatrix();
 
+		///// <summary>
+		///// Returns true if the only difference betweens this matrix and <paramref name="other"/> is their values.
+		///// </summary>
+		///// <param name="other">The vector to compare.</param>
+		///// <returns>True if the matrices have the same format. False otherwise.</returns>
+		//bool HasSameFormat(IMatrixView other);
+
 		/// Performs the following operation for all (i, j):
 		/// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
 		/// <paramref name="otherMatrix"/>[i, j]. 

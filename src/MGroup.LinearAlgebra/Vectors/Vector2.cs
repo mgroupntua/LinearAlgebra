@@ -7,7 +7,6 @@ namespace MGroup.LinearAlgebra.Vectors
 {
     /// <summary>
     /// A vector with 2 entries. Optimized version of <see cref="Vector"/>.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public class Vector2: IVector, IEntrywiseOperableView1D<Vector2, Vector2>, IEntrywiseOperable1D<Vector2>
     {
@@ -438,7 +437,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public bool HasSameFormat(IIndexable1D other)
+		public bool HasSameFormat(IVectorView other)
 		{
 			if (other is Vector2)
 			{

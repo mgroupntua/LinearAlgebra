@@ -48,7 +48,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 			var localZExpected = environment.CalcNodeData(n => GetX(n) - 2.0 * GetY(n));
 			var distributedZExpected = new DistributedOverlappingVector(indexer, localZExpected);
 
-			var distributedZ = distributedX.Copy();
+			var distributedZ = distributedX.CopyAsDistributed();
 			distributedZ.AxpyIntoThis(distributedY, -2.0);
 
 			var tol = 1E-13;
@@ -118,7 +118,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 			var localZExpected = environment.CalcNodeData(n => 2.0 * GetX(n) + 3.0 * GetY(n));
 			var distributedZExpected = new DistributedOverlappingVector(indexer, localZExpected);
 
-			var distributedZ = distributedX.Copy();
+			var distributedZ = distributedX.CopyAsDistributed();
 			distributedZ.LinearCombinationIntoThis(2.0, distributedY, 3.0);
 
 			var tol = 1E-13;
@@ -143,7 +143,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 			var localZExpected = environment.CalcNodeData(n => -3.0 * GetX(n));
 			var distributedZExpected = new DistributedOverlappingVector(indexer, localZExpected);
 
-			var distributedZ = distributedX.Copy();
+			var distributedZ = distributedX.CopyAsDistributed();
 			distributedZ.ScaleIntoThis(-3.0);
 
 			var tol = 1E-13;

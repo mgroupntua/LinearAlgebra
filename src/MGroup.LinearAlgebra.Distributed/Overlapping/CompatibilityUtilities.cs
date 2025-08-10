@@ -37,15 +37,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public static void CheckSameFormat(DistributedOverlappingVector vector1, DistributedOverlappingVector vector2)
-		{
-			if (!vector2.Indexer.IsCompatibleWith(vector1.Indexer))
-			{
-				throw new NonMatchingFormatException(
-					$"The 2 vectors have different formats, as defined by their indexers ({vector1.Indexer.GetType()})");
-			}
-		}
-
 		public static void CheckSameFormat<TMatrix>(
 			DistributedOverlappingMatrix<TMatrix> matrix1, DistributedOverlappingMatrix<TMatrix> matrix2)
 			where TMatrix : class, IMatrix

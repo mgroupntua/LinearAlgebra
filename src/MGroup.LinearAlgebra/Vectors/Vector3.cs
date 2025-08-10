@@ -466,7 +466,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public bool HasSameFormat(IIndexable1D other)
+		public bool HasSameFormat(IVectorView other)
 		{
 			if (other is Vector3)
 			{

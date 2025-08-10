@@ -30,12 +30,5 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     <paramref name="tolerance"/> = 0, will check if these entries are exactly the same.</param>
 		/// <returns>True if the vectors are equal, within the specified tolerance.</returns>
 		bool Equals(IIndexable1D other, double tolerance = 1e-13);
-
-		/// <summary>
-		/// Returns true if the only difference betweens this vector and <paramref name="other"/> is their values.
-		/// </summary>
-		/// <param name="other">The vector to compare.</param>
-		/// <returns>True if the vectors have the same format. False otherwise.</returns>
-		bool HasSameFormat(IIndexable1D other);
 	}
 }
