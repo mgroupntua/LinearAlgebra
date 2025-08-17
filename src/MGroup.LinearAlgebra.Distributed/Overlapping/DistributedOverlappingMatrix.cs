@@ -10,8 +10,6 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 
-using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities;
-
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
 	public sealed class DistributedOverlappingMatrix<TMatrix> : DefaultMatrix

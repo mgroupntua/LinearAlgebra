@@ -11,8 +11,6 @@ using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Reduction;
 using DotNumerics.FortranLibrary;
 
-using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities;
-
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
 //      buffers. Such functionality can be included in the indexer, which is shared across vectors/matrices.

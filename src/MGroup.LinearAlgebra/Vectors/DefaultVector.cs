@@ -7,6 +7,8 @@ namespace MGroup.LinearAlgebra.Vectors
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Reduction;
 
+	using static MGroup.LinearAlgebra.Commons.PerformanceWarnings;
+
 	public abstract class DefaultVector : IVector
 	{
 		public abstract int Length { get; }
@@ -298,24 +300,6 @@ namespace MGroup.LinearAlgebra.Vectors
 			{
 				Set(i, value);
 			}
-		}
-
-		[Conditional("RELEASE")]
-		private static void ProhibitPerformanceBottlenecks()
-		{
-			if (LibrarySettings.ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds)
-			{
-				throw new PerformanceBottleneckException(
-					"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector.");
-			}
-		}
-
-		[Conditional("DEBUG")]
-		private static void WarnAboutPerformanceBottlenecks()
-		{
-			Debug.WriteLine(
-				"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector, at :"
-				+ Environment.StackTrace);
 		}
 	}
 }

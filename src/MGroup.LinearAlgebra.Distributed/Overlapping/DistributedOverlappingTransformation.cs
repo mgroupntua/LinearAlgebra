@@ -5,8 +5,8 @@ using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 
-using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities;
 using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Exceptions;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
@@ -59,8 +59,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public void Multiply(DistributedOverlappingVector input, DistributedOverlappingVector output)
 		{
-			CheckSameFormat(this, input);
-			CheckSameFormat(this, output);
+			CheckSameFormat(input);
+			CheckSameFormat(output);
 
 			Action<int> multiplyLocal = nodeID =>
 			{
@@ -71,6 +71,28 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(multiplyLocal);
 
 			output.SumOverlappingEntries();
+		}
+
+		private static DistributedOverlappingVector CastToDistributed(IVectorView vector)
+		{
+			if (vector is DistributedOverlappingVector casted)
+			{
+				return casted;
+			}
+			else
+			{
+				throw new NonMatchingFormatException($"Cannot perform the required operation, because the vector is not in " +
+					$"{typeof(DistributedOverlappingVector)} format, but in {vector.GetType()} format.");
+			}
+		}
+
+		private void CheckSameFormat(DistributedOverlappingVector vector)
+		{
+			if (!this.Indexer.IsCompatibleWith(vector.Indexer))
+			{
+				throw new NonMatchingFormatException("The linear transformation and the vector have different formats," +
+					$" as defined by their indexers ({this.Indexer.GetType()}, {vector.Indexer.GetType()})");
+			}
 		}
 	}
 }

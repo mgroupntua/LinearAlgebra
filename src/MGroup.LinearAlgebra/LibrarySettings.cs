@@ -22,6 +22,7 @@ namespace MGroup.LinearAlgebra
 		static LibrarySettings()
 		{
 			GlobalProvider = new ManagedSequentialImplementationProvider();
+			ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds = false;
 		}
 
 		/// <summary>
@@ -33,6 +34,6 @@ namespace MGroup.LinearAlgebra
 		/// </summary>
 		public static IImplementationProvider GlobalProvider { get; set; }
 
-		public static bool ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds { get; set; } = true;
+		public static bool ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds { get; set; }
 	}
 }

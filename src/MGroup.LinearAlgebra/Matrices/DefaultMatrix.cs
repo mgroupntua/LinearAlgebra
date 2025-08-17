@@ -9,6 +9,8 @@ namespace MGroup.LinearAlgebra.Matrices
 	using MGroup.LinearAlgebra.Reduction;
 	using MGroup.LinearAlgebra.Vectors;
 
+	using static MGroup.LinearAlgebra.Commons.PerformanceWarnings;
+
 	[Serializable]
 	public abstract class DefaultMatrix : IMatrix
 	{
@@ -433,24 +435,6 @@ namespace MGroup.LinearAlgebra.Matrices
 					return result;
 				}
 			}
-		}
-
-		[Conditional("RELEASE")]
-		private static void ProhibitPerformanceBottlenecks()
-		{
-			if (LibrarySettings.ThrowExceptionOnKnownPerformanceBottlenecksInReleaseBuilds)
-			{
-				throw new PerformanceBottleneckException(
-					"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector.");
-			}
-		}
-
-		[Conditional("DEBUG")]
-		private static void WarnAboutPerformanceBottlenecks()
-		{
-			Debug.WriteLine(
-				"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector, at :"
-				+ Environment.StackTrace);
 		}
 	}
 }
