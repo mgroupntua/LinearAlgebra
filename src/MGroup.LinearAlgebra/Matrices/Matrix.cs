@@ -1,16 +1,3 @@
-using System;
-using System.Collections.Generic;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Vectors;
-using static MGroup.LinearAlgebra.LibrarySettings;
-using MGroup.LinearAlgebra.Orthogonalization;
-using MGroup.LinearAlgebra.Eigensystems;
-using DotNumerics.Optimization.LBFGSB;
-
 //TODO: align data using mkl_malloc
 //TODO: add inplace option for factorizations and leave all subsequent operations (determinant, system solution, etc.) to them
 //TODO: remove legacy matrix conversions
@@ -20,19 +7,32 @@ using DotNumerics.Optimization.LBFGSB;
 //      https://software.intel.com/en-us/mkl-developer-reference-c-syswapr for reordering
 namespace MGroup.LinearAlgebra.Matrices
 {
+	using System;
+	using System.Collections.Generic;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Eigensystems;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Orthogonalization;
+	using MGroup.LinearAlgebra.Reduction;
+	using MGroup.LinearAlgebra.Triangulation;
+	using MGroup.LinearAlgebra.Vectors;
+
+	using static MGroup.LinearAlgebra.LibrarySettings;
+
 	/// <summary>
 	/// General purpose matrix class. All entries are stored in an 1D column major array. Uses LAPACK for most operations. 
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
 	public class Matrix : IMatrix, ISliceable2D, IEntrywiseOperableView2D<Matrix, Matrix>, IEntrywiseOperable2D<Matrix>
 	{
-		private double[] data;
+		private double[] values;
 		private bool isOverwritten = false;
 
 		private Matrix(double[] data, int numRows, int numColumns)
 		{
-			this.data = data;
+			this.values = data;
 			this.NumRows = numRows;
 			this.NumColumns = numColumns;
 		}
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The internal array that stores the entries of the matrix in column major layout.
 		/// It should only be used for passing the raw array to linear algebra libraries.
 		/// </summary>
-		public double[] RawData { get { return data; } }
+		public double[] RawData { get { return values; } }
 
 		/// <summary>
 		/// See <see cref="IIndexable2D.this[int, int]"/>.
@@ -85,8 +85,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </remarks>
 		public double this[int rowIdx, int colIdx] //TODO: Should I add bound checking?
 		{
-			get { return data[colIdx * NumRows + rowIdx]; }
-			set { data[colIdx * NumRows + rowIdx] = value; }
+			get { return values[colIdx * NumRows + rowIdx]; }
+			set { values[colIdx * NumRows + rowIdx] = value; }
 		}
 
 		/// <summary>
@@ -338,8 +338,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix AppendBottom(Matrix matrix)
 		{
 			Preconditions.CheckSameColDimension(this, matrix);
-			double[] result = ArrayColMajor.JoinVertically(this.NumRows, this.NumColumns, this.data,
-				matrix.NumRows, matrix.NumColumns, matrix.data);
+			double[] result = ArrayColMajor.JoinVertically(this.NumRows, this.NumColumns, this.values,
+				matrix.NumRows, matrix.NumColumns, matrix.values);
 			return new Matrix(result, this.NumRows + matrix.NumRows, NumColumns);
 		}
 
@@ -353,8 +353,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix AppendRight(Matrix matrix)
 		{
 			Preconditions.CheckSameRowDimension(this, matrix);
-			double[] result = ArrayColMajor.JoinHorizontally(this.NumRows, this.NumColumns, this.data,
-				matrix.NumRows, matrix.NumColumns, matrix.data);
+			double[] result = ArrayColMajor.JoinHorizontally(this.NumRows, this.NumColumns, this.values,
+				matrix.NumRows, matrix.NumColumns, matrix.values);
 			return new Matrix(result, NumRows, this.NumColumns + matrix.NumColumns);
 		}
 
@@ -381,9 +381,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
-			Array.Copy(this.data, result, data.Length);
-			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+			double[] result = new double[values.Length];
+			Array.Copy(this.values, result, values.Length);
+			GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, result, 0, 1);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
@@ -400,7 +400,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSameRowDimension(this, wholeColumn);
 			int colOffset = colIdx * NumRows;
-			GlobalProvider.Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, data, colOffset, 1);
+			GlobalProvider.Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, values, colOffset, 1);
 		}
 
 		/// <summary>
@@ -416,7 +416,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int i = 0; i < NumRows; ++i)
 					{
-						this.data[j * NumRows + i] += otherCoefficient * otherMatrix[i, j];
+						this.values[j * NumRows + i] += otherCoefficient * otherMatrix[i, j];
 					}
 				}
 			}
@@ -435,7 +435,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void AxpyIntoThis(Matrix otherMatrix, double otherCoefficient)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+			GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
 		}
 
 		/// <summary>
@@ -447,11 +447,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				return AnalyticFormulas.Matrix2x2ColMajorDeterminant(data);
+				return AnalyticFormulas.Matrix2x2ColMajorDeterminant(values);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				return AnalyticFormulas.Matrix3x3ColMajorDeterminant(data);
+				return AnalyticFormulas.Matrix3x3ColMajorDeterminant(values);
 			}
 			else return FactorLU().CalcDeterminant();
 		}
@@ -485,7 +485,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IMatrix.Clear"/>.
 		/// </summary>
-		public void Clear() => Array.Clear(data, 0, data.Length);
+		public void Clear() => Array.Clear(values, 0, values.Length);
 
 		/// <summary>
 		/// See <see cref="IMatrixView.Copy(bool)"/>.
@@ -498,8 +498,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix Copy()
 		{
 			//TODO: Perhaps this should use BLAS. 
-			double[] clone = new double[data.Length];
-			Array.Copy(data, clone, data.Length);
+			double[] clone = new double[values.Length];
+			Array.Copy(values, clone, values.Length);
 			return new Matrix(clone, NumRows, NumColumns);
 		}
 
@@ -512,7 +512,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void CopyFrom(Matrix otherMatrix)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			Array.Copy(otherMatrix.RawData, data, data.Length);
+			Array.Copy(otherMatrix.RawData, values, values.Length);
 		}
 
 		/// <summary>
@@ -521,12 +521,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		public double[,] CopyToArray2D()
 		{
-			return Conversions.FullColMajorToArray2D(data, NumRows, NumColumns);
+			return Conversions.FullColMajorToArray2D(values, NumRows, NumColumns);
 		}
 
 		/// See <see cref="IMatrixView.CopyToFullMatrix()"/>
 		/// </summary>
 		public Matrix CopyToFullMatrix() => Copy();
+
+		public IMatrix CreateZeroMatrixWithSameFormat() => new Matrix(new double[values.Length], NumRows, NumColumns);
+
+		public Matrix CreateZeroMatrixSame() => new Matrix(new double[values.Length], NumRows, NumColumns);
 
 		/// <summary>
 		/// <summary>
@@ -544,8 +548,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix DoEntrywise(Matrix matrix, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, matrix);
-			var result = new double[data.Length];
-			for (int i = 0; i < data.Length; ++i) result[i] = binaryOperation(this.data[i], matrix.data[i]);
+			var result = new double[values.Length];
+			for (int i = 0; i < values.Length; ++i) result[i] = binaryOperation(this.values[i], matrix.values[i]);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
@@ -563,7 +567,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = binaryOperation(this.data[index1D], matrix[i, j]);
+						this.values[index1D] = binaryOperation(this.values[index1D], matrix[i, j]);
 					}
 				}
 			}
@@ -575,7 +579,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void DoEntrywiseIntoThis(Matrix matrix, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, matrix);
-			for (int i = 0; i < data.Length; ++i) this.data[i] = binaryOperation(this.data[i], matrix.data[i]);
+			for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], matrix.values[i]);
 		}
 
 		/// <summary>
@@ -590,7 +594,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix DoToAllEntries(Func<double, double> unaryOperation)
 		{
 			var result = new double[NumRows * NumColumns];
-			for (int i = 0; i < NumRows * NumColumns; ++i) result[i] = unaryOperation(data[i]);
+			for (int i = 0; i < NumRows * NumColumns; ++i) result[i] = unaryOperation(values[i]);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
@@ -599,7 +603,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
-			for (int i = 0; i < NumRows * NumColumns; ++i) data[i] = unaryOperation(data[i]);
+			for (int i = 0; i < NumRows * NumColumns; ++i) values[i] = unaryOperation(values[i]);
 		}
 
 		/// <summary>
@@ -611,11 +615,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			{
 				//Check each dimension, rather than the lengths of the internal buffers
 				if (!Preconditions.AreSameMatrixDimensions(this, dense)) return false;
-				double[] otherData = dense.data;
+				double[] otherData = dense.values;
 				var comparer = new ValueComparer(tolerance);
-				for (int i = 0; i < this.data.Length; ++i)
+				for (int i = 0; i < this.values.Length; ++i)
 				{
-					if (!comparer.AreEqual(this.data[i], otherData[i])) return false;
+					if (!comparer.AreEqual(this.values[i], otherData[i])) return false;
 				}
 				return true;
 			}
@@ -639,10 +643,10 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSquare(this);
 			if (inPlace)
 			{
-				var factor = CholeskyFull.Factorize(NumColumns, data);
+				var factor = CholeskyFull.Factorize(NumColumns, values);
 				// Set the internal array to null to force NullReferenceException if it is accessed again.
 				// TODO: perhaps there is a better way to handle this.
-				data = null;
+				values = null;
 				isOverwritten = true;
 				return factor;
 			}
@@ -663,10 +667,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			if (inPlace)
 			{
-				var factor = LQFactorization.Factorize(NumRows, NumColumns, data);
+				var factor = LQFactorization.Factorize(NumRows, NumColumns, values);
 				// Set the internal array to null to force NullReferenceException if it is accessed again.
 				// TODO: perhaps there is a better way to handle this.
-				data = null;
+				values = null;
 				isOverwritten = true;
 				return factor;
 			}
@@ -689,10 +693,10 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSquare(this);
 			if (inPlace)
 			{
-				var factor = LUFullFactorization.Factorize(NumColumns, data);
+				var factor = LUFullFactorization.Factorize(NumColumns, values);
 				// Set the internal array to null to force NullReferenceException if it is accessed again.
 				// TODO: perhaps there is a better way to handle this.
-				data = null;
+				values = null;
 				isOverwritten = true;
 				return factor;
 			}
@@ -713,10 +717,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			if (inPlace)
 			{
-				var factor = QRFactorization.Factorize(NumRows, NumColumns, data);
+				var factor = QRFactorization.Factorize(NumRows, NumColumns, values);
 				// Set the internal array to null to force NullReferenceException if it is accessed again.
 				// TODO: perhaps there is a better way to handle this.
-				data = null;
+				values = null;
 				isOverwritten = true;
 				return factor;
 			}
@@ -731,15 +735,16 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
 			Preconditions.CheckIndexCol(this, colIndex);
 			double[] columnVector = new double[NumRows];
-			Array.Copy(data, colIndex * NumRows, columnVector, 0, NumRows);
+			Array.Copy(values, colIndex * NumRows, columnVector, 0, NumRows);
 			return Vector.CreateFromArray(columnVector, false);
 		}
 
-		/// <inheritdoc/>
+		public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray());
+
 		public double[] GetDiagonalAsArray()
 		{
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
-			return ArrayColMajor.DiagonalGet(NumRows, NumColumns, data);
+			return ArrayColMajor.DiagonalGet(NumRows, NumColumns, values);
 		}
 
 		/// <summary>
@@ -750,7 +755,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
 			Preconditions.CheckIndexRow(this, rowIndex);
 			double[] rowVector = new double[NumColumns];
-			for (int j = 0; j < NumColumns; ++j) rowVector[j] = data[j * NumRows + rowIndex];
+			for (int j = 0; j < NumColumns; ++j) rowVector[j] = values[j * NumRows + rowIndex];
 			return Vector.CreateFromArray(rowVector, false);
 		}
 
@@ -766,7 +771,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			int idxCounter = -1;
 			foreach (var j in colIndices)
 			{
-				foreach (var i in rowIndices) submatrix[++idxCounter] = data[j * NumRows + i];
+				foreach (var i in rowIndices) submatrix[++idxCounter] = values[j * NumRows + i];
 			}
 			return new Matrix(submatrix, rowIndices.Length, colIndices.Length);
 		}
@@ -788,10 +793,20 @@ namespace MGroup.LinearAlgebra.Matrices
 			{
 				for (int i = rowStartInclusive; i < rowEndExclusive; ++i)
 				{
-					submatrix[++idxCounter] = data[j * NumRows + i];
+					submatrix[++idxCounter] = values[j * NumRows + i];
 				}
 			}
 			return new Matrix(submatrix, numNewRows, numNewCols);
+		}
+
+		public bool HasSameFormat(IMatrixView other)
+		{
+			if (other is Matrix casted)
+			{
+				return (this.NumRows == casted.NumRows) && (this.NumColumns == other.NumColumns);
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -819,12 +834,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(values, tolerance);
 				return new Matrix(inverse, 2, 2);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(values, tolerance);
 				return new Matrix(inverse, 3, 3);
 			}
 			else
@@ -857,18 +872,18 @@ namespace MGroup.LinearAlgebra.Matrices
 			//TODO: implement efficient 2x2 and 3x3 inplace operations to avoid copying. 
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
-				Array.Copy(inverse, data, 4);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(values, tolerance);
+				Array.Copy(inverse, values, 4);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
-				Array.Copy(inverse, data, 9);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(values, tolerance);
+				Array.Copy(inverse, values, 9);
 			}
 			else
 			{
 				// The next will update the entries of this matrix, but we do not need the intermediate objects
-				LUFullFactorization.Factorize(NumColumns, data).Invert(true); 
+				LUFullFactorization.Factorize(NumColumns, values).Invert(true); 
 			}
 		}
 
@@ -895,12 +910,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			if ((NumRows == 2) && (NumColumns == 2))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(data, tolerance);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix2x2ColMajorInvert(values, tolerance);
 				return (new Matrix(inverse, 2, 2), det);
 			}
 			else if ((NumRows == 3) && (NumColumns == 3))
 			{
-				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(data, tolerance);
+				(double[] inverse, double det) = AnalyticFormulas.Matrix3x3ColMajorInvert(values, tolerance);
 				return (new Matrix(inverse, 3, 3), det);
 			}
 			else
@@ -918,7 +933,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="tolerance">The tolerance under which a matrix entry is considered to be 0. It can be set to 0, to check 
 		///     if the entries are exactly 0.</param>
-		public bool IsZero(double tolerance) => DenseStrategies.IsZero(data, tolerance);
+		public bool IsZero(double tolerance) => DenseStrategies.IsZero(values, tolerance);
 
 		/// <summary>
 		/// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
@@ -945,21 +960,21 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
+			double[] result = new double[values.Length];
 			if (thisCoefficient == 1.0)
 			{
-				Array.Copy(this.data, result, data.Length);
-				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, result, 0, 1);
+				Array.Copy(this.values, result, values.Length);
+				GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, result, 0, 1);
 			}
 			else if (otherCoefficient == 1.0)
 			{
-				Array.Copy(otherMatrix.data, result, data.Length);
-				GlobalProvider.Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				Array.Copy(otherMatrix.values, result, values.Length);
+				GlobalProvider.Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, result, 0, 1);
 			}
 			else
 			{
-				Array.Copy(this.data, result, data.Length);
-				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, result, 0, 1);
+				Array.Copy(this.values, result, values.Length);
+				GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new Matrix(result, NumRows, NumColumns);
 		}
@@ -978,7 +993,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * otherMatrix[i, j];
+						this.values[index1D] = thisCoefficient * this.values[index1D] + otherCoefficient * otherMatrix[i, j];
 					}
 				}
 			}
@@ -1001,11 +1016,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			if (thisCoefficient == 1.0)
 			{
-				GlobalProvider.Blas.Daxpy(data.Length, otherCoefficient, otherMatrix.data, 0, 1, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
 			}
 			else
 			{
-				GlobalProvider.Blas.Daxpby(data.Length, otherCoefficient, otherMatrix.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherMatrix.values, 0, 1, thisCoefficient, this.values, 0, 1);
 			}
 		}
 
@@ -1068,7 +1083,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckMultiplicationDimensions(leftCols, rightRows);
 			double[] result = new double[leftRows * rightCols];
 			GlobalProvider.Blas.Dgemm(transposeLeft, transposeRight, leftRows, rightCols, leftCols,
-				1.0, this.data, 0, this.NumRows, other.data, 0, other.NumRows,
+				1.0, this.values, 0, this.NumRows, other.values, 0, other.NumRows,
 				1.0, result, 0, leftRows);
 			return new Matrix(result, leftRows, rightCols);
 		}
@@ -1139,7 +1154,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
 			GlobalProvider.Blas.Dgemv(transposeA, NumRows, NumColumns,
-				1.0, this.data, 0, NumRows, lhsVector.RawData, 0, 1,
+				1.0, this.values, 0, NumRows, lhsVector.RawData, 0, 1,
 				0.0, rhsVector.RawData, 0, 1);
 		}
 
@@ -1180,12 +1195,12 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckMultiplicationDimensions(this, lhsVector, lhsOffset, rhsVector, rhsOffset, transposeThis);
 			if (transposeThis)
 			{
-				GlobalProvider.Blas.Dgemv(TransposeMatrix.Transpose, NumColumns, NumRows, lhsScale, this.data, 0, NumRows,
+				GlobalProvider.Blas.Dgemv(TransposeMatrix.Transpose, NumColumns, NumRows, lhsScale, this.values, 0, NumRows,
 					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
 			}
 			else
 			{
-				GlobalProvider.Blas.Dgemv(TransposeMatrix.NoTranspose, NumRows, NumColumns, lhsScale, this.data, 0, NumRows,
+				GlobalProvider.Blas.Dgemv(TransposeMatrix.NoTranspose, NumRows, NumColumns, lhsScale, this.values, 0, NumRows,
 					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
 			}
 		}
@@ -1196,7 +1211,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
 			double aggregator = identityValue;
-			for (int i = 0; i < data.Length; ++i) aggregator = processEntry(data[i], aggregator);
+			for (int i = 0; i < values.Length; ++i) aggregator = processEntry(values[i], aggregator);
 			// no zeros implied
 			return finalize(aggregator);
 		}
@@ -1221,11 +1236,11 @@ namespace MGroup.LinearAlgebra.Matrices
 				$"This matrix has {NumColumns} columns, while the permutation vector has {permutation.Count} entries.");
 			if (oldToNew)
 			{
-				return new Matrix(ArrayColMajor.ReorderColumnsOldToNew(NumRows, NumColumns, data, permutation), NumRows, NumRows);
+				return new Matrix(ArrayColMajor.ReorderColumnsOldToNew(NumRows, NumColumns, values, permutation), NumRows, NumRows);
 			}
 			else
 			{
-				return new Matrix(ArrayColMajor.ReorderColumnsNewToOld(NumRows, NumColumns, data, permutation), NumRows, NumRows);
+				return new Matrix(ArrayColMajor.ReorderColumnsNewToOld(NumRows, NumColumns, values, permutation), NumRows, NumRows);
 			}
 		}
 
@@ -1248,8 +1263,8 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckSquare(this);
 			if (permutation.Count != NumRows) throw new NonMatchingDimensionsException(
 				$"This matrix has order = {NumRows}, while the permutation vector has {permutation.Count} entries.");
-			if (oldToNew) return new Matrix(ArrayColMajor.ReorderOldToNew(NumRows, data, permutation), NumRows, NumRows);
-			else return new Matrix(ArrayColMajor.ReorderNewToOld(NumRows, data, permutation), NumRows, NumRows);
+			if (oldToNew) return new Matrix(ArrayColMajor.ReorderOldToNew(NumRows, values, permutation), NumRows, NumRows);
+			else return new Matrix(ArrayColMajor.ReorderNewToOld(NumRows, values, permutation), NumRows, NumRows);
 		}
 
 		/// <summary>
@@ -1266,22 +1281,22 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Matrix Scale(double scalar)
 		{
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
-			Array.Copy(data, result, data.Length);
-			GlobalProvider.Blas.Dscal(data.Length, scalar, result, 0, 1);
+			double[] result = new double[values.Length];
+			Array.Copy(values, result, values.Length);
+			GlobalProvider.Blas.Dscal(values.Length, scalar, result, 0, 1);
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
 		/// <summary>
 		/// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
 		/// </summary>
-		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(data.Length, scalar, data, 0, 1);
+		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(values.Length, scalar, values, 0, 1);
 
 		/// <summary>
 		/// Sets all entries of this matrix to be equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="value">The value that all entries of the this matrix will be equal to.</param>
-		public void SetAll(double value) => ArrayUtilities.MemSet(data, value);
+		public void SetAll(double value) => ArrayUtilities.MemSet(values, value);
 
 		/// <summary>
 		/// Sets some consecutive entries of the column with index = <paramref name="colIdx"/> to be equal to 
@@ -1304,15 +1319,15 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckIndexCol(this, colIdx);
 			if (rowStart + colValues.Length > this.NumRows) throw new NonMatchingDimensionsException(
 				"The entries to set exceed this matrix's number of rows");
-			ArrayColMajor.SetCol(NumRows, NumColumns, data, colIdx, rowStart, colValues.RawData);
+			ArrayColMajor.SetCol(NumRows, NumColumns, values, colIdx, rowStart, colValues.RawData);
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrix.SetEntryRespectingPattern(int, int, double)"/>.
+		/// See <see cref="IMatrix.Set(int, int, double)"/>.
 		/// </summary>
-		public void SetEntryRespectingPattern(int rowIdx, int colIdx, double value)
+		public void Set(int rowIdx, int colIdx, double value)
 		{
-			data[colIdx * NumRows + rowIdx] = value;
+			values[colIdx * NumRows + rowIdx] = value;
 		}
 
 		/// <summary>
@@ -1345,8 +1360,8 @@ namespace MGroup.LinearAlgebra.Matrices
 				throw new NonMatchingDimensionsException("The submatrix doesn't fit inside this matrix, at least when starting"
 					+ " from the specified entry.");
 			}
-			ArrayColMajor.SetSubmatrix(this.NumRows, this.NumColumns, this.data, rowStart, colStart, 
-				submatrix.NumRows, submatrix.NumColumns, submatrix.data);
+			ArrayColMajor.SetSubmatrix(this.NumRows, this.NumColumns, this.values, rowStart, colStart, 
+				submatrix.NumRows, submatrix.NumColumns, submatrix.values);
 		}
 
 		/// <summary>
@@ -1370,7 +1385,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckIndexRow(this, rowIdx);
 			if (colStart + rowValues.Length > this.NumRows) throw new NonMatchingDimensionsException(
 				"The entries to set exceed this matrix's number of columns");
-			ArrayColMajor.SetRow(NumRows, NumColumns, data, rowIdx, colStart, rowValues.RawData);
+			ArrayColMajor.SetRow(NumRows, NumColumns, values, rowIdx, colStart, rowValues.RawData);
 		}
 
 		/// <summary>
@@ -1396,7 +1411,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			//TODO: The wrapper library does not include LAPACK's CBlas-like extensions yet. Create my own wrapper or 
 			// piggyback on another BLAS function.
-			double[] transpose = Conversions.ColumnMajorToRowMajor(data, NumRows, NumColumns);
+			double[] transpose = Conversions.ColumnMajorToRowMajor(values, NumRows, NumColumns);
 			return new Matrix(transpose, NumColumns, NumRows);
 		}
 
@@ -1410,8 +1425,8 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		private double[] CopyInternalData()
 		{
-			double[] dataCopy = new double[data.Length];
-			Array.Copy(data, dataCopy, data.Length);
+			double[] dataCopy = new double[values.Length];
+			Array.Copy(values, dataCopy, values.Length);
 			return dataCopy;
 		}
 	}

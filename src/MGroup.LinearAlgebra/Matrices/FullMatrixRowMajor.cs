@@ -1,9 +1,7 @@
 namespace MGroup.LinearAlgebra.Matrices
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Diagnostics;
-	using System.Text;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Implementations;
@@ -12,7 +10,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	using static MGroup.LinearAlgebra.LibrarySettings;
 
-	public class FullMatrixRowMajor : IMatrixView
+	public sealed class FullMatrixRowMajor : DefaultMatrix
 	{
 		private readonly double[] values;
 
@@ -23,19 +21,17 @@ namespace MGroup.LinearAlgebra.Matrices
 			this.values = values;
 		}
 
-		public double this[int rowIdx, int colIdx]
+		public override int NumColumns { get; }
+
+		public override int NumRows { get; }
+
+		public double[] RawData => values;
+
+		public override double this[int rowIdx, int colIdx]
 		{
 			get => values[rowIdx * NumColumns + colIdx];
 			set => values[rowIdx * NumColumns + colIdx] = value;
 		}
-
-		public int NumColumns { get; }
-
-		public int NumRows { get; }
-
-		public double[] RawData => values;
-
-		public MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Unknown;
 
 		public static FullMatrixRowMajor CreateFromArray(int numRows, int numColumns, double[] values, bool copyArray = false)
 		{
@@ -67,65 +63,31 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new FullMatrixRowMajor(numRows, numColumns, new double[numRows * numColumns]);
 		}
 
-		public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public override void Clear() => Array.Clear(values, 0, values.Length);
+
+		public override IMatrix CreateZeroMatrixWithSameFormat()
+			=> new FullMatrixRowMajor(NumRows, NumColumns, new double[values.Length]);
+
+		public override bool HasSameFormat(IMatrixView other)
 		{
-			throw new NotImplementedException();
+			if (other is FullMatrixRowMajor casted)
+			{
+				return (this.NumRows == casted.NumRows) && (this.NumColumns == other.NumColumns);
+			}
+
+			return false;
 		}
 
-		public IMatrix Copy(bool copyIndexingData = false)
+		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
 		{
-			throw new NotImplementedException();
-		}
-
-		public Matrix CopyToFullMatrix()
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
-		{
-			throw new NotImplementedException();
-		}
-
-		public bool Equals(IIndexable2D other, double tolerance = 1E-13)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Vector GetColumn(int colIndex)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Vector GetRow(int rowIndex)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix GetSubmatrix(int[] rowIndices, int[] colIndices)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IVector Multiply(IVectorView vector, bool transposeThis = false)
-		{
-			if (vector is Vector dense) return Multiply(dense, transposeThis);
-			else throw new NotImplementedException();
+			if (vector is Vector dense)
+			{
+				return Multiply(dense, transposeThis);
+			}
+			else
+			{
+				return base.Multiply(vector, transposeThis);
+			}
 		}
 
 		public Vector Multiply(Vector vector, bool transposeThis = false)
@@ -136,7 +98,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (lhsVector is Vector denseLhs && rhsVector is Vector denseRhs)
 			{
@@ -144,7 +106,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else
 			{
-				throw new NotImplementedException();
+				base.MultiplyIntoResult(lhsVector, rhsVector, transposeThis);
 			}
 		}
 
@@ -156,21 +118,6 @@ namespace MGroup.LinearAlgebra.Matrices
 			GlobalProvider.Blas.DgemvRowMajor(transposeA, NumRows, NumColumns, this.values, lhsVector.RawData, rhsVector.RawData);
 		}
 
-		public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
-		{
-			throw new NotImplementedException();
-		}
-
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-		{
-			throw new NotImplementedException();
-		}
-
 		public void SetRow(int rowIdx, Vector rowValues)
 		{
 			Debug.Assert(rowIdx >= 0 && rowIdx < NumRows);
@@ -178,14 +125,6 @@ namespace MGroup.LinearAlgebra.Matrices
 			Array.Copy(rowValues.RawData, 0, values, rowIdx * NumColumns, NumColumns);
 		}
 
-		public IMatrix Scale(double scalar)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IMatrix Transpose()
-		{
-			throw new NotImplementedException();
-		}
+		public override IMatrix Transpose() => Matrix.CreateFromArray(values, NumColumns, NumRows, true);
 	}
 }

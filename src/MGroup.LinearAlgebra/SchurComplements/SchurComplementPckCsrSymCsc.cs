@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.SchurComplements
 					// Perform the subtraction S = A00 - (A10^T * inv(A11) * A10) for the current (i, j)
 					double dot = MultiplyRowTimesVector(A01, i, colInvA11TimesA10);
 					int indexS = i + (j * (j + 1)) / 2;
-					result.RawData[indexS] = A00.RawData[indexS] - dot;
+					result.RawValues[indexS] = A00.RawValues[indexS] - dot;
 				}
 			}
 		}

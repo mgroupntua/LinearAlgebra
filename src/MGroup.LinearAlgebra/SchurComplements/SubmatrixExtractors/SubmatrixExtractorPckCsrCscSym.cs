@@ -63,7 +63,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 				}
 			}
 
-			mapper00.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix00.RawData);
+			mapper00.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix00.RawValues);
 			mapper01.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix01.RawValues);
 			mapper11.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix11.RawValues);
 		}

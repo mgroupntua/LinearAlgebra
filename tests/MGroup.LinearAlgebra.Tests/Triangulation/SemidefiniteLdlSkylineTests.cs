@@ -101,7 +101,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
 			double tolerance = 1E-2;
 			CheckFactorization(unconstrainedK, 3, tolerance);
-			CheckFactorization(unconstrainedK.Scale(1E-6), 3, 1E-8); //TODO: Normalization is required when comparing the pivot with the tolerance.
+			CheckFactorization(unconstrainedK.ScaleSameFormat(1E-6), 3, 1E-8); //TODO: Normalization is required when comparing the pivot with the tolerance.
 		}
 
 		[Fact]
@@ -115,7 +115,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
 			double tolerance = 1E-3;
 			CheckFactorization(unconstrainedK, 6, tolerance);
-			CheckFactorization(unconstrainedK.Scale(1E-5), 6, 1E-8); //TODO: Normalization is required when comparing the pivot with the tolerance.
+			CheckFactorization(unconstrainedK.ScaleSameFormat(1E-5), 6, 1E-8); //TODO: Normalization is required when comparing the pivot with the tolerance.
 		}
 	}
 }

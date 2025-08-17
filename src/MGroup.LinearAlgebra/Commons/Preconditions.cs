@@ -131,6 +131,48 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
+		public static void CheckMultiplicationDimensionsMatrixVector(IIndexable2D matrix, IIndexable1D lhsVector)
+		{
+			if (matrix.NumColumns != lhsVector.Length)
+			{
+				throw new NonMatchingDimensionsException(
+					$"Cannot multiply ({matrix.NumRows} x {matrix.NumColumns}) * ({lhsVector.Length} x 1)");
+			}
+		}
+
+		public static void CheckMultiplicationDimensionsMatrixVector(
+			IIndexable2D matrix, IIndexable1D lhsVector, IIndexable1D rhsVector)
+		{
+			CheckMultiplicationDimensionsMatrixVector(matrix, lhsVector);
+			if (matrix.NumRows != rhsVector.Length)
+			{
+				throw new NonMatchingDimensionsException(
+					$"The result of ({matrix.NumRows} x {matrix.NumColumns}) * ({lhsVector.Length} x 1)" +
+					$" must be ({matrix.NumRows} x 1), but a ({rhsVector.Length} x 1) vector was provided");
+			}
+		}
+
+		public static void CheckMultiplicationDimensionsMatrixVectorTranspose(IIndexable2D matrix, IIndexable1D lhsVector)
+		{
+			if (matrix.NumRows != lhsVector.Length)
+			{
+				throw new NonMatchingDimensionsException(
+					$"Cannot multiply ({matrix.NumColumns} x {matrix.NumRows}) * ({lhsVector.Length} x 1)");
+			}
+		}
+
+		public static void CheckMultiplicationDimensionsMatrixVectorTranspose(
+			IIndexable2D matrix, IIndexable1D lhsVector, IIndexable1D rhsVector)
+		{
+			CheckMultiplicationDimensionsMatrixVectorTranspose(matrix, lhsVector);
+			if (matrix.NumColumns != rhsVector.Length)
+			{
+				throw new NonMatchingDimensionsException(
+					$"The result of ({matrix.NumColumns} x {matrix.NumRows}) * ({lhsVector.Length} x 1)" +
+					$" must be ({matrix.NumColumns} x 1), but a ({rhsVector.Length} x 1) vector was provided.");
+			}
+		}
+
 		public static void CheckSameColDimension(IIndexable2D matrix, IVectorView vector)
 		{
 			if (matrix.NumColumns != vector.Length)

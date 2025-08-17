@@ -96,7 +96,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			(double[] values, int[] rowIndices, int[] colOffsets) expected11 = example.Submatrix11CscSymmetric;
 
 			var comparer = new MatrixComparer(1E-15);
-			comparer.AssertEqual(expected00, extractor.Submatrix00.RawData);
+			comparer.AssertEqual(expected00, extractor.Submatrix00.RawValues);
 
 			comparer.AssertEqual(expected01.values, extractor.Submatrix01.RawValues);
 			comparer.AssertEqual(expected01.colIndices, extractor.Submatrix01.RawColIndices);

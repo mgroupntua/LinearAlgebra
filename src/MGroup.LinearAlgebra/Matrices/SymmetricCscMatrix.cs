@@ -1,24 +1,21 @@
-using System;
-using System.Runtime.CompilerServices;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Triangulation;
-using MGroup.LinearAlgebra.Implementations;
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Vectors;
-using static MGroup.LinearAlgebra.LibrarySettings;
-using DotNumerics.FortranLibrary;
-using MGroup.LinearAlgebra.Matrices.Builders;
-
 //TODO: Should this be removed? I need it to provide analyzers with a matrix.
 namespace MGroup.LinearAlgebra.Matrices
 {
+	using System;
+
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Matrices.Builders;
+	using MGroup.LinearAlgebra.Reduction;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
 	/// Symmetric sparse matrix in Compressed Sparse Columns format, with only the non-zero entries of the upper triangle being
-	/// explicitly stored. This matrix format is better used for factorizations using SuiteSparse or CSparse libraries.
-	/// Authors: Serafeim Bakalakos
+	/// explicitly stored in column major order. This matrix format is best used for factorizations using SuiteSparse
+	/// and CSparse libraries.
 	/// </summary>
-	public class SymmetricCscMatrix : IMatrix
+	public sealed class SymmetricCscMatrix : ValuesBackedMatrix<SymmetricCscMatrix>
 	{
 		/// <summary>
 		/// values.Length = number of non zeros in upper triangle.
@@ -36,33 +33,33 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		private readonly int[] colOffsets;
 
-		private SymmetricCscMatrix(int order, int numNonZerosUpper, double[] values, int[] rowIndices, int[] colOffsets)
+		private SymmetricCscMatrix(int order, double[] values, int[] rowIndices, int[] colOffsets)
 		{
+			this.values = values;
 			this.NumColumns = order;
 			this.NumRows = order;
-			this.NumNonZerosUpper = numNonZerosUpper;
-			this.values = values;
+			this.NumNonZerosUpper = values.Length;
 			this.rowIndices = rowIndices;
 			this.colOffsets = colOffsets;
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
-		/// </summary>
-		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
+		public override MatrixSymmetry MatrixSymmetry => MatrixSymmetry.Symmetric;
+
+		public override int NumColumns { get; }
 
 		/// <summary>
-		/// The internal array that stores the non-zero entries of the upper triangle. The non-zero entries of each
-		/// column are consecutive. Its length is equal to the number of the upper triangle's non-zero entries.
-		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// The number of the upper triangle's non zero entries. These are the only ones being explicitly stored.
 		/// </summary>
-		public double[] RawValues => values;
+		public int NumNonZerosUpper { get; }
+
+		public override int NumRows { get; }
 
 		/// <summary>
-		/// The internal array that stores the index into the arrays <see cref="RawValues"/> and <see cref="RawRowIndices"/> of
-		/// the first entry of each column. Its length is equal to <paramref name="NumColumns"/> + 1.
+		/// The internal array that stores the index into the arrays <see cref="ValuesBackedMatrix{TMatrix}.RawValues"/> and
+		/// <see cref="RawRowIndices"/> of the first entry of each column. Its length is equal to
+		/// <paramref name="NumColumns"/> + 1.
 		/// The last entry is the number of the upper triangle's non-zero entries, which must be equal to
-		/// <see cref="RawValues"/>.Length == <see cref="RawRowIndices"/>.Length.
+		/// <see cref="ValuesBackedMatrix{TMatrix}.RawValues"/>.Length == <see cref="RawRowIndices"/>.Length.
 		/// It should only be used for passing the raw array to linear algebra libraries.
 		/// </summary>
 		public int[] RawColOffsets => colOffsets;
@@ -74,31 +71,22 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		public int[] RawRowIndices => rowIndices;
 
-		/// <summary>
-		/// The number of columns of the matrix.
-		/// </summary>
-		public int NumColumns { get; }
+		public override double[] RawValues => values;
 
-		/// <summary>
-		/// The number of the upper triangle's non zero entries. These are the only ones being explicitly stored.
-		/// </summary>
-		public int NumNonZerosUpper { get; }
-
-		/// <summary>
-		/// The number of rows of the matrix.
-		/// </summary>
-		public int NumRows { get; }
-
-		/// <summary>
-		/// See <see cref="IIndexable2D.this[int, int]"/>.
-		/// </summary>
-		public double this[int rowIdx, int colIdx]
+		public override double this[int rowIdx, int colIdx]
 		{
 			get
 			{
 				int offset = FindOffsetOf(rowIdx, colIdx);
 				if (offset >= 0) return values[offset];
 				else return 0.0;
+			}
+
+			set
+			{
+				int offset = FindOffsetOf(rowIdx, colIdx);
+				if (offset >= 0) values[offset] = value;
+				else throw new SparsityPatternModifiedException($"Cannot write to zero entry ({rowIdx}, {colIdx}).");
 			}
 		}
 
@@ -146,94 +134,16 @@ namespace MGroup.LinearAlgebra.Matrices
 						+ " = values.Length = rowIndices.Length = number of non zeros in upper triangle");
 				}
 			}
-			return new SymmetricCscMatrix(order, nnz, values, rowIndices, colOffsets);
+			return new SymmetricCscMatrix(order, values, rowIndices, colOffsets);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
-		/// </summary>
-		public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
-		{
-			if (otherMatrix is SymmetricCscMatrix otherCSC)
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					double[] copiedValues = new double[values.Length];
-					Array.Copy(this.values, copiedValues, values.Length);
-					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, copiedValues, this.rowIndices, this.colOffsets);
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					// Unneeded if the indexers are identical, but worth it
-					Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-
-					//TODO: Perhaps this should be done using mkl_malloc and BLAS copy.
-					double[] resultValues = new double[values.Length];
-					Array.Copy(this.values, resultValues, values.Length);
-
-					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
-
-					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
-				}
-
-				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
-			}
-			else
-			{
-				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-		/// </summary>
-		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
-		{
-			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			if (otherMatrix is SymmetricCscMatrix otherCSC)
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					return;
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
-				}
-			}
-			else
-			{
-				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrix.Clear"/>.
-		/// </summary>
-		public void Clear() => Array.Clear(values, 0, values.Length);
-
-		/// <summary>
-		/// See <see cref="IMatrixView.Copy(bool)"/>.
-		/// </summary>
-		IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy(copyIndexingData);
-
-		/// <summary>
-		/// Copies the entries of this matrix.
-		/// </summary>
-		/// <param name="copyIndexingData">
-		/// If true, all data of this object will be copied. If false, only the array containing the values of the stored
-		/// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
-		/// </param>
-		public SymmetricCscMatrix Copy(bool copyIndexingArrays)
+		public override SymmetricCscMatrix CopyAsSameType(bool copyIndexingArrays)
 		{
 			var valuesCopy = new double[values.Length];
 			Array.Copy(values, valuesCopy, values.Length);
 			if (!copyIndexingArrays)
 			{
-				return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, valuesCopy, rowIndices, colOffsets);
+				return new SymmetricCscMatrix(NumColumns, valuesCopy, rowIndices, colOffsets);
 			}
 			else
 			{
@@ -241,7 +151,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				Array.Copy(rowIndices, rowIndicesCopy, rowIndices.Length);
 				var colOffsetsCopy = new int[colOffsets.Length];
 				Array.Copy(colOffsets, colOffsetsCopy, colOffsets.Length);
-				return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, valuesCopy, rowIndicesCopy, colOffsetsCopy);
+				return new SymmetricCscMatrix(NumColumns, valuesCopy, rowIndicesCopy, colOffsetsCopy);
 			}
 		}
 
@@ -272,10 +182,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return dok.BuildCsrMatrix(true);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.CopyToFullMatrix()"/>
-		/// </summary>
-		public Matrix CopyToFullMatrix()
+		public override Matrix CopyToFullMatrix()
 		{
 			Matrix fullMatrix = Matrix.CreateZero(this.NumRows, this.NumColumns);
 			for (int j = 0; j < this.NumColumns; ++j) //Column major order
@@ -293,238 +200,27 @@ namespace MGroup.LinearAlgebra.Matrices
 			return fullMatrix;
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-		/// </summary>
-		public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+		public override SymmetricCscMatrix CreateZeroMatrixSame()
 		{
-			Preconditions.CheckSameMatrixDimensions(this, other);
-			if (other is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					double[] copiedValues = new double[values.Length];
-					Array.Copy(this.values, copiedValues, values.Length);
-					return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, copiedValues, rowIndices, colOffsets);
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-					var resultValues = new double[values.Length];
-					for (int i = 0; i < values.Length; ++i)
-					{
-						resultValues[i] = binaryOperation(this.values[i], otherCSC.values[i]);
-					}
-
-					return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, resultValues, rowIndices, colOffsets);
-				}
-			}
-
-			// All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-			Matrix result = Matrix.CreateZero(this.NumRows, this.NumColumns);
-			for (int j = 0; j < this.NumColumns; ++j)
-			{
-				for (int i = 0; i < this.NumRows; ++i)
-				{
-					result[i, j] = binaryOperation(this[i, j], other[i, j]);
-				}
-			}
-
-			return result;
+			var resultValues = new double[values.Length];
+			return new SymmetricCscMatrix(NumColumns, resultValues, rowIndices, colOffsets);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-		/// </summary>
-		public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		public override Vector GetRow(int rowIndex) => GetColumn(rowIndex);
+
+		public override bool HasSameFormat(SymmetricCscMatrix other)
 		{
-			Preconditions.CheckSameMatrixDimensions(this, matrix); // Unneeded if they have the same indexers, but worth it
-
-			if (matrix is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					return;
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], otherCSC.values[i]);
-				}
-			}
-			else
-			{
-				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-			}
+			return (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
-		{
-			if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0)) // The same sparsity pattern can be used.
-			{
-				// Only apply the operation on non zero entries
-				double[] newValues = new double[values.Length];
-				for (int i = 0; i < values.Length; ++i) newValues[i] = unaryOperation(values[i]);
-
-				//TODO: Perhaps I should also copy the indexers
-				return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, newValues, rowIndices, colOffsets);
-			}
-			else // The sparsity is destroyed. Revert to a full matrix.
-			{
-				Matrix full = CopyToFullMatrix();
-				full.DoToAllEntriesIntoThis(unaryOperation);
-				return full;
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-		/// </summary>
-		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
-		{
-			if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0)) // The same sparsity pattern can be used.
-			{
-				for (int i = 0; i < values.Length; ++i) values[i] = unaryOperation(values[i]);
-			}
-			else
-			{
-				throw new SparsityPatternModifiedException("This operation will change the sparsity pattern");
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-		/// </summary>
-		public bool Equals(IIndexable2D other, double tolerance = 1e-13)
-			=> DenseStrategies.AreEqual(this, other, tolerance);
-
-		/// <summary>
-		/// See <see cref="ISliceable2D.GetColumn(int)"/>.
-		/// </summary>
-		public Vector GetColumn(int colIndex) => DenseStrategies.GetColumn(this, colIndex);
-
-		/// <summary>
-		/// See <see cref="ISliceable2D.GetRow(int)"/>.
-		/// </summary>
-		public Vector GetRow(int rowIndex) => GetColumn(rowIndex);
-
-		/// <summary>
-		/// See <see cref="ISliceable2D.GetSubmatrix(int[], int[])"/>.
-		/// </summary>
-		public IMatrix GetSubmatrix(int[] rowIndices, int[] colIndices)
-			=> DenseStrategies.GetSubmatrix(this, rowIndices, colIndices);
-
-		/// <summary>
-		/// See <see cref="ISliceable2D.GetSubmatrix(int, int, int, int)"/>.
-		/// </summary>
-		public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
-			=> DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
-
-		/// <summary>
-		/// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-		/// </summary>
-		public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
-		{
-			if (otherMatrix is SymmetricCscMatrix otherCSC) // In case both matrices have the exact same index arrays
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					double[] copiedValues = new double[values.Length];
-					Array.Copy(this.values, copiedValues, values.Length);
-					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, copiedValues, this.rowIndices, this.colOffsets);
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					// Unneeded if the indexers are identical, but worth it
-					Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-
-					//TODO: Perhaps this should be done using mkl_malloc and BLAS copy.
-					double[] resultValues = new double[values.Length];
-
-					if (thisCoefficient == 1.0)
-					{
-						Array.Copy(this.values, resultValues, values.Length);
-						GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, resultValues, 0, 1);
-					}
-					else if (otherCoefficient == 1.0)
-					{
-						Array.Copy(otherCSC.values, resultValues, values.Length);
-						GlobalProvider.Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, resultValues, 0, 1);
-					}
-					else
-					{
-						Array.Copy(this.values, resultValues, values.Length);
-						GlobalProvider.Blas.Daxpby(values.Length, otherCoefficient, otherCSC.values, 0, 1,
-							thisCoefficient, resultValues, 0, 1);
-					}
-
-					// Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
-				}
-
-				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
-			}
-			else
-			{
-				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisCoefficient * thisEntry + otherCoefficient * otherEntry);
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
-		{
-			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-			if (otherMatrix is SymmetricCscMatrix otherCSC)
-			{
-				if (otherCSC.values.Length == 0)
-				{
-					return;
-				}
-
-				if (HaveSameIndexArrays(otherCSC))
-				{
-					GlobalProvider.Blas.Daxpy(values.Length, otherCoefficient, otherCSC.values, 0, 1, this.values, 0, 1);
-				}
-			}
-			else
-			{
-				throw new SparsityPatternModifiedException("Only allowed if the index arrays are the same");
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyLeft(IMatrixView, bool, bool)"/>.
-		/// </summary>
-		public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
-			=> DenseStrategies.Multiply(other, this, transposeOther, transposeThis);
-
-		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyRight(IMatrixView, bool, bool)"/>.
-		/// </summary>
-		public Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
-			=> DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
-
-		/// <summary>
-		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
-		/// </summary>
-		public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
 		{
 			var result = Vector.CreateZero(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, vector, result.RawData);
 			return result;
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
-		/// </summary>
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis)
+		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis)
 		{
 			rhsVector.Clear(); // TODO: add this as an optional flag or convert the method to axpy like.
 			if (rhsVector is Vector denseVector)
@@ -554,10 +250,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Finalize)"/>.
-		/// </summary>
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		public override double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
 			double aggregator = identityValue;
 			int numNonZeros = 0;
@@ -585,46 +278,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return finalize(aggregator);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.Scale(double)"/>.
-		/// </summary>
-		public IMatrix Scale(double scalar)
-		{
-			// Only apply the operation on non zero entries
-			var resultValues = new double[values.Length];
-			Array.Copy(values, resultValues, values.Length);
-			GlobalProvider.Blas.Dscal(NumNonZerosUpper, scalar, resultValues, 0, 1);
-
-			//TODO: Perhaps I should also copy the indexers
-			return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, resultValues, rowIndices, colOffsets);
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-		/// </summary>
-		public void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(NumNonZerosUpper, scalar, this.values, 0, 1);
-
-		/// <summary>
-		/// See <see cref="IMatrix.SetEntryRespectingPattern(int, int, double)"/>.
-		/// </summary>
-		public void SetEntryRespectingPattern(int rowIdx, int colIdx, double value)
-		{
-			int offset = FindOffsetOf(rowIdx, colIdx);
-			if (offset >= 0) values[offset] = value;
-			else throw new SparsityPatternModifiedException($"Cannot write to zero entry ({rowIdx}, {colIdx}).");
-		}
-
-		/// <summary>
-		/// See <see cref="IMatrixView.Transpose"/>.
-		/// </summary>
-		public IMatrix Transpose() => Copy(true);
-
-		/// <summary>
-		/// 2 or more sparse matrices may have the same (2 references to 1 object) index arrays.
-		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool HaveSameIndexArrays(SymmetricCscMatrix other)
-			=> (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
+		public override IMatrix Transpose() => CopyAsSameType(true);
 
 		/// <summary>
 		/// For an entry (i,j), returns the offset into values and rowIndices arrays or -1 of the entry corresponds to a

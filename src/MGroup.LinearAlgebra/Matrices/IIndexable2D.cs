@@ -17,14 +17,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		MatrixSymmetry MatrixSymmetry { get; }
 
-        /// <summary>
-        /// The entry with row index = rowIdx and column index = colIdx. 
-        /// </summary>
-        /// <param name="rowIdx">The row index: 0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="NumRows"/>.</param>
-        /// <param name="colIdx">The column index: 0 &lt;= <paramref name="colIdx"/> &lt; <see cref="NumColumns"/>.</param>
-        /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colIdx"/> violate 
-        ///     the described constraints.</exception>
-        double this[int rowIdx, int colIdx] { get; }
+		/// <summary>
+		/// The entry with row index = rowIdx and column index = colIdx. 
+		/// </summary>
+		/// <param name="rowIdx">The row index: 0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="NumRows"/>.</param>
+		/// <param name="colIdx">The column index: 0 &lt;= <paramref name="colIdx"/> &lt; <see cref="NumColumns"/>.</param>
+		/// <exception cref="IndexOutOfRangeException">
+		/// Thrown if <paramref name="rowIdx"/> or <paramref name="colIdx"/> violate the described constraints.</exception>
+		/// <remarks>
+		/// Indexing is inefficient for most matrix storage formats. There is usually a method to do any job more efficiently.
+		/// </remarks>
+		double this[int rowIdx, int colIdx] { get; }
 
 		/// <summary>
 		/// Returns true if 1) this and <paramref name="other"/> have the same <see cref="NumRows"/> and <see cref="NumColumns"/>

@@ -162,7 +162,7 @@ namespace MGroup.LinearAlgebra.Commons
 			{
 				for (int i = 0; i < matrix1.NumRows; ++i)
 				{
-					matrix1.SetEntryRespectingPattern(i, j, binaryOperation(matrix1[i, j], matrix2[i, j]));
+					matrix1.Set(i, j, binaryOperation(matrix1[i, j], matrix2[i, j]));
 				}
 			}
 		}

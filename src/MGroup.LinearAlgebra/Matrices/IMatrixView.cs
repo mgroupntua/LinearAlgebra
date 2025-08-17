@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-		IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient) => LinearCombination(1.0, otherMatrix, otherCoefficient);
+		IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient);
 
 		/// <summary>
 		/// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
@@ -36,18 +36,23 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// If true, all data of this object will be copied. If false, only the array(s) containing the values of the stored 
 		/// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
 		/// </param>
-		IMatrix Copy(bool copyIndexingData = false) => CopyToFullMatrix();
+		IMatrix Copy(bool copyIndexingData = false);
 
 		/// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
 		/// </summary>
 		Matrix CopyToFullMatrix();
 
-		///// <summary>
-		///// Returns true if the only difference betweens this matrix and <paramref name="other"/> is their values.
-		///// </summary>
-		///// <param name="other">The vector to compare.</param>
-		///// <returns>True if the matrices have the same format. False otherwise.</returns>
-		//bool HasSameFormat(IMatrixView other);
+		/// <summary>
+		/// Initializes a new instance of the same type as this matrix, with the exact same storage format and zero entries.
+		/// </summary>
+		IMatrix CreateZeroMatrixWithSameFormat();
+
+		/// <summary>
+		/// Returns true if the only difference betweens this matrix and <paramref name="other"/> is their values.
+		/// </summary>
+		/// <param name="other">The matrix to compare.</param>
+		/// <returns>True if the matrices have the same format. False otherwise.</returns>
+		bool HasSameFormat(IMatrixView other);
 
 		/// Performs the following operation for all (i, j):
 		/// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
@@ -61,8 +66,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-		IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
-			=> DoEntrywise(otherMatrix, (x, y) => thisCoefficient * x + otherCoefficient * y);
+		IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
 
 		/// <summary>
 		/// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
@@ -155,7 +159,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting matrix is written in a new object and then returned.
 		/// </summary>
 		/// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
-		IMatrix Scale(double scalar) => DoToAllEntries(x => scalar * x);
+		IMatrix Scale(double scalar);
 
 		/// <summary>
 		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some

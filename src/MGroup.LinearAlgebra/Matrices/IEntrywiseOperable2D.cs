@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MGroup.LinearAlgebra.Matrices
 {
@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Performs a unary operation on each entry: this[i] = <paramref name="unaryOperation"/>(this[i, j]).
-        /// he resulting matrix overwrites the entries of this.
+        /// The resulting matrix overwrites the entries of this.
         /// </summary>
         /// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
         /// <exception cref="Exceptions.PatternModifiedException">

@@ -14,7 +14,7 @@ using static MGroup.LinearAlgebra.Distributed.Overlapping.CompatibilityUtilities
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
-	public class DistributedOverlappingMatrix<TMatrix> : IMatrix //IGlobalMatrix
+	public sealed class DistributedOverlappingMatrix<TMatrix> : DefaultMatrix
 		where TMatrix : class, IMatrix
 	{
 		private GlobalIndexer globalIndexer;
@@ -31,13 +31,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
 
-		public int NumRows => Indexer.NumUniqueEntries;
+		public override int NumRows => Indexer.NumUniqueEntries;
 
-		public int NumColumns => Indexer.NumUniqueEntries;
+		public override int NumColumns => Indexer.NumUniqueEntries;
 
-		public MatrixSymmetry MatrixSymmetry { get; set; } = MatrixSymmetry.Unknown;
-
-		public double this[int rowIdx, int colIdx]
+		public override double this[int rowIdx, int colIdx]
 		{
 			get
 			{
@@ -62,30 +60,68 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				// If we reached this line, then the entry (rowIdx, colIdx) is not explicitly stored (structural zero)
 				return 0.0;
 			}
-		}
-
-		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
-		{
-			DistributedOverlappingMatrix<TMatrix> distributedOther = CastToDistributed<TMatrix>(otherMatrix);
-			CheckSameFormat(this,distributedOther);
-			Action<int> localOperation = nodeID =>
+			set
 			{
-				TMatrix thisSubdomainMatrix = this.LocalMatrices[nodeID];
-				TMatrix otherSubdomainMatrix = distributedOther.LocalMatrices[nodeID];
-				thisSubdomainMatrix.AxpyIntoThis(otherSubdomainMatrix, otherCoefficient);
-			};
-			Environment.DoPerNode(localOperation);
+				CreateGlobalIndexerIfMissing();
+				globalIndexer.CheckGlobalIndex2D(rowIdx, colIdx);
+				IReadOnlyDictionary<int, int> localRowIndices = globalIndexer.FindLocalIndicesOf(rowIdx);
+				IReadOnlyDictionary<int, int> localColIndices = globalIndexer.FindLocalIndicesOf(colIdx);
+
+				foreach ((int nodeID, int localColIdx) in localColIndices)
+				{
+					if (!LocalMatrices.ContainsKey(nodeID))
+					{
+						throw new Exception("This should not have happened. The distributed matrix is not created correctly.");
+					}
+
+					if (localRowIndices.TryGetValue(nodeID, out int localRowIdx))
+					{
+						LocalMatrices[nodeID].Set(localRowIdx, localColIdx, value); // Do this in all instances.
+					}
+				}
+
+				// If we reached this line, then the entry (rowIdx, colIdx) is not explicitly stored (structural zero)
+				if (value != 0.0)
+				{
+					throw new SparsityPatternModifiedException(
+						$"The entry ({rowIdx}, {colIdx}) is a structural zero and cannot be changed");
+				}
+			}
 		}
 
-		public void Clear()
+		public override void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		{
+			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
+			{
+				AxpyIntoThis(casted, otherCoefficient);
+			}
+			else
+			{
+				base.AxpyIntoThis(otherMatrix, otherCoefficient);
+			}
+		}
+
+		public void AxpyIntoThis(DistributedOverlappingMatrix<TMatrix> otherMatrix, double otherCoefficient)
+		{
+			if (Indexer.IsCompatibleWith(otherMatrix.Indexer))
+			{
+				Environment.DoPerNode(
+					node => this.LocalMatrices[node].AxpyIntoThis(otherMatrix.LocalMatrices[node], otherCoefficient));
+			}
+			else
+			{
+				base.AxpyIntoThis(otherMatrix, otherCoefficient);
+			}
+		}
+
+		public override void Clear()
 		{
 			Environment.DoPerNode(nodeID => this.LocalMatrices[nodeID].Clear());
 		}
 
+		public override IMatrix Copy(bool copyIndexingData) => CopyAsDistributed(copyIndexingData);
 
-		IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy(copyIndexingData);
-
-		public DistributedOverlappingMatrix<TMatrix> Copy(bool copyIndexingData = false)
+		public DistributedOverlappingMatrix<TMatrix> CopyAsDistributed(bool copyIndexingData = false)
 		{
 			var indexerCloned = copyIndexingData ? Indexer.DeepCopy() : Indexer;
 			var copy = new DistributedOverlappingMatrix<TMatrix>(indexerCloned);
@@ -93,7 +129,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return copy;
 		}
 
-		public Matrix CopyToFullMatrix()
+		public override Matrix CopyToFullMatrix()
 		{
 			CreateGlobalIndexerIfMissing();
 			var result = Matrix.CreateZero(NumRows, NumColumns);
@@ -113,38 +149,50 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return result;
 		}
 
-		public DistributedOverlappingMatrix<TMatrix> CreateZeroMatrixWithSameFormat() //TODO: Move this to IMatrixView
+		public override IMatrix CreateZeroMatrixWithSameFormat() => CreateZeroMatrixSame();
+
+		public DistributedOverlappingMatrix<TMatrix> CreateZeroMatrixSame()
 			=> new DistributedOverlappingMatrix<TMatrix>(Indexer);
 
-		public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IMatrixView otherMatrix, Func<double, double, double> binaryOperation)
 		{
-			DistributedOverlappingMatrix<TMatrix> result = Copy();
-			result.DoEntrywiseIntoThis(other, binaryOperation);
-			return result;
+			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
+			{
+				DoEntrywiseIntoThis(casted, binaryOperation);
+			}
+			else
+			{
+				base.DoEntrywiseIntoThis(otherMatrix, binaryOperation);
+			}
 		}
 
-		public void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
-			=> DoEntrywiseIntoThis(CastToDistributed<TMatrix>(other), binaryOperation);
-
-		public void DoEntrywiseIntoThis(DistributedOverlappingMatrix<TMatrix> other, Func<double, double, double> binaryOperation)
+		public void DoEntrywiseIntoThis(
+			DistributedOverlappingMatrix<TMatrix> otherMatrix, Func<double, double, double> binaryOperation)
 		{
-			CheckSameFormat(this, other);
-			Environment.DoPerNode(node => this.LocalMatrices[node].DoEntrywiseIntoThis(other, binaryOperation));
+			if (Indexer.IsCompatibleWith(otherMatrix.Indexer))
+			{
+				Environment.DoPerNode(
+					node => this.LocalMatrices[node].DoEntrywiseIntoThis(otherMatrix.LocalMatrices[node], binaryOperation));
+			}
+			else
+			{
+				base.DoEntrywiseIntoThis(otherMatrix, binaryOperation);
+			}
 		}
 
-		public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
+		public override IMatrix DoToAllEntries(Func<double, double> unaryOperation)
 		{
-			DistributedOverlappingMatrix<TMatrix> result = Copy();
+			DistributedOverlappingMatrix<TMatrix> result = CopyAsDistributed();
 			result.DoToAllEntriesIntoThis(unaryOperation);
 			return result;
 		}
 
-		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+		public override void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			Environment.DoPerNode(node => this.LocalMatrices[node].DoToAllEntriesIntoThis(unaryOperation));
 		}
 
-		public bool Equals(IIndexable2D other, double tolerance = 1E-7)
+		public override bool Equals(IIndexable2D other, double tolerance = 1E-7)
 		{
 			if (other is DistributedOverlappingMatrix<TMatrix> casted)
 			{
@@ -166,9 +214,9 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceAnd(flags);
 		}
 
-		public bool HasSameFormat(IIndexable2D other) //TODO: Move this to IMatrixView. Same for IVectorView
+		public override bool HasSameFormat(IMatrixView otherMatrix)
 		{
-			if (other is DistributedOverlappingMatrix<TMatrix> casted)
+			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
 				return this.Indexer.IsCompatibleWith(casted.Indexer);
 			}
@@ -176,170 +224,99 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return false;
 		}
 
-		public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
-		{
-			DistributedOverlappingMatrix<TMatrix> distributedOther = CastToDistributed<TMatrix>(otherMatrix);
-			CheckSameFormat(this, distributedOther);
-			Action<int> localOperation = nodeID =>
-			{
-				TMatrix thisSubdomainMatrix = this.LocalMatrices[nodeID];
-				TMatrix otherSubdomainMatrix = distributedOther.LocalMatrices[nodeID];
-				thisSubdomainMatrix.LinearCombinationIntoThis(thisCoefficient, otherSubdomainMatrix, otherCoefficient);
-			};
-			Environment.DoPerNode(localOperation);
-		}
+		public bool HasSameFormat(DistributedOverlappingMatrix<TMatrix> otherMatrix)
+			=> this.Indexer.IsCompatibleWith(otherMatrix.Indexer);
 
-		public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false) 
-			=> other.MultiplyRight(this, transposeOther, transposeOther); //TODO: default interface implementation
-
-		public Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false) //TODO: default interface implementation
+		public override void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
 		{
-			if (transposeThis)
+			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
-				if (transposeOther)
-				{
-					Preconditions.CheckMultiplicationDimensions(this.NumRows, other.NumColumns);
-					var result = Matrix.CreateZero(this.NumColumns, other.NumRows);
-					for (int i = 0; i < this.NumColumns; i++)
-					{
-						for (int j = 0; j < other.NumRows; j++)
-						{
-							for (int k = 0; k < this.NumRows; k++)
-							{
-								result[i, j] += this[k, i] * other[j, k];
-							}
-						}
-					}
-					return result;
-				}
-				else
-				{
-					Preconditions.CheckMultiplicationDimensions(this.NumRows, other.NumRows);
-					var result = Matrix.CreateZero(this.NumColumns, other.NumColumns);
-					for (int i = 0; i < this.NumColumns; i++)
-					{
-						for (int j = 0; j < other.NumColumns; j++)
-						{
-							for (int k = 0; k < this.NumRows; k++)
-							{
-								result[i, j] += this[k, i] * other[k, j];
-							}
-						}
-					}
-					return result;
-				}
+				LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
 			}
 			else
 			{
-				if (transposeOther)
-				{
-					Preconditions.CheckMultiplicationDimensions(this.NumColumns, other.NumColumns);
-					var result = Matrix.CreateZero(this.NumRows, other.NumRows);
-					for (int i = 0; i < this.NumRows; i++)
-					{
-						for (int j = 0; j < other.NumRows; j++)
-						{
-							for (int k = 0; k < this.NumColumns; k++)
-							{
-								result[i, j] += this[i, k] * other[j, k];
-							}
-						}
-					}
-					return result;
-				}
-				else
-				{
-					Preconditions.CheckMultiplicationDimensions(this.NumColumns, other.NumRows);
-					var result = Matrix.CreateZero(this.NumRows, other.NumColumns);
-					for (int i = 0; i < this.NumRows; i++)
-					{
-						for (int j = 0; j < other.NumColumns; j++)
-						{
-							for (int k = 0; k < this.NumColumns; k++)
-							{
-								result[i, j] += this[i, k] * other[k, j];
-							}
-						}
-					}
-					return result;
-				}
+				base.LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
 			}
 		}
 
-		public IVector Multiply(IVectorView vector, bool transposeThis = false) //TODO: Rename to MultiplyVector. Also IMatrixView must implement ILinearTransformation
+		public void LinearCombinationIntoThis(
+			double thisCoefficient, DistributedOverlappingMatrix<TMatrix> otherMatrix, double otherCoefficient)
 		{
-			DistributedOverlappingVector distributedLhs = CastToDistributed(vector);
-			DistributedOverlappingVector result = distributedLhs.CreateZeroVector();
-			MultiplyIntoResult(distributedLhs, result, transposeThis);
-			return result;
+			if (Indexer.IsCompatibleWith(otherMatrix.Indexer))
+			{
+				Environment.DoPerNode(
+					node => this.LocalMatrices[node].LinearCombinationIntoThis(
+						thisCoefficient, otherMatrix.LocalMatrices[node], otherCoefficient));
+			}
+			else
+			{
+				base.LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
+			}
 		}
 
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
 		{
-			DistributedOverlappingVector distributedLhs = CastToDistributed(lhsVector);
-			DistributedOverlappingVector distributedRhs = CastToDistributed(rhsVector);
-			MultiplyIntoResult(distributedLhs, distributedRhs, transposeThis);
+			if (vector is DistributedOverlappingVector lhsCasted)
+			{
+				DistributedOverlappingVector result = lhsCasted.CreateZeroVectorSame();
+				MultiplyIntoResult(lhsCasted, result, transposeThis);
+				return result;
+			}
+			else
+			{
+				return base.Multiply(vector, transposeThis);
+			}
+		}
+
+		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		{
+			if ((lhsVector is DistributedOverlappingVector lhsCasted) && (rhsVector is DistributedOverlappingVector rhsCasted))
+			{
+				MultiplyIntoResult(lhsCasted, rhsVector, transposeThis);
+			}
+			else
+			{
+				base.MultiplyIntoResult(lhsVector, rhsVector, transposeThis);
+			}
 		}
 
 		public void MultiplyIntoResult(DistributedOverlappingVector lhsVector, DistributedOverlappingVector rhsVector,
 			bool transposeThis = false)
 		{
-			if (transposeThis)
+			if (this.Indexer.IsCompatibleWith(lhsVector.Indexer) && this.Indexer.IsCompatibleWith(rhsVector.Indexer))
 			{
-				throw new NotImplementedException();
+				Action<int> multiplyLocal = nodeID =>
+				{
+					TMatrix localA = this.LocalMatrices[nodeID];
+					Vector localX = lhsVector.LocalVectors[nodeID];
+					Vector localY = rhsVector.LocalVectors[nodeID];
+					localA.MultiplyIntoResult(localX, localY, transposeThis);
+				};
+				Environment.DoPerNode(multiplyLocal);
+
+				rhsVector.SumOverlappingEntries();
 			}
-
-			CheckSameFormat(this, lhsVector);
-			CheckSameFormat(this, rhsVector);
-
-			Action<int> multiplyLocal = nodeID =>
+			else
 			{
-				TMatrix localA = this.LocalMatrices[nodeID];
-				Vector localX = lhsVector.LocalVectors[nodeID];
-				Vector localY = rhsVector.LocalVectors[nodeID];
-				localA.MultiplyIntoResult(localX, localY);
-			};
-			Environment.DoPerNode(multiplyLocal);
-
-			rhsVector.SumOverlappingEntries();
+				base.MultiplyIntoResult(lhsVector, rhsVector, transposeThis);
+			}
 		}
 
-		public void ScaleIntoThis(double coefficient)
+		public override IMatrix Scale(double scalar)
+		{
+			DistributedOverlappingMatrix<TMatrix> result = CopyAsDistributed();
+			result.ScaleIntoThis(scalar);
+			return result;
+		}
+
+		public override void ScaleIntoThis(double coefficient)
 		{
 			Environment.DoPerNode(nodeID => this.LocalMatrices[nodeID].ScaleIntoThis(coefficient));
 		}
 
-		public void SetEntryRespectingPattern(int rowIdx, int colIdx, double value)
-		{
-			CreateGlobalIndexerIfMissing();
-			globalIndexer.CheckGlobalIndex2D(rowIdx, colIdx);
-			IReadOnlyDictionary<int, int> localRowIndices = globalIndexer.FindLocalIndicesOf(rowIdx);
-			IReadOnlyDictionary<int, int> localColIndices = globalIndexer.FindLocalIndicesOf(colIdx);
+		public override IMatrix Transpose() => TransposeDistributed();
 
-			foreach ((int nodeID, int localColIdx) in localColIndices)
-			{
-				if (!LocalMatrices.ContainsKey(nodeID))
-				{
-					throw new Exception("This should not have happened. The distributed matrix is not created correctly.");
-				}
-
-				if (localRowIndices.TryGetValue(nodeID, out int localRowIdx))
-				{
-					LocalMatrices[nodeID].SetEntryRespectingPattern(localRowIdx, localColIdx, value); // Do this in all instances.
-				}
-			}
-
-			// If we reached this line, then the entry (rowIdx, colIdx) is not explicitly stored (structural zero)
-			if (value != 0.0)
-			{
-				throw new SparsityPatternModifiedException(
-					$"The entry ({rowIdx}, {colIdx}) is a structural zero and cannot be changed");
-			}
-		}
-
-		IMatrix IMatrixView.Transpose() => Transpose();
-
-		public DistributedOverlappingMatrix<TMatrix> Transpose()
+		public DistributedOverlappingMatrix<TMatrix> TransposeDistributed()
 		{
 			var transpose = new DistributedOverlappingMatrix<TMatrix>(Indexer);
 			Environment.DoPerNode(nodeID => transpose.LocalMatrices[nodeID] = (TMatrix)this.LocalMatrices[nodeID].Transpose());

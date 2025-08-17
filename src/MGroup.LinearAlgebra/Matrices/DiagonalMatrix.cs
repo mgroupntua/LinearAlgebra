@@ -147,10 +147,9 @@ namespace MGroup.LinearAlgebra.Matrices
 			return clone;
 		}
 
-		public double[] GetDiagonalAsArray()
-		{
-			return this.diagonal;
-		}
+		public Vector GetDiagonal() => Vector.CreateFromArray(this.GetDiagonalAsArray(), false);
+
+		public double[] GetDiagonalAsArray() => this.diagonal;
 
 		/// <summary>
 		/// Calculates the inverse matrix and writes it over the entries of this object, in order to conserve memory 
