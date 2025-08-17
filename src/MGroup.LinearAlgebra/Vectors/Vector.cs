@@ -482,6 +482,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public IVector CreateZeroVectorWithSameFormat() => new Vector(new double[Length]);
 
+		public IVector CreateZeroVectorSame() => new Vector(new double[Length]);
+
+
 		/// <summary>
 		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
 		/// </summary>

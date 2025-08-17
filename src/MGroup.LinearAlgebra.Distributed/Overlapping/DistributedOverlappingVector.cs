@@ -83,6 +83,18 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 				throw new Exception("This should not have happened. The distributed vector is not created correctly.");
 			}
+
+			set
+			{
+				IReadOnlyDictionary<int, int> localIndices = FindLocalIndicesFromGlobal(index);
+				foreach ((int nodeID, int localIdx) in localIndices)
+				{
+					if (LocalVectors.TryGetValue(nodeID, out Vector localVector))
+					{
+						localVector[localIdx] = value; // Set all instances
+					}
+				}
+			}
 		}
 
 		public override void AddToIndex(int index, double value)
@@ -224,14 +236,14 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return result;
 		}
 
-		public DistributedOverlappingVector CreateZeroVector()
+		public DistributedOverlappingVector CreateZeroVectorSame()
 		{
 			var result = new DistributedOverlappingVector(Indexer);
 			result.CacheSendRecvBuffers = this.CacheSendRecvBuffers;
 			return result;
 		}
 
-		public override IVector CreateZeroVectorWithSameFormat() => CreateZeroVector();
+		public override IVector CreateZeroVectorWithSameFormat() => CreateZeroVectorSame();
 
 		public override void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
 		{
@@ -454,19 +466,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(node => LocalVectors[node].ScaleIntoThis(scalar));
 		}
 
-		public override void Set(int index, double value) //TODO: also Update()
-		{
-			IReadOnlyDictionary<int, int> localIndices = FindLocalIndicesFromGlobal(index);
-			foreach ((int nodeID, int localIdx) in localIndices)
-			{
-				if (LocalVectors.TryGetValue(nodeID, out Vector localVector))
-				{
-					localVector[localIdx] = value; // Set all instances
-				}
-			}
-		}
-
-		public override void SetAll(double value) //TODO: also UpdateAll(). But isn't this the job of DoToAllEntries()? 
+		public override void SetAll(double value)
 		{
 			Environment.DoPerNode(node => LocalVectors[node].SetAll(value));
 		}

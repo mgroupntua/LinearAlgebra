@@ -11,15 +11,13 @@ namespace MGroup.LinearAlgebra.Vectors
 	{
 		public abstract int Length { get; }
 
-		public abstract double this[int index] { get; }
+		public abstract double this[int index] { get; set; }
 
 		public abstract void Clear();
 
 		public abstract IVector CreateZeroVectorWithSameFormat();
 
 		public abstract bool HasSameFormat(IVectorView other);
-
-		public abstract void Set(int index, double value);
 
 		public virtual void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
 		{
@@ -33,7 +31,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			for (int i = 0; i < otherIndices.Length; ++i)
 			{
 				double val = otherVector[otherIndices[i]];
-				this.Set(thisIndices[i], this[i] + val);
+				this[thisIndices[i]] += val;
 			}
 		}
 
@@ -43,11 +41,11 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < thisIndices.Length; ++i)
 			{
-				this.Set(thisIndices[i], otherVector[i]);
+				this[thisIndices[i]] = otherVector[i];
 			}
 		}
 
-		public virtual void AddToIndex(int index, double value) => Set(index, this[index] + value);
+		public virtual void AddToIndex(int index, double value) => this[index] = this[index] + value;
 
 		public virtual IVector Axpy(IVectorView otherVector, double otherCoefficient)
 			=> LinearCombination(1.0, otherVector, otherCoefficient);
@@ -72,8 +70,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < length; ++i)
 			{
-				double val = sourceCoefficient * sourceVector[sourceIndex + i];
-				this.Set(destinationIndex + i, this[destinationIndex + i] + val);
+				this[destinationIndex + i] += sourceCoefficient * sourceVector[sourceIndex + i];
 			}
 		}
 
@@ -105,7 +102,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				double val = sourceVector[i];
 				if (val != 0.0)
 				{
-					this.Set(i, val);
+					this[i] = val;
 				}
 			}
 		}
@@ -121,8 +118,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < otherIndices.Length; ++i)
 			{
-				double val = otherVector[otherIndices[i]];
-				this.Set(thisIndices[i], val);
+				this[thisIndices[i]] = otherVector[otherIndices[i]];
 			}
 		}
 
@@ -132,8 +128,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < otherIndices.Length; ++i)
 			{
-				double val = otherVector[otherIndices[i]];
-				this.Set(i, val);
+				this[i] = otherVector[otherIndices[i]];
 			}
 		}
 
@@ -153,8 +148,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < length; ++i)
 			{
-				double val = sourceVector[sourceIndex + i];
-				this.Set(destinationIndex + i, val);
+				this[destinationIndex + i] = sourceVector[sourceIndex + i];
 			}
 		}
 
@@ -201,7 +195,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < Length; i++)
 			{
-				this.Set(i, binaryOperation(this[i], otherVector[i]));
+				this[i] = binaryOperation(this[i], otherVector[i]);
 			}
 		}
 
@@ -229,7 +223,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < Length; i++)
 			{
-				this.Set(i, unaryOperation(this[i]));
+				this[i] = unaryOperation(this[i]);
 			}
 		}
 
@@ -294,6 +288,8 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public virtual void ScaleIntoThis(double scalar) => DoToAllEntries(x => scalar * x);
 
+		public virtual void Set(int index, double value) => this[index] = value;
+
 		public virtual void SetAll(double value)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -304,14 +300,6 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		[Conditional("DEBUG")]
-		private static void WarnAboutPerformanceBottlenecks()
-		{
-			Debug.WriteLine(
-				"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector, at :"
-				+ Environment.StackTrace);
-		}
-
 		[Conditional("RELEASE")]
 		private static void ProhibitPerformanceBottlenecks()
 		{
@@ -320,6 +308,14 @@ namespace MGroup.LinearAlgebra.Vectors
 				throw new PerformanceBottleneckException(
 					"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector.");
 			}
+		}
+
+		[Conditional("DEBUG")]
+		private static void WarnAboutPerformanceBottlenecks()
+		{
+			Debug.WriteLine(
+				"Potential performance bottleneck due to accessing all entries of a potentially sparse matrix or vector, at :"
+				+ Environment.StackTrace);
 		}
 	}
 }

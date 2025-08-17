@@ -243,7 +243,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.SparsityPatternModifiedException">
 		/// Thrown if a structural zero entry of a sparse vector format is written to.
 		/// </exception>
-		void Set(int index, double value);
+		void Set(int index, double value); //TODO: Also provide an update method
 
 		/// <summary>
 		/// Sets all explicitly stored values to <paramref name="value"/>. Structural zeros will remain zero.

@@ -53,8 +53,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			get
 			{
 				int sparseIdx = FindSparseIndexOf(index);
-				if (sparseIdx < 0) return 0.0;
-				else return values[sparseIdx];
+				return (sparseIdx < 0) ? 0.0 : values[sparseIdx];
+			}
+
+			set
+			{
+				int sparseIdx = FindSparseIndexOf(index);
+				CheckMutatedIndex(index, sparseIdx);
+				values[sparseIdx] = value;
 			}
 		}
 
@@ -582,13 +588,6 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		public override void ScaleIntoThis(double scalar) => GlobalProvider.Blas.Dscal(values.Length, scalar, values, 0, 1);
-
-		public override void Set(int index, double value)
-		{
-			int sparseIdx = FindSparseIndexOf(index);
-			CheckMutatedIndex(index, sparseIdx);
-			values[sparseIdx] = value;
-		}
 
 		public override void SetAll(double value)
 		{
