@@ -110,14 +110,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		public static DistributedOverlappingIndexer CreateIndexer(IComputeEnvironment environment)
 		{
 			var indexer = new DistributedOverlappingIndexer(environment);
-			Action<int> initializeIndexer = n =>
+			indexer.Initialize(nodeID => new LocalIndexerDto
 			{
-				var commonEntries = CreateCommonEntriesWithNeighbors(n);
-				var numEntries = 3;
-				indexer.GetLocalComponent(n).Initialize(numEntries, commonEntries);
-			};
-			environment.DoPerNode(initializeIndexer);
-
+				NumEntries = 3,
+				CommonEntriesOfNodeWithNeighbors = CreateCommonEntriesWithNeighbors(nodeID),
+			});
 			return indexer;
 		}
 

@@ -32,11 +32,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public GlobalIndexer(DistributedOverlappingIndexer mainIndexer)
 		{
-			Dictionary<int, DistributedOverlappingIndexer.Local> localIndexers = AllGatherLocalIndexers(mainIndexer);
+			Dictionary<int, LocalIndexer> localIndexers = mainIndexer.AllGatherLocalIndexers();
 			int numNodes = localIndexers.Count;
 
 			// Allocate memory for global-to-local maps. 
-			NumGlobalIndices = mainIndexer.NumUniqueEntries;
+			NumGlobalIndices = mainIndexer.NumGlobalIndices;
 			globalToLocal = new List<Dictionary<int, int>>(NumGlobalIndices);
 			for (int i = 0; i < NumGlobalIndices; i++)
 			{
@@ -47,7 +47,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			localToGlobal = new Dictionary<int, int[]>();
 			for (int nodeID = 0; nodeID < numNodes; nodeID++)
 			{
-				DistributedOverlappingIndexer.Local localIndexer = localIndexers[nodeID];
+				LocalIndexer localIndexer = localIndexers[nodeID];
 				localToGlobal[nodeID] = new int[localIndexer.NumEntries];
 				Array.Fill(localToGlobal[nodeID], -1);
 			}
@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			for (int nodeID = 0; nodeID < numNodes; nodeID++)
 			{
 				//ComputeNode node = mainIndexer.Environment.GetComputeNode(nodeID);
-				DistributedOverlappingIndexer.Local localIndexer = localIndexers[nodeID];
+				LocalIndexer localIndexer = localIndexers[nodeID];
 				int numLocalEntries = localIndexers[nodeID].NumEntries;
 				for (int localIdx = 0; localIdx < numLocalEntries; localIdx++)
 				{
@@ -89,7 +89,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 			for (int nodeID = 0; nodeID < numNodes; nodeID++)
 			{
-				DistributedOverlappingIndexer.Local localIndexer = localIndexers[nodeID];
+				LocalIndexer localIndexer = localIndexers[nodeID];
 				int[] map = localToGlobal[nodeID];
 				for (int localIdx = 0; localIdx < map.Length; localIdx++)
 				{
@@ -176,25 +176,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return nodeToLocal;
 		}
 
-		private Dictionary<int, DistributedOverlappingIndexer.Local> AllGatherLocalIndexers(DistributedOverlappingIndexer mainIndexer)
-		{
-			Dictionary<int, LocalIndexerDto> transferedDtos = mainIndexer.Environment.AllGather(
-				nodeID => new LocalIndexerDto(mainIndexer.GetLocalComponent(nodeID)));
-
-			var localIndexers = new Dictionary<int, DistributedOverlappingIndexer.Local>();
-			foreach (var nodeID_indexerDtoPair in transferedDtos)
-			{
-				localIndexers[nodeID_indexerDtoPair.Key] = nodeID_indexerDtoPair.Value.ToLocalIndexer(mainIndexer.Environment);
-			}
-
-			return localIndexers;
-		}
-
 		private List<(int neighborNodeID, int neighborLocalIdx)> FindCommonEntriesInNeighbors(int targetNodeID, 
-			int targetLocalIdx, Dictionary<int, DistributedOverlappingIndexer.Local> localIndexers)
+			int targetLocalIdx, Dictionary<int, LocalIndexer> localIndexers)
 		{
 			var result = new List<(int, int)>();
-			DistributedOverlappingIndexer.Local targetLocalIndexer = localIndexers[targetNodeID];
+			LocalIndexer targetLocalIndexer = localIndexers[targetNodeID];
 			foreach (int neighborNodeID in targetLocalIndexer.ActiveNeighborsOfNode)
 			{
 				// Check if the target local index corresponds to a common entry with this neighbor
@@ -218,34 +204,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 
 			return result;
-		}
-
-		[Serializable]
-		private class LocalIndexerDto
-		{
-			public LocalIndexerDto(DistributedOverlappingIndexer.Local localIndexer)
-			{
-				NodeID = localIndexer.Node.ID;
-				NumEntries = localIndexer.NumEntries;
-				CommonEntriesWithNeighbors = new Dictionary<int, int[]>();
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
-				{
-					CommonEntriesWithNeighbors[neighborID] = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
-				}
-			}
-
-			public Dictionary<int, int[]> CommonEntriesWithNeighbors { get; set; }
-
-			public int NodeID { get; set; }
-
-			public int NumEntries { get; set; }
-
-			public DistributedOverlappingIndexer.Local ToLocalIndexer(IComputeEnvironment environment)
-			{
-				var localIndexer = new DistributedOverlappingIndexer.Local(environment.GetComputeNode(NodeID));
-				localIndexer.Initialize(NumEntries, CommonEntriesWithNeighbors);
-				return localIndexer;
-			}
 		}
 	}
 }

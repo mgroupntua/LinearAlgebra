@@ -29,9 +29,9 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
 
-		public override int NumRows => Indexer.NumUniqueEntries;
+		public override int NumRows => Indexer.NumGlobalIndices;
 
-		public override int NumColumns => Indexer.NumUniqueEntries;
+		public override int NumColumns => Indexer.NumGlobalIndices;
 
 		public override double this[int rowIdx, int colIdx]
 		{
