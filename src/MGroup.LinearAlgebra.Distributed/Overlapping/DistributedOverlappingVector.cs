@@ -32,8 +32,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		private ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>	cachedBuffers = 
 			new ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>();
 
-		private GlobalIndexer globalIndexer;
-
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer)
 		{
 			this.Indexer = indexer;
@@ -217,14 +215,13 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public override double[] CopyToArray()
 		{
-			CreateGlobalIndexerIfMissing();
 			var result = new double[Length];
 			Environment.DoPerNodeSerially(nodeID =>
 			{
 				Vector localVector = LocalVectors[nodeID];
 				for (int localIdx = 0; localIdx < localVector.Length; localIdx++)
 				{
-					int globalIdx = globalIndexer.FindGlobalIndexOf(nodeID, localIdx);
+					int globalIdx = Indexer.FindGlobalIndexOf(nodeID, localIdx);
 					result[globalIdx] = localVector[localIdx];
 				}
 			});
@@ -496,25 +493,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(sumLocalSubvectors);
 		}
 
-		private void CreateGlobalIndexerIfMissing()
-		{
-			if (globalIndexer == null)
-			{
-				lock (globalIndexer)
-				{
-					if (globalIndexer == null) // in case another thread created it before this thread got the lock
-					{
-						globalIndexer = new GlobalIndexer(Indexer);
-					}
-				}
-			}
-		}
-
 		private IReadOnlyDictionary<int, int> FindLocalIndicesFromGlobal(int globalIdx)
 		{
-			CreateGlobalIndexerIfMissing();
-			globalIndexer.CheckGlobalIndex1D(globalIdx);
-			IReadOnlyDictionary<int, int> localIndices = globalIndexer.FindLocalIndicesOf(globalIdx);
+			Indexer.CheckGlobalIndex1D(globalIdx);
+			IReadOnlyDictionary<int, int> localIndices = Indexer.FindLocalIndicesOf(globalIdx);
 			if (localIndices.Count == 0)
 			{
 				throw new Exception("This should not have happened. The distributed vector is not created correctly.");

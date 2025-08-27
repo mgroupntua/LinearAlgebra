@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	/// In the distributed overlapping vector (and matrix) strategy, each entry of the global vector entry may appear in one or 
 	/// more local vectors. This class is responsible for converting global indices to local ones.
 	/// </summary>
-	public class GlobalIndexer
+	internal class GlobalIndexer
     {
 		/// <summary>
 		/// Each entry of the List corresponds to one global index. Each global vector entry may appear in one or more local
@@ -30,15 +30,16 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// </summary>
 		private readonly Dictionary<int, int[]> localToGlobal;
 
-		public GlobalIndexer(DistributedOverlappingIndexer mainIndexer)
+		private readonly int numGlobalIndices;
+
+		internal GlobalIndexer(Dictionary<int, LocalIndexer> localIndexers, int numGlobalIndices)
 		{
-			Dictionary<int, LocalIndexer> localIndexers = mainIndexer.AllGatherLocalIndexers();
+			this.numGlobalIndices = numGlobalIndices;
 			int numNodes = localIndexers.Count;
 
 			// Allocate memory for global-to-local maps. 
-			NumGlobalIndices = mainIndexer.NumGlobalIndices;
-			globalToLocal = new List<Dictionary<int, int>>(NumGlobalIndices);
-			for (int i = 0; i < NumGlobalIndices; i++)
+			globalToLocal = new List<Dictionary<int, int>>(this.numGlobalIndices);
+			for (int i = 0; i < this.numGlobalIndices; i++)
 			{
 				globalToLocal.Add(new Dictionary<int, int>());
 			}
@@ -80,7 +81,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 
 			// Check the mappings
-			for (int i = 0; i < NumGlobalIndices; i++)
+			for (int i = 0; i < this.numGlobalIndices; i++)
 			{
 				if (globalToLocal[i].Count < 1)
 				{
@@ -101,32 +102,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public int NumGlobalIndices { get; }
-
-		public void CheckGlobalIndex1D(int index)
-		{
-			if (index < 0 || index >= NumGlobalIndices)
-			{
-				throw new IndexOutOfRangeException($"The index must be in the range [0, {NumGlobalIndices}), but was {index}");
-			}
-		}
-
-		public void CheckGlobalIndex2D(int rowIdx, int colIdx)
-		{
-			if (rowIdx < 0 || rowIdx >= NumGlobalIndices)
-			{
-				throw new IndexOutOfRangeException(
-					$"The row index must be in the range [0, {NumGlobalIndices}), but was {rowIdx}");
-			}
-
-			if (colIdx < 0 || colIdx >= NumGlobalIndices)
-			{
-				throw new IndexOutOfRangeException(
-					$"The column index must be in the range [0, {NumGlobalIndices}), but was {colIdx}");
-			}
-		}
-
-		public int FindGlobalIndexOf(int nodeID, int localIdx) => localToGlobal[nodeID][localIdx];
+		internal int FindGlobalIndexOf(int nodeID, int localIdx) => localToGlobal[nodeID][localIdx];
 
 		/// <summary>
 		/// Returns -1 if no such index exists
@@ -135,7 +111,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// <param name="nodeID"></param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentException">Invalid global index</exception>
-		public int FindLocalIndexOf(int globalIdx, int nodeID)
+		internal int FindLocalIndexOf(int globalIdx, int nodeID)
 		{
 			if (globalIdx < 0 || globalIdx > globalToLocal.Count)
 			{
@@ -158,7 +134,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// Returns a dictionary where: a) the keys are the ids of the nodes containing <paramref name="globalIdx"/>,
 		/// b) the values are the local indices for the corresponding nodes.
 		/// </summary>
-		public IReadOnlyDictionary<int, int> FindLocalIndicesOf(int globalIdx)
+		internal IReadOnlyDictionary<int, int> FindLocalIndicesOf(int globalIdx)
 		{
 			if (globalIdx < 0 || globalIdx > globalToLocal.Count)
 			{

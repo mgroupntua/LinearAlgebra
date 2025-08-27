@@ -26,6 +26,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	{
 		private readonly object myLock = new();
 		private Dictionary<int, LocalIndexer> localIndexers;
+		private GlobalIndexer globalIndexer;
 
 		public DistributedOverlappingIndexer(IComputeEnvironment environment)
 		{
@@ -35,6 +36,29 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public IComputeEnvironment Environment { get; }
 
 		public int NumGlobalIndices { get; private set; }
+
+		public void CheckGlobalIndex1D(int index)
+		{
+			if (index < 0 || index >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException($"The index must be in the range [0, {NumGlobalIndices}), but was {index}");
+			}
+		}
+
+		internal void CheckGlobalIndex2D(int rowIdx, int colIdx)
+		{
+			if (rowIdx < 0 || rowIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The row index must be in the range [0, {NumGlobalIndices}), but was {rowIdx}");
+			}
+
+			if (colIdx < 0 || colIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The column index must be in the range [0, {NumGlobalIndices}), but was {colIdx}");
+			}
+		}
 
 		/// <summary>
 		/// Counts how many vector (or matrix) entries are common with other compute nodes. 
@@ -59,6 +83,26 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			clone.NumGlobalIndices = this.NumGlobalIndices;
 			return clone;
 		}
+
+		public int FindGlobalIndexOf(int nodeID, int localIdx) 
+			=> CreateGlobalIndexerIfMissing().FindGlobalIndexOf(nodeID, localIdx);
+
+		/// <summary>
+		/// Returns the global index corresponding to a local index or -1 if no such entry exists.
+		/// </summary>
+		/// <param name="globalIdx">The global index of the entry.</param>
+		/// <param name="nodeID">The id of the local vector/node</param>
+		/// <returns>See summary</returns>
+		/// <exception cref="ArgumentException">Invalid global index</exception>
+		public int FindLocalIndexOf(int globalIdx, int nodeID)
+			=> CreateGlobalIndexerIfMissing().FindLocalIndexOf(globalIdx, nodeID);
+
+		/// <summary>
+		/// Returns a dictionary where: a) keys are the ids of the nodes (1 node -> 1 local vector) containing
+		/// <paramref name="globalIdx"/>, b) values are the local indices for the corresponding nodes.
+		/// </summary>
+		public IReadOnlyDictionary<int, int> FindLocalIndicesOf(int globalIdx) 
+			=> CreateGlobalIndexerIfMissing().FindLocalIndicesOf(globalIdx);
 
 		public SortedSet<int> GetActiveNeighborIDs(int nodeID) => localIndexers[nodeID].ActiveNeighborsOfNode;
 
@@ -116,6 +160,22 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 
 			return result;
+		}
+
+		private GlobalIndexer CreateGlobalIndexerIfMissing()
+		{
+			if (globalIndexer == null)
+			{
+				lock (myLock)
+				{
+					if (globalIndexer == null) // in case another thread created it before this thread got the lock
+					{
+						globalIndexer = new GlobalIndexer(localIndexers, NumGlobalIndices);
+					}
+				}
+			}
+
+			return globalIndexer;
 		}
 
 		private void CountUniqueEntries()

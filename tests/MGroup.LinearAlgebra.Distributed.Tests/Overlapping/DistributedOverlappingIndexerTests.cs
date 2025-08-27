@@ -72,14 +72,13 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestGlobalToLocalIndex(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var distributedIndexer = CreateIndexer(environment);
-			var globalIndexer = new GlobalIndexer(distributedIndexer);
+			var indexer = CreateIndexer(environment);
 
-			for (var globalIdx = 0; globalIdx < globalIndexer.NumGlobalIndices; globalIdx++)
+			for (var globalIdx = 0; globalIdx < indexer.NumGlobalIndices; globalIdx++)
 			{
 				for (var node = 0; node <= NumComputeNodes; node++)
 				{
-					var localIdxComputed = globalIndexer.FindLocalIndexOf(globalIdx, node);
+					var localIdxComputed = indexer.FindLocalIndexOf(globalIdx, node);
 
 					var localIdxExpected = -1;
 					if (GlobalToLocalIndices[globalIdx].ContainsKey(node))
@@ -101,12 +100,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestGlobalToLocalIndices(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var distributedIndexer = CreateIndexer(environment);
-			var globalIndexer = new GlobalIndexer(distributedIndexer);
+			var indexer = CreateIndexer(environment);
 
-			for (var gi = 0; gi < globalIndexer.NumGlobalIndices; gi++)
+			for (var gi = 0; gi < indexer.NumGlobalIndices; gi++)
 			{
-				var localIndicesComputed = globalIndexer.FindLocalIndicesOf(gi);
+				var localIndicesComputed = indexer.FindLocalIndicesOf(gi);
 				var localIndicesExpected = GlobalToLocalIndices[gi];
 				Assert.Equal(localIndicesExpected.Count, localIndicesComputed.Count);
 				foreach ((var nodeID, var localIdx) in localIndicesComputed)
@@ -126,14 +124,13 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestLocalToGlobalIndex(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var distributedIndexer = CreateIndexer(environment);
-			var globalIndexer = new GlobalIndexer(distributedIndexer);
+			var indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				var numLocalIndices = distributedIndexer.GetNumLocalIndices(nodeID);
+				var numLocalIndices = indexer.GetNumLocalIndices(nodeID);
 				var localIndices = Enumerable.Range(0, numLocalIndices).ToArray();
-				var globalIndicesComputed = localIndices.Select(li => globalIndexer.FindGlobalIndexOf(nodeID, li)).ToArray();
+				var globalIndicesComputed = localIndices.Select(li => indexer.FindGlobalIndexOf(nodeID, li)).ToArray();
 				var globalIndicesExpected = localIndices.Select(li => LocalToGlobalIndices[nodeID][li]).ToArray();
 				Assert.Equal(globalIndicesExpected, globalIndicesComputed);
 			});
