@@ -48,7 +48,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			for (int nodeID = 0; nodeID < numNodes; nodeID++)
 			{
 				LocalIndexer localIndexer = localIndexers[nodeID];
-				localToGlobal[nodeID] = new int[localIndexer.NumEntries];
+				localToGlobal[nodeID] = new int[localIndexer.NumIndices];
 				Array.Fill(localToGlobal[nodeID], -1);
 			}
 
@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			{
 				//ComputeNode node = mainIndexer.Environment.GetComputeNode(nodeID);
 				LocalIndexer localIndexer = localIndexers[nodeID];
-				int numLocalEntries = localIndexers[nodeID].NumEntries;
+				int numLocalEntries = localIndexers[nodeID].NumIndices;
 				for (int localIdx = 0; localIdx < numLocalEntries; localIdx++)
 				{
 					if (localToGlobal[nodeID][localIdx] == -1) // This is an entry we have not met when processing another local vector

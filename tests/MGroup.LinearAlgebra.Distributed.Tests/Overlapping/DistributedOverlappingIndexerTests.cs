@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestCreateAllToAllBuffers(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
@@ -52,7 +52,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestCountCommonEntries(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
@@ -142,28 +142,12 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		[Theory]
 		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
 		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
-		public static void TestLocalNumEntriesManaged(EnvironmentChoice env) => TestLocalNumEntries(env.CreateEnvironment());
-
-		internal static void TestLocalNumEntries(IComputeEnvironment environment)
-		{
-			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
-
-			environment.DoPerNode(nodeID =>
-			{
-				Assert.Equal(3, indexer.GetNumLocalIndices(nodeID));
-			});
-		}
-
-		[Theory]
-		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
-		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
 		public static void TestLocalNeighborsManaged(EnvironmentChoice env) => TestLocalNeighbors(env.CreateEnvironment());
 
 		internal static void TestLocalNeighbors(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
@@ -181,11 +165,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestLocalCommonEntries(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
-				var commonEntriesExpected = CreateCommonEntriesWithNeighbors(nodeID);
+				Dictionary<int, int[]> commonEntriesExpected = CreateCommonEntriesWithNeighbors(nodeID);
 				foreach (var neighborID in GetNeighborsOfNode(nodeID))
 				{
 					var commonEntriesComputed = indexer.GetCommonEntriesOfNodeWithNeighbor(nodeID, neighborID);
@@ -203,7 +187,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		internal static void TestLocalMultiplicities(IComputeEnvironment environment)
 		{
 			environment.Initialize(CreateNodeTopology());
-			var indexer = CreateIndexer(environment);
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
 
 			environment.DoPerNode(nodeID =>
 			{
@@ -213,6 +197,71 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 			});
 		}
 
+		[Theory]
+		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
+		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
+		public static void TestNumGlobalEntriesManaged(EnvironmentChoice env) => TestNumGlobalEntries(env.CreateEnvironment());
+
+		internal static void TestNumGlobalEntries(IComputeEnvironment environment)
+		{
+			environment.Initialize(CreateNodeTopology());
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+			Assert.Equal(NumGlobalEntries, indexer.NumGlobalIndices);
+			
+		}
+
+		[Theory]
+		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
+		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
+		public static void TestNumLocalEntriesManaged(EnvironmentChoice env) => TestNumLocalEntries(env.CreateEnvironment());
+
+		internal static void TestNumLocalEntries(IComputeEnvironment environment)
+		{
+			environment.Initialize(CreateNodeTopology());
+			DistributedOverlappingIndexer indexer = CreateIndexer(environment);
+
+			environment.DoPerNode(nodeID =>
+			{
+				Assert.Equal(3, indexer.GetNumLocalIndices(nodeID));
+			});
+		}
+
+		[Theory]
+		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
+		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
+		public static void TestReuseAsBasisForNewIndexer(EnvironmentChoice env)
+			=> TestReuseAsBasisForNewIndexer(env.CreateEnvironment());
+
+		internal static void TestReuseAsBasisForNewIndexer(IComputeEnvironment environment)
+		{
+			environment.Initialize(CreateNodeTopology());
+			DistributedOverlappingIndexer originalIndexer = CreateIndexer(environment);
+
+			// Add an internal entry to the last subdomain
+			DistributedOverlappingIndexer newIndexer = originalIndexer.ReuseAsBasisForNewIndexer(nodeID =>
+			{
+				if (nodeID == 5) 
+				{
+					Dictionary<int, int[]> commonEntriesWithNodes = [];
+					commonEntriesWithNodes[4] = new int[] { 0 };
+					commonEntriesWithNodes[0] = new int[] { 3 };
+					return LocalIndexerDto.CreateWithNewContent(4, commonEntriesWithNodes);
+				}
+				else
+				{
+					return LocalIndexerDto.CreateUnmodified();
+				}
+			});
+
+			environment.DoPerNode(nodeID =>
+			{
+				var inverseMultiplicitiesExpected = Vector.CreateFromArray(
+					nodeID == 5 ? new double[] { 0.5, 1, 1, 0.5 } : new double[] { 0.5, 1, 0.5 });
+				var inverseMultiplicitiesComputed = Vector.CreateFromArray(newIndexer.GetInverseMultiplicities(nodeID));
+				Assert.True(inverseMultiplicitiesExpected.Equals(inverseMultiplicitiesComputed, 1E-13));
+			});
+			Assert.Equal(NumGlobalEntries + 1, newIndexer.NumGlobalIndices);
+		}
 
 		public static void RunMpiTests()
 		{
@@ -225,10 +274,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 				TestCreateAllToAllBuffers(mpiEnvironment);
 				TestLocalCommonEntries(mpiEnvironment);
 				TestLocalNeighbors(mpiEnvironment);
-				TestLocalNumEntries(mpiEnvironment);
+				TestNumLocalEntries(mpiEnvironment);
 				TestLocalMultiplicities(mpiEnvironment);
 				TestGlobalToLocalIndices(mpiEnvironment);
 				TestLocalToGlobalIndex(mpiEnvironment);
+				TestReuseAsBasisForNewIndexer(mpiEnvironment);
 
 				MpiDebugUtilities.DoSerially(MPI.Communicator.world,
 					() => Console.WriteLine($"Process {MPI.Communicator.world.Rank}: All tests passed"));

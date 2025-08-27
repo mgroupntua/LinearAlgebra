@@ -9,36 +9,50 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	[Serializable]
     public class LocalIndexerDto
 	{
-		public LocalIndexerDto() { }
+		internal LocalIndexerDto() { }
+		public static LocalIndexerDto CreateUnmodified() => new LocalIndexerDto { Modified = false };
 
-		internal LocalIndexerDto(LocalIndexer localIndexer)
+		public static LocalIndexerDto CreateWithNewContent(
+			int numIndices, Dictionary<int, int[]> commonEntriesOfNodeWithNeighbors)
 		{
-			NodeID = localIndexer.Node.ID;
-			NumEntries = localIndexer.NumEntries;
-			CommonEntriesOfNodeWithNeighbors = new Dictionary<int, int[]>();
+			var dto = new LocalIndexerDto
+			{
+				NumIndices = numIndices,
+				CommonEntriesOfNodeWithNeighbors = commonEntriesOfNodeWithNeighbors
+			};
+
+			return dto;
+		}
+
+		internal static LocalIndexerDto CreateForSerialization(LocalIndexer localIndexer)
+		{
+			var dto = new LocalIndexerDto
+			{
+				NodeID = localIndexer.Node.ID,
+				NumIndices = localIndexer.NumIndices,
+				CommonEntriesOfNodeWithNeighbors = new Dictionary<int, int[]>()
+			};
+
 			foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
 			{
-				this.CommonEntriesOfNodeWithNeighbors[neighborID] = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+				dto.CommonEntriesOfNodeWithNeighbors[neighborID] = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
 			}
+
+			return dto;
 		}
 
 		public Dictionary<int, int[]> CommonEntriesOfNodeWithNeighbors { get; set; }
 
-		public bool Modified { get; set; } = false;
+		public bool Modified { get; set; } = true;
 
-		public int NodeID { get; set; }
+		public int NodeID { get; set; } = -1;
 
-		public int NumEntries { get; set; }
+		public int NumIndices { get; set; }
 
 		internal LocalIndexer ToLocalIndexer(IComputeEnvironment environment)
 		{
-			var localIndexer = new LocalIndexer(environment.GetComputeNode(NodeID));
-			localIndexer.Initialize(new LocalIndexerDto
-			{
-				NumEntries = this.NumEntries,
-				CommonEntriesOfNodeWithNeighbors = this.CommonEntriesOfNodeWithNeighbors
-			});
-			return localIndexer;
+			ComputeNode node = environment.GetComputeNode(this.NodeID);
+			return new LocalIndexer(node, this.CommonEntriesOfNodeWithNeighbors, this.NumIndices);
 		}
 	}
 }

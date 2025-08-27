@@ -24,13 +24,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	/// </remarks>
 	public class DistributedOverlappingIndexer : IDistributedIndexer
 	{
-		private readonly Dictionary<int, LocalIndexer> localIndexers;
 		private readonly object myLock = new();
+		private Dictionary<int, LocalIndexer> localIndexers;
 
 		public DistributedOverlappingIndexer(IComputeEnvironment environment)
 		{
-			localIndexers = environment.CalcNodeData(
-				n => new LocalIndexer(environment.GetComputeNode(n)));
 			Environment = environment;
 		}
 
@@ -69,42 +67,46 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public double[] GetInverseMultiplicities(int nodeID) => localIndexers[nodeID].InverseMultiplicities;
 
-		public int GetNumLocalIndices(int nodeID) => localIndexers[nodeID].NumEntries;
+		public int GetNumLocalIndices(int nodeID) => localIndexers[nodeID].NumIndices;
 
 		public void Initialize(Func<int, LocalIndexerDto> getLocalIndexingData)
 		{
-			Environment.DoPerNode(node =>
+			localIndexers = Environment.CalcNodeData(nodeID =>
 			{
-				LocalIndexerDto localIndexingData = getLocalIndexingData(node);
-				localIndexers[node].Initialize(localIndexingData);
+				LocalIndexerDto dto = getLocalIndexingData(nodeID);
+				return new LocalIndexer(Environment.GetComputeNode(nodeID), dto.CommonEntriesOfNodeWithNeighbors, dto.NumIndices);
 			});
 			CountUniqueEntries();
 		}
 
 		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
 
-		public DistributedOverlappingIndexer ReplaceWithNewIndexer(Func<int, LocalIndexerDto> getLocalIndexingData)
+
+		public DistributedOverlappingIndexer ReuseAsBasisForNewIndexer(Func<int, LocalIndexerDto> getLocalIndexingData)
 		{
 			var result = new DistributedOverlappingIndexer(Environment);
-			Environment.DoPerNode(node =>
+			result.localIndexers = Environment.CalcNodeData(nodeID =>
 			{
-				LocalIndexerDto localIndexingData = getLocalIndexingData(node);
-				if (localIndexingData.Modified)
+				LocalIndexerDto dto = getLocalIndexingData(nodeID);
+				if (dto.Modified)
 				{
-					result.localIndexers[node].InitializeFrom(this.localIndexers[node]);
+					return new LocalIndexer(
+						Environment.GetComputeNode(nodeID), dto.CommonEntriesOfNodeWithNeighbors, dto.NumIndices);
 				}
 				else
 				{
-					result.localIndexers[node].Initialize(localIndexingData);
+					return this.localIndexers[nodeID];
 				}
 			});
+
+			result.CountUniqueEntries();
 			return result;
 		}
 
 		internal Dictionary<int, LocalIndexer> AllGatherLocalIndexers()
 		{
 			Dictionary<int, LocalIndexerDto> transferedDtos = Environment.AllGather(
-				nodeID => new LocalIndexerDto(this.localIndexers[nodeID])
+				nodeID => LocalIndexerDto.CreateForSerialization(this.localIndexers[nodeID])
 			);
 
 			var result = new Dictionary<int, LocalIndexer>();

@@ -9,29 +9,44 @@ using MGroup.Environments;
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
 	/// <summary>
-	/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 
-	/// matrix, etc. that corresponds to a specific <see cref="ComputeNode"/>.
+	/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector / 
+	/// matrix / etc. that corresponds to a specific <see cref="ComputeNode"/>.
 	/// </summary>
 	internal class LocalIndexer
 	{
-		private Dictionary<int, int[]> commonEntriesWithNeighbors;
+		private readonly Dictionary<int, int[]> commonEntriesWithNeighbors;
 
-		internal LocalIndexer(ComputeNode node)
+		internal LocalIndexer(ComputeNode node, SortedSet<int> activeNeighbors, 
+			Dictionary<int, int[]> commonEntriesWithNeighbors, double[] inverseMultiplicities, int numIndices)
 		{
 			this.Node = node;
+			this.NumIndices = numIndices;
+			this.commonEntriesWithNeighbors = commonEntriesWithNeighbors;
+			this.ActiveNeighborsOfNode = activeNeighbors;
+			this.InverseMultiplicities = inverseMultiplicities;
+		}
+
+		internal LocalIndexer(ComputeNode node, Dictionary<int, int[]> commonEntriesWithNeighbors, int numIndices)
+		{
+			this.Node = node;
+			this.NumIndices = numIndices;
+			this.commonEntriesWithNeighbors = commonEntriesWithNeighbors;
+			ActiveNeighborsOfNode = new SortedSet<int>(commonEntriesWithNeighbors.Keys);
+			Debug.Assert(Node.Neighbors.IsSupersetOf(ActiveNeighborsOfNode));
+			this.InverseMultiplicities = FindMultiplicities();
 		}
 
 		/// <summary>
 		/// Neighboring <see cref="ComputeNode"/>s of this <see cref="Node"/> with local vectors that have at least 1 common 
 		/// entry with the local vector of this <see cref="Node"/>.
 		/// </summary>
-		internal SortedSet<int> ActiveNeighborsOfNode { get; private set; }
+		internal SortedSet<int> ActiveNeighborsOfNode { get; }
 
-		internal double[] InverseMultiplicities { get; private set; }
+		internal double[] InverseMultiplicities { get; }
 
 		internal ComputeNode Node { get; }
 
-		internal int NumEntries { get; private set; }
+		internal int NumIndices { get; }
 
 		internal (int local, int remote) CountCommonEntries()
 		{
@@ -71,59 +86,39 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		internal LocalIndexer DeepCopy()
 		{
-			var clone = new LocalIndexer(this.Node);
-			clone.NumEntries = this.NumEntries;
-			clone.ActiveNeighborsOfNode = new SortedSet<int>(this.ActiveNeighborsOfNode);
+			var activeNeighborsCopy = new SortedSet<int>(this.ActiveNeighborsOfNode);
 
-			clone.InverseMultiplicities = new double[this.InverseMultiplicities.Length];
-			Array.Copy(this.InverseMultiplicities, clone.InverseMultiplicities, this.InverseMultiplicities.Length);
+			var inverseMultiplicitiesCopy = new double[this.InverseMultiplicities.Length];
+			Array.Copy(this.InverseMultiplicities, inverseMultiplicitiesCopy, this.InverseMultiplicities.Length);
 
-			clone.commonEntriesWithNeighbors = new Dictionary<int, int[]>();
+			var commonEntriesWithNeighborsCopy = new Dictionary<int, int[]>();
 			foreach ((int nodeID, int[] data) in this.commonEntriesWithNeighbors)
 			{
 				var clonedData = new int[data.Length];
 				Array.Copy(data, clonedData, data.Length);
-				clone.commonEntriesWithNeighbors[nodeID] = clonedData;
+				commonEntriesWithNeighborsCopy[nodeID] = clonedData;
 			}
 
-			return clone;
+			return new LocalIndexer(
+				this.Node,  activeNeighborsCopy, commonEntriesWithNeighborsCopy, inverseMultiplicitiesCopy, this.NumIndices);
 		}
 
 
 		internal int[] GetCommonEntriesWithNeighbor(int neighborID) => commonEntriesWithNeighbors[neighborID];
 
-		internal void Initialize(LocalIndexerDto indexingDto)
+		private double[] FindMultiplicities()
 		{
-			this.NumEntries = indexingDto.NumEntries;
-			ActiveNeighborsOfNode = new SortedSet<int>(indexingDto.CommonEntriesOfNodeWithNeighbors.Keys);
-			Debug.Assert(Node.Neighbors.IsSupersetOf(ActiveNeighborsOfNode));
-			this.commonEntriesWithNeighbors = indexingDto.CommonEntriesOfNodeWithNeighbors;
-			FindMultiplicities();
-		}
-
-		/// <summary>
-		/// Copy data shallowly from <paramref name="other"/>.
-		/// </summary>
-		/// <param name="other"></param>
-		internal void InitializeFrom(LocalIndexer other)
-		{
-			this.NumEntries = other.NumEntries;
-			this.commonEntriesWithNeighbors = other.commonEntriesWithNeighbors;
-			this.ActiveNeighborsOfNode = other.ActiveNeighborsOfNode;
-			this.InverseMultiplicities = other.InverseMultiplicities;
-		}
-
-		private void FindMultiplicities()
-		{
-			var multiplicities = new int[NumEntries];
-			for (int i = 0; i < NumEntries; ++i) multiplicities[i] = 1;
+			var multiplicities = new int[NumIndices];
+			for (int i = 0; i < NumIndices; ++i) multiplicities[i] = 1;
 			foreach (int[] commonEntries in commonEntriesWithNeighbors.Values)
 			{
 				foreach (int i in commonEntries) multiplicities[i] += 1;
 			}
 
-			InverseMultiplicities = new double[NumEntries];
-			for (int i = 0; i < NumEntries; ++i) InverseMultiplicities[i] = 1.0 / multiplicities[i];
+			var inverseMultiplicities = new double[NumIndices];
+			for (int i = 0; i < NumIndices; ++i) inverseMultiplicities[i] = 1.0 / multiplicities[i];
+
+			return inverseMultiplicities;
 		}
 	}
 }
