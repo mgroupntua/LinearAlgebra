@@ -6,11 +6,14 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
-	using MGroup.LinearAlgebra.Iterative.Stationary.CSR;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;
 
+	/// <summary>
+	/// Preconditioner for iterative methods for linear systems, which uses the POD-AMG (Proper Orthogonal Decomposition - 
+	/// Algebraic Multigrid) method.
+	/// </summary>
 	public class PodAmgPreconditioner : IPreconditioner
 	{
 		private readonly bool keepOnlyNonZeroPrincipalComponents;
@@ -20,9 +23,19 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		private CsrMatrix fineMatrix;
 		private CholeskyFull coarseMatrixFactorized;
 
-		// Restriction is the transpose of this
+		/// <summary>
+		/// Prolongation/interpolation matrix. Restriction mastrix is assumed to be the transpose of this.
+		/// </summary>
 		private Matrix prolongation;
 
+		/// <summary>
+		/// Creates a new instance of <see cref="PodAmgAlgorithm"/> with the specified settings.
+		/// </summary>
+		/// <param name="keepOnlyNonZeroPrincipalComponents">How many principal components to keep during POD.</param>
+		/// <param name="smoothing">
+		/// Specifies the smoothing operator (e.g. Gauss-Seidel, Jacobi, SOR, ...) of the multigrid procedure.
+		/// </param>
+		/// <param name="numIterations">How many AMG cycles to perform each time the preconditioner is called.</param>
 		public PodAmgPreconditioner(
 			bool keepOnlyNonZeroPrincipalComponents, MultigridLevelSmoothing smoothing, int numIterations)
 		{
@@ -31,15 +44,33 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			this.numIterations = numIterations;
 		}
 
+		/// <summary>
+		/// Creates a new instance of <see cref="PodAmgPreconditioner"/> with the same settings as this instance.
+		/// </summary>
+		/// <returns>A new instance of <see cref="PodAmgPreconditioner"/>.</returns>
 		public IPreconditioner CopyWithInitialSettings()
 			=> new PodAmgPreconditioner(keepOnlyNonZeroPrincipalComponents, smoothing.CopyWithInitialSettings(), numIterations);
 
+		/// <summary>
+		/// Prepares the multigrid operators for the provided training data. This can be done only once, regardless of changes
+		/// in the linear system matrix.
+		/// </summary>
+		/// <param name="sampleVectors">Matrix whose columns are the vectors to be used in POD.</param>
+		/// <param name="numPrincipalComponents">How many principal components to keep during POD.</param>
 		public void Initialize(Matrix sampleVectors, int numPrincipalComponents)
 		{
 			var pod = new ProperOrthogonalDecomposition(keepOnlyNonZeroPrincipalComponents);
 			prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
 		}
 
+		/// <summary>
+		/// Solves the linear system of the preconditioning step.
+		/// </summary>
+		/// <param name="rhsVector">
+		/// The right-hand-side vector of the preconditiong step. Usually the residual vector of the original linear system
+		/// solver.
+		/// </param>
+		/// <param name="lhsVector">Initial guess for the solution vector. Usually it is zero.</param>
 		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
 		{
 			var rhs = (Vector)rhsVector;
@@ -81,6 +112,20 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			}
 		}
 
+		/// <summary>
+		/// Prepares the multigrid operators for the provided matrix of the linear system. <see cref="Initialize(Matrix, int)"/> 
+		/// must be called prior to this.
+		/// </summary>
+		/// <param name="matrix">The matrix of the original linear system in CSR format.</param>
+		/// <param name="isPatternModified">
+		/// True if the sparsity pattern of the matrix has been changed since the previous call of this method.
+		/// </param>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown if <see cref="Initialize(Matrix, int)"/> has not already been called.
+		/// </exception>
+		/// <exception cref="InvalidSparsityPatternException">
+		/// Thrown if the matrix of the linear system is not in CSR format.
+		/// </exception>
 		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
 		{
 			if (prolongation == null)

@@ -1,18 +1,27 @@
 namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Text;
 
 	using MGroup.LinearAlgebra.Eigensystems;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
+	/// <summary>
+	/// Performs Proper Orthogonal Decomposition (POD), also known as Principal Component Analysis (PCA).
+	/// </summary>
 	public class ProperOrthogonalDecomposition
 	{
 		private readonly bool _keepOnlyNonZeroEigenvalues;
 		private readonly double _zeroEigenvalueTolerance;
 
+		/// <summary>
+		/// Creates a new instance of <see cref="ProperOrthogonalDecomposition"/> with the specified settings.
+		/// </summary>
+		/// <param name="keepOnlyNonZeroEigenvalues">
+		/// If true, eigenvalues that are smaller <paramref name="zeroEigenvalueTolerance"/> will be ignored during SVD,
+		/// along with their corresponding eigenvectors.
+		/// </param>
+		/// <param name="zeroEigenvalueTolerance">The max absolute value of important eigenvalues.</param>
 		public ProperOrthogonalDecomposition(bool keepOnlyNonZeroEigenvalues, double zeroEigenvalueTolerance = 1E-10)
 		{
 			_keepOnlyNonZeroEigenvalues = keepOnlyNonZeroEigenvalues;
@@ -20,7 +29,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		}
 
 		/// <summary>
-		/// Performs POD analysis and returns the principal components of a samples set
+		/// Performs POD analysis and returns the principal components of a samples set.
 		/// </summary>
 		/// <param name="numSampleVectors">
 		/// The number of sample vectors. Must be equal to the number of columns in <paramref name="sampleVectors"/> and &gt;= 2.
@@ -33,7 +42,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		/// How many principal components to keep. Depending on the configuration of this object, if some eigenvectors 
 		/// correspond to zero eigenvalues, they will be discarded and fewer total eigenvectors will be returned.
 		/// </param>
-		/// <returns></returns>
+		/// <returns>The principal components as columns of a dense matrix.</returns>
 		public Matrix CalculatePrincipalComponents(int numSampleVectors, Matrix sampleVectors, int numPrincipalComponents)
 		{
 			if (sampleVectors.NumColumns != numSampleVectors)
@@ -72,6 +81,13 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			}
 		}
 
+		/// <summary>
+		/// Count the number of principal components that will be kept during POD. The number might differ from the user's
+		/// instructions.
+		/// </summary>
+		/// <param name="numComponentsRequested">How many principal compenents were requested by the user.</param>
+		/// <param name="eigenvaluesDescending">The eigenvalues in descending order.</param>
+		/// <returns>The number of important components, as an integer.</returns>
 		private int CountPrincipalComponentsToKeep(int numComponentsRequested, Vector eigenvaluesDescending)
 		{
 			if (_keepOnlyNonZeroEigenvalues)

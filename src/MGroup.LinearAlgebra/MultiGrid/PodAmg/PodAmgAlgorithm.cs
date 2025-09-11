@@ -10,6 +10,9 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;
 
+	/// <summary>
+	/// Solves linear systems using the 2-level POD-AMG (Proper Orthogonal Decomposition - Algebraic Multigrid) method.
+	/// </summary>
 	public class PodAmgAlgorithm
 	{
 		private const string name = "POD-AMG";
@@ -44,6 +47,10 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			this.maxIterationsProvider = maxIterationsProvider;
 		}
 
+		/// <summary>
+		/// Performs POD and prepares the multigrid operators for the provided matrix and training data.
+		/// </summary>
+		/// <param name="systemMatrix">The matrix of the linear system in CSR format.</param>
 		public void Initialize(CsrMatrix systemMatrix)
 		{
 			if (_prolongation == null) // It may have been created in previous system solutions
@@ -62,10 +69,11 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		}
 
 		/// <summary>
+		/// Solves the linear system using the 2-level POD-AMG method. <see cref="Initialize(CsrMatrix)"/> must be called first.
 		/// </summary>
-		/// <param name="rhs"></param>
-		/// <param name="solution">An initial guess or a zero vector.</param>
-		/// <returns></returns>
+		/// <param name="rhs">The right-hand-side vector of the linear system</param>
+		/// <param name="solution">Initial guess for the solution vector. Can be zero.</param>
+		/// <returns>Info about the performance of the algorithm.</returns>
 		public IterativeStatistics Solve(Vector rhs, Vector solution)
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(fineMatrix, rhs, solution);
@@ -137,8 +145,14 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			};
 		}
 
+		/// <summary>
+		/// Helper class to create instances of <see cref="PodAmgAlgorithm"/>.
+		/// </summary>
 		public class Factory
 		{
+			/// <summary>
+			/// Creates new instance of <see cref="Factory"/>.
+			/// </summary>
 			public Factory()
 			{
 				KeepOnlyNonZeroPrincipalComponents = true;
@@ -152,10 +166,20 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 					.AddPostSmoother(new GaussSeidelIterationCsr(), 1);
 			}
 
+			/// <summary>
+			/// Specifies how to determines when the iterative algorithm has converged to the desired solution.
+			/// </summary>
 			public ISolutionConvergenceCriterion ConvergenceCriterion { get; set; }
 
+			/// <summary>
+			/// Max absolute value for the norm-2 of the residual vector to determine that the algorithm has converged.
+			/// </summary>
 			public double ConvergenceTolerance { get; set; }
 
+			/// <summary>
+			/// If true, eigenvalues that are smaller than a specified tolerance will be ignored during POD,
+			/// along with their corresponding eigenvectors.
+			/// </summary>
 			public bool KeepOnlyNonZeroPrincipalComponents { get; set; }
 
 			/// <summary>
@@ -163,8 +187,17 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			/// </summary>
 			public IMaxIterationsProvider MaxIterationsProvider { get; set; }
 
+			/// <summary>
+			/// Specifies the smoothing operator (e.g. Gauss-Seidel, Jacobi, SOR, ...) of the multigrid procedure.
+			/// </summary>
 			public MultigridLevelSmoothing Smoothing { get; set; }
 
+			/// <summary>
+			/// Creates a new instance of <see cref="PodAmgAlgorithm"/> with the specified settings.
+			/// </summary>
+			/// <param name="sampleVectors">Matrix whose columns are the vectors to be used in POD.</param>
+			/// <param name="numPrincipalComponents">How many principal components to keep during POD.</param>
+			/// <returns>A new instance of <see cref="PodAmgAlgorithm"/>.</returns>
 			public PodAmgAlgorithm Create(Matrix sampleVectors, int numPrincipalComponents)
 			{
 				return new PodAmgAlgorithm(sampleVectors, KeepOnlyNonZeroPrincipalComponents, numPrincipalComponents,
@@ -172,6 +205,5 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 					MaxIterationsProvider.CopyWithInitialSettings());
 			}
 		}
-
 	}
 }
