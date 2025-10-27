@@ -105,7 +105,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 			builder.MaximumIterations = 10 * A.NumRows;
 			var gmres = builder.Build();
 			preconditioner.UpdateMatrix(csrA, true);
-			var stats = gmres.Solve(csrA, preconditioner, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			var stats = gmres.Solve(csrA, preconditioner, b, xComputed, true);
 
 			var comparer = new MatrixComparer(1E-5);
 			comparer.AssertEqual(xExpected, xComputed);

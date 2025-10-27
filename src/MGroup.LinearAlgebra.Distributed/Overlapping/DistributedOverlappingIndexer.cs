@@ -37,6 +37,20 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public int NumGlobalIndices { get; private set; }
 
+		public DistributedOverlappingVector CastCompatibleVector(IVectorView vector)
+		{
+			if (vector is DistributedOverlappingVector distributedVector)
+			{
+				if (distributedVector.Indexer == this)
+				{
+					return distributedVector;
+				}
+			}
+
+			throw new NonMatchingFormatException("The provided vector has a different format than this indexer. " +
+				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
+		}
+
 		public void CheckGlobalIndex1D(int index)
 		{
 			if (index < 0 || index >= NumGlobalIndices)
@@ -124,7 +138,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		}
 
 		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
-
 
 		public DistributedOverlappingIndexer ReuseAsBasisForNewIndexer(Func<int, LocalIndexerDto> getLocalIndexingData)
 		{
