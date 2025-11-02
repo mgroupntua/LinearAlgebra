@@ -11,11 +11,25 @@
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
 
+  <!-- Import the global props file for development on local machines-->
+  <Import Project="..\..\..\Directory.Build.props" Condition="Exists('..\..\..\Directory.Build.props')" />
+
+  <PropertyGroup>
+    <UseLocalMSolveProjects Condition="'$(UseLocalMSolveProjects)' == ''">false</UseLocalMSolveProjects>
+  </PropertyGroup>  
+  
   <ItemGroup>
-    <PackageReference Include="MGroup.Environments" Version="0.2.0-unstable.12" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'false'">
+    <PackageReference Include="MGroup.Environments" Version="0.2.0-unstable.12" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseLocalMSolveProjects)' == 'true'">
+    <ProjectReference Include="..\..\..\Environments\src\MGroup.Environments\MGroup.Environments.csproj" />
+  </ItemGroup>  
+  
   <ItemGroup>
     <ProjectReference Include="..\MGroup.LinearAlgebra\MGroup.LinearAlgebra.csproj" />
   </ItemGroup>

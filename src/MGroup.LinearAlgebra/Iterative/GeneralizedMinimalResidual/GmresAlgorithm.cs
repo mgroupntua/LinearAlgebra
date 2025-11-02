@@ -12,15 +12,15 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 	/// <summary>
 	/// Based on Restarted GMRES implementation provided in https://people.sc.fsu.edu/~jburkardt/m_src/mgmres/mgmres.html
 	/// </summary>
-	public class GmresAlgorithm
+	public class GmresAlgorithm : ISystemSolutionIterativeMethod
 	{
 		private const string name = "Restarted Generalized minimal residual method";
 
-		private double absoluteTolerance;
-		private double relativeTolerance;
-		private int maximumIterations;
-		private IMaxIterationsProvider innerIterationsProvider;
-		protected IVector residual;
+		private readonly double absoluteTolerance;
+		private readonly double relativeTolerance;
+		private readonly int maximumIterations;
+		private readonly IMaxIterationsProvider innerIterationsProvider;
+		private IVector residual;
 
 		public GmresAlgorithm(double absoluteTolerance, double relativeTolerance, int maximumIterations,
 			IMaxIterationsProvider innerIterationsProvider)
@@ -31,16 +31,19 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 			this.innerIterationsProvider = innerIterationsProvider;
 		}
 
-		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
-			bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+		public void Clear()
 		{
-			return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero,
-				zeroVectorInitializer);
+			this.residual = null;
 		}
 
+		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
+			bool initialGuessIsZero)
+		{
+			return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero);
+		}
 
-		public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
-			bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+		public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
+			IVector solution, bool initialGuessIsZero)
 		{
 			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
 			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);

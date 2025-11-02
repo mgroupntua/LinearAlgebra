@@ -13,8 +13,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	/// <summary>
 	/// Manages the indices for a <see cref="DistributedOverlappingVector"/>, <see cref="DistributedOverlappingMatrix{TMatrix}"/>, 
 	/// etc. Supports multiple local vectors, each of which may have none, some or all its entries in common with other local 
-	/// vectors. Specifies the relationships between these common entries. When dealing with multiple distributed vectors that 
-	/// have the same indexing pattern, reuse the same instance of <see cref="DistributedOverlappingIndexer"/>.
+	/// vectors/matrices. Specifies the relationships between these common entries. When dealing with multiple distributed  
+	/// vectors that have the same indexing pattern, reuse the same instance of <see cref="DistributedOverlappingIndexer"/>.
 	/// </summary>
 	/// <remarks>
 	/// In interface problems of PSM and related DDMs, local vectors have all their entries in common with other local vectors, 
@@ -24,31 +24,68 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	/// </remarks>
 	public class DistributedOverlappingIndexer : IDistributedIndexer
 	{
-		private readonly Dictionary<int, Local> localIndexers;
 		private readonly object myLock = new();
-		private int numUniqueEntries = int.MinValue;
+		private Dictionary<int, LocalIndexer> localIndexers;
+		private GlobalIndexer globalIndexer;
 
 		public DistributedOverlappingIndexer(IComputeEnvironment environment)
 		{
-			localIndexers = environment.CalcNodeData(
-				n => new Local(environment.GetComputeNode(n)));
 			Environment = environment;
 		}
 
 		public IComputeEnvironment Environment { get; }
 
-		public int NumUniqueEntries 
-		{ 
-			get
-			{
-				if (numUniqueEntries == int.MinValue) // If it has not already been computed
-				{
-					CountUniqueEntries();
-				}
+		public int NumGlobalIndices { get; private set; }
 
-				return numUniqueEntries;
+		public DistributedOverlappingVector CastCompatibleVector(IVectorView vector)
+		{
+			if (vector is DistributedOverlappingVector distributedVector)
+			{
+				if (distributedVector.Indexer == this)
+				{
+					return distributedVector;
+				}
+			}
+
+			throw new NonMatchingFormatException("The provided vector has a different format than this indexer. " +
+				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
+		}
+
+		public void CheckGlobalIndex1D(int index)
+		{
+			if (index < 0 || index >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException($"The index must be in the range [0, {NumGlobalIndices}), but was {index}");
 			}
 		}
+
+		internal void CheckGlobalIndex2D(int rowIdx, int colIdx)
+		{
+			if (rowIdx < 0 || rowIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The row index must be in the range [0, {NumGlobalIndices}), but was {rowIdx}");
+			}
+
+			if (colIdx < 0 || colIdx >= NumGlobalIndices)
+			{
+				throw new IndexOutOfRangeException(
+					$"The column index must be in the range [0, {NumGlobalIndices}), but was {colIdx}");
+			}
+		}
+
+		/// <summary>
+		/// Counts how many vector (or matrix) entries are common with other compute nodes. 
+		/// </summary>
+		/// <returns>
+		/// "local" = how many entries in common with vectors (or matrices) in the same cluster.
+		/// "remote" = how many entries in common with vectors (or matrices) in other clusters.
+		/// </returns>
+		public (int local, int remote) CountCommonEntriesOfNodeWithNeighbors(int nodeID) 
+			=> localIndexers[nodeID].CountCommonEntries();
+
+		public ConcurrentDictionary<int, double[]> CreateBuffersForAllToAllWithNeighbors(int nodeID) 
+			=> localIndexers[nodeID].CreateBuffersForAllToAllWithNeighbors();
 
 		public DistributedOverlappingIndexer DeepCopy()
 		{
@@ -57,163 +94,119 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			{
 				clone.localIndexers[node] = this.localIndexers[node].DeepCopy();
 			});
-			clone.numUniqueEntries = this.numUniqueEntries;
+			clone.NumGlobalIndices = this.NumGlobalIndices;
 			return clone;
 		}
 
-		public DistributedOverlappingIndexer.Local GetLocalComponent(int nodeID) => localIndexers[nodeID];
+		public int FindGlobalIndexOf(int nodeID, int localIdx) 
+			=> CreateGlobalIndexerIfMissing().FindGlobalIndexOf(nodeID, localIdx);
+
+		/// <summary>
+		/// Returns the global index corresponding to a local index or -1 if no such entry exists.
+		/// </summary>
+		/// <param name="globalIdx">The global index of the entry.</param>
+		/// <param name="nodeID">The id of the local vector/node</param>
+		/// <returns>See summary</returns>
+		/// <exception cref="ArgumentException">Invalid global index</exception>
+		public int FindLocalIndexOf(int globalIdx, int nodeID)
+			=> CreateGlobalIndexerIfMissing().FindLocalIndexOf(globalIdx, nodeID);
+
+		/// <summary>
+		/// Returns a dictionary where: a) keys are the ids of the nodes (1 node -> 1 local vector) containing
+		/// <paramref name="globalIdx"/>, b) values are the local indices for the corresponding nodes.
+		/// </summary>
+		public IReadOnlyDictionary<int, int> FindLocalIndicesOf(int globalIdx) 
+			=> CreateGlobalIndexerIfMissing().FindLocalIndicesOf(globalIdx);
+
+		public SortedSet<int> GetActiveNeighborIDs(int nodeID) => localIndexers[nodeID].ActiveNeighborsOfNode;
+
+		public int[] GetCommonEntriesOfNodeWithNeighbor(int nodeID, int neighborID) 
+			=> localIndexers[nodeID].GetCommonEntriesWithNeighbor(neighborID);
+
+		public double[] GetInverseMultiplicities(int nodeID) => localIndexers[nodeID].InverseMultiplicities;
+
+		public int GetNumLocalIndices(int nodeID) => localIndexers[nodeID].NumIndices;
+
+		public void Initialize(Func<int, LocalIndexerDto> getLocalIndexingData)
+		{
+			localIndexers = Environment.CalcNodeData(nodeID =>
+			{
+				LocalIndexerDto dto = getLocalIndexingData(nodeID);
+				return new LocalIndexer(Environment.GetComputeNode(nodeID), dto.CommonEntriesOfNodeWithNeighbors, dto.NumIndices);
+			});
+			CountUniqueEntries();
+		}
 
 		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
 
-		private void CountUniqueEntries()
+		public DistributedOverlappingIndexer ReuseAsBasisForNewIndexer(Func<int, LocalIndexerDto> getLocalIndexingData)
 		{
-			lock (myLock)
+			var result = new DistributedOverlappingIndexer(Environment);
+			result.localIndexers = Environment.CalcNodeData(nodeID =>
 			{
-				if (numUniqueEntries != int.MinValue) // in case another thread calculated it before the lock was acquired
+				LocalIndexerDto dto = getLocalIndexingData(nodeID);
+				if (dto.Modified)
 				{
-					return;
+					return new LocalIndexer(
+						Environment.GetComputeNode(nodeID), dto.CommonEntriesOfNodeWithNeighbors, dto.NumIndices);
 				}
-
-				Dictionary<int, double> countPerNode = Environment.CalcNodeData(node =>
+				else
 				{
-					double[] inverseMultiplicities = localIndexers[node].InverseMultiplicities;
+					return this.localIndexers[nodeID];
+				}
+			});
 
-					double localCount = 0.0;
-					for (int i = 0; i < inverseMultiplicities.Length; ++i)
-					{
-						localCount += inverseMultiplicities[i];
-					}
-
-					return localCount;
-				});
-				double globalCount = Environment.AllReduceSum(countPerNode);
-				numUniqueEntries = (int)Math.Round(globalCount);
-			}
+			result.CountUniqueEntries();
+			return result;
 		}
 
-		/// <summary>
-		/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 
-		/// matrix, etc. that corresponds to a specific <see cref="ComputeNode"/>.
-		/// </summary>
-		public class Local
+		internal Dictionary<int, LocalIndexer> AllGatherLocalIndexers()
 		{
-			private Dictionary<int, int[]> commonEntriesWithNeighbors;
+			Dictionary<int, LocalIndexerDto> transferedDtos = Environment.AllGather(
+				nodeID => LocalIndexerDto.CreateForSerialization(this.localIndexers[nodeID])
+			);
 
-			public Local(ComputeNode node)
+			var result = new Dictionary<int, LocalIndexer>();
+			foreach (var nodeID_indexerDtoPair in transferedDtos)
 			{
-				this.Node = node;
+				result[nodeID_indexerDtoPair.Key] = nodeID_indexerDtoPair.Value.ToLocalIndexer(Environment);
 			}
 
-			/// <summary>
-			/// Neighboring <see cref="ComputeNode"/>s of this <see cref="Node"/> with local vectors that have at least 1 common 
-			/// entry with the local vector of this <see cref="Node"/>.
-			/// </summary>
-			public SortedSet<int> ActiveNeighborsOfNode { get; private set; }
+			return result;
+		}
 
-			public double[] InverseMultiplicities { get; private set; } 
-
-			public ComputeNode Node { get; }
-
-			public int NumEntries { get; private set; }
-
-			/// <summary>
-			/// Counts how many vector (or matrix) entries are common with other compute nodes. 
-			/// </summary>
-			/// <returns>
-			/// "local" = how many entries in common with vectors (or matrices) in the same cluster.
-			/// "remote" = how many entries in common with vectors (or matrices) in other clusters.
-			/// </returns>
-			public (int local, int remote) CountCommonEntries()
+		private GlobalIndexer CreateGlobalIndexerIfMissing()
+		{
+			if (globalIndexer == null)
 			{
-				int local = 0;
-				int remote = 0;
-				foreach (var pair in commonEntriesWithNeighbors)
+				lock (myLock)
 				{
-					int neighborID = pair.Key;
-					int[] commonEntries = pair.Value;
-					if (this.Node.Cluster.Nodes.ContainsKey(neighborID))
+					if (globalIndexer == null) // in case another thread created it before this thread got the lock
 					{
-						local += commonEntries.Length;
-					}
-					else
-					{
-						remote += commonEntries.Length;
+						globalIndexer = new GlobalIndexer(localIndexers, NumGlobalIndices);
 					}
 				}
-				return (local, remote);
 			}
 
-			public Local DeepCopy()
+			return globalIndexer;
+		}
+
+		private void CountUniqueEntries()
+		{
+			Dictionary<int, double> countPerNode = Environment.CalcNodeData(node =>
 			{
-				var clone = new Local(this.Node);
-				clone.NumEntries = this.NumEntries;
-				clone.ActiveNeighborsOfNode = new SortedSet<int>(this.ActiveNeighborsOfNode);
+				double[] inverseMultiplicities = localIndexers[node].InverseMultiplicities;
 
-				clone.InverseMultiplicities = new double[this.InverseMultiplicities.Length];
-				Array.Copy(this.InverseMultiplicities, clone.InverseMultiplicities, this.InverseMultiplicities.Length);
-
-				clone.commonEntriesWithNeighbors = new Dictionary<int, int[]>();
-				foreach((int nodeID, int[] data) in this.commonEntriesWithNeighbors)
+				double localCount = 0.0;
+				for (int i = 0; i < inverseMultiplicities.Length; ++i)
 				{
-					var clonedData = new int[data.Length];
-					Array.Copy(data, clonedData, data.Length);
-					clone.commonEntriesWithNeighbors[nodeID] = clonedData;
+					localCount += inverseMultiplicities[i];
 				}
 
-				return clone;
-			}
-
-			//TODO: cache a buffer for sending and a buffer for receiving inside Indexer (lazily or not) and just return them. 
-			//      Also provide an option to request newly initialized buffers. It may be better to have dedicated Buffer classes to
-			//      handle all that logic (e.g. keeping allocated buffers in a LinkedList, giving them out & locking them, 
-			//      freeing them in clients, etc.
-			public ConcurrentDictionary<int, double[]> CreateBuffersForAllToAllWithNeighbors()
-			{
-				//TODOMPI: dictionaries that contain per node values should be requested from the environment, which knows their
-				//      type (Dictionary/ConcurrentDictionary), capacity and concurrency level.
-				var buffers = new ConcurrentDictionary<int, double[]>(); 
-				foreach (int neighborID in ActiveNeighborsOfNode)
-				{
-					buffers[neighborID] = new double[commonEntriesWithNeighbors[neighborID].Length];
-				}
-				return buffers;
-			}
-
-			public void FindMultiplicities()
-			{
-				var multiplicities = new int[NumEntries];
-				for (int i = 0; i < NumEntries; ++i) multiplicities[i] = 1;
-				foreach (int[] commonEntries in commonEntriesWithNeighbors.Values)
-				{
-					foreach (int i in commonEntries) multiplicities[i] += 1;
-				}
-
-				InverseMultiplicities = new double[NumEntries];
-				for (int i = 0; i < NumEntries; ++i) InverseMultiplicities[i] = 1.0 / multiplicities[i];
-			}
-
-			public int[] GetCommonEntriesWithNeighbor(int neighbor) => commonEntriesWithNeighbors[neighbor];
-
-			public void Initialize(int numTotalEntries, Dictionary<int, int[]> commonEntriesWithNeighbors)
-			{
-				this.NumEntries = numTotalEntries;
-				ActiveNeighborsOfNode = new SortedSet<int>(commonEntriesWithNeighbors.Keys);
-				Debug.Assert(Node.Neighbors.IsSupersetOf(ActiveNeighborsOfNode));
-				this.commonEntriesWithNeighbors = commonEntriesWithNeighbors;
-				FindMultiplicities();
-			}
-
-			/// <summary>
-			/// Copy data shallowly from <paramref name="other"/>.
-			/// </summary>
-			/// <param name="other"></param>
-			public void InitializeFrom(Local other)
-			{
-				this.NumEntries = other.NumEntries;
-				this.commonEntriesWithNeighbors = other.commonEntriesWithNeighbors;
-				this.ActiveNeighborsOfNode = other.ActiveNeighborsOfNode;
-				this.InverseMultiplicities = other.InverseMultiplicities;
-			}
+				return localCount;
+			});
+			double globalCount = Environment.AllReduceSum(countPerNode);
+			NumGlobalIndices = (int)Math.Round(globalCount);
 		}
 	}
 }

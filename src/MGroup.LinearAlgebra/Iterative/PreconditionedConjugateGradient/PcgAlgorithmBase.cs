@@ -11,7 +11,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// <summary>
 	/// Base abstract class for Preconditioned Conjugate Gradient implementations.
 	/// </summary>
-	public abstract class PcgAlgorithmBase
+	public abstract class PcgAlgorithmBase : ISystemSolutionIterativeMethod
 	{
 		protected readonly bool throwIfNotConvergence;
 

@@ -32,14 +32,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		private ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>	cachedBuffers = 
 			new ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>();
 
-		private GlobalIndexer globalIndexer;
-
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer)
 		{
 			this.Indexer = indexer;
 			this.Environment = indexer.Environment;
-			this.LocalVectors = Environment.CalcNodeData(
-				node => Vector.CreateZero(indexer.GetLocalComponent(node).NumEntries));
+			this.LocalVectors = Environment.CalcNodeData(node => Vector.CreateZero(indexer.GetNumLocalIndices(node)));
 		}
 
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer, IDictionary<int, Vector> localVectors)
@@ -62,7 +59,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public DistributedOverlappingIndexer Indexer { get; }
 
-		public override int Length => Indexer.NumUniqueEntries;
+		public override int Length => Indexer.NumGlobalIndices;
 
 		public IDictionary<int, Vector> LocalVectors { get; }
 
@@ -116,18 +113,16 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			// Add the common entries of neighbors back to the original local vector.
 			Func<int, bool> checkLocalSubvector = nodeID =>
 			{
-				ComputeNode node = Environment.GetComputeNode(nodeID);
 				Vector localVector = LocalVectors[nodeID];
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
 
 				IDictionary<int, double[]> recvValues = dataPerNode[nodeID].recvValues;
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
+				foreach (int neighborID in Indexer.GetActiveNeighborIDs(nodeID))
 				{
-					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					int[] commonEntries = Indexer.GetCommonEntriesOfNodeWithNeighbor(nodeID, neighborID);
 					Vector localValues = localVector.GetSubvector(commonEntries);
 					double[] neighborValues = recvValues[neighborID];
 					Debug.Assert(localValues.Length == neighborValues.Length);
-					if (node.ID < neighborID) // Make sure the comparisons are done with identical arguments for both compute nodes
+					if (nodeID < neighborID) // Make sure the comparisons are done with identical arguments for both compute nodes
 					{
 						for (int i = 0; i < localValues.Length; ++i)
 						{
@@ -220,14 +215,13 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public override double[] CopyToArray()
 		{
-			CreateGlobalIndexerIfMissing();
 			var result = new double[Length];
 			Environment.DoPerNodeSerially(nodeID =>
 			{
 				Vector localVector = LocalVectors[nodeID];
 				for (int localIdx = 0; localIdx < localVector.Length; localIdx++)
 				{
-					int globalIdx = globalIndexer.FindGlobalIndexOf(nodeID, localIdx);
+					int globalIdx = Indexer.FindGlobalIndexOf(nodeID, localIdx);
 					result[globalIdx] = localVector[localIdx];
 				}
 			});
@@ -307,7 +301,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				{
 					Vector thisLocalVector = this.LocalVectors[node];
 					Vector otherLocalVector = otherVector.LocalVectors[node];
-					double[] inverseMultiplicities = Indexer.GetLocalComponent(node).InverseMultiplicities;
+					double[] inverseMultiplicities = Indexer.GetInverseMultiplicities(node);
 
 					double dotLocal = 0.0;
 					int length = thisLocalVector.Length;
@@ -395,7 +389,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Func<int, double> calcLocalDot = node =>
 			{
 				Vector localVector = this.LocalVectors[node];
-				double[] inverseMultiplicities = Indexer.GetLocalComponent(node).InverseMultiplicities;
+				double[] inverseMultiplicities = Indexer.GetInverseMultiplicities(node);
 
 				double dotLocal = 0.0;
 				for (int i = 0; i < localVector.Length; ++i)
@@ -433,17 +427,16 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			// Divide the values of overlapping entries via their sums.
 			Action<int> regularizeLocalVectors = nodeID =>
 			{
-				ComputeNode node = Environment.GetComputeNode(nodeID);
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
 				Vector orginalLocalVector = this.LocalVectors[nodeID];
 				Vector reducedLocalVector = reducedVector.LocalVectors[nodeID];
-
-				for (int i = 0; i < localIndexer.NumEntries; ++i)
+				int numLocalIndices = Indexer.GetNumLocalIndices(nodeID);
+				double[] inverseMultiplicities = Indexer.GetInverseMultiplicities(nodeID);
+				for (int i = 0; i < numLocalIndices; ++i)
 				{
 					//TODO: This assumes that all entries with multiplicity > 1 are overlapping and must be regularized. 
 					//      Is that always a correct assumption?
 					//TODO: Perhaps some tolerance should be used or the original int[] Multiplicities.
-					if (localIndexer.InverseMultiplicities[i] < 1.0)
+					if (inverseMultiplicities[i] < 1.0)
 					{
 						orginalLocalVector[i] /= reducedLocalVector[i];
 					}
@@ -488,12 +481,11 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			{
 				ComputeNode node = Environment.GetComputeNode(nodeID);
 				Vector localVector = LocalVectors[nodeID];
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
 
 				IDictionary<int, double[]> recvValues = dataPerNode[nodeID].recvValues;
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
+				foreach (int neighborID in Indexer.GetActiveNeighborIDs(nodeID))
 				{
-					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					int[] commonEntries = Indexer.GetCommonEntriesOfNodeWithNeighbor(nodeID, neighborID);
 					var rv = Vector.CreateFromArray(recvValues[neighborID]);
 					localVector.AddIntoThisNonContiguouslyFrom(commonEntries, rv);
 				}
@@ -501,25 +493,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(sumLocalSubvectors);
 		}
 
-		private void CreateGlobalIndexerIfMissing()
-		{
-			if (globalIndexer == null)
-			{
-				lock (globalIndexer)
-				{
-					if (globalIndexer == null) // in case another thread created it before this thread got the lock
-					{
-						globalIndexer = new GlobalIndexer(Indexer);
-					}
-				}
-			}
-		}
-
 		private IReadOnlyDictionary<int, int> FindLocalIndicesFromGlobal(int globalIdx)
 		{
-			CreateGlobalIndexerIfMissing();
-			globalIndexer.CheckGlobalIndex1D(globalIdx);
-			IReadOnlyDictionary<int, int> localIndices = globalIndexer.FindLocalIndicesOf(globalIdx);
+			Indexer.CheckGlobalIndex1D(globalIdx);
+			IReadOnlyDictionary<int, int> localIndices = Indexer.FindLocalIndicesOf(globalIdx);
 			if (localIndices.Count == 0)
 			{
 				throw new Exception("This should not have happened. The distributed vector is not created correctly.");
@@ -533,16 +510,14 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			// Prepare the boundary entries of each node before communicating them to its neighbors.
 			Func<int, AllToAllNodeData<double>> prepareLocalData = nodeID =>
 			{
-				ComputeNode node = Environment.GetComputeNode(nodeID);
 				Vector localVector = LocalVectors[nodeID];
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
 
 				// Find the common entries (to send and receive) of this node with each of its neighbors
 				var transferData = new AllToAllNodeData<double>();
 				(transferData.sendValues, transferData.recvValues) = GetSendRecvBuffers(nodeID);
-				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode)
+				foreach (int neighborID in Indexer.GetActiveNeighborIDs(nodeID))
 				{
-					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
+					int[] commonEntries = Indexer.GetCommonEntriesOfNodeWithNeighbor(nodeID, neighborID);
 					var sv = Vector.CreateFromArray(transferData.sendValues[neighborID]);
 					sv.CopyNonContiguouslyFrom(localVector, commonEntries);
 				}
@@ -566,9 +541,9 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 					out (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv) buffers);
 				if (!isCached)
 				{
-					DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
-					buffers = (localIndexer.CreateBuffersForAllToAllWithNeighbors(), 
-						localIndexer.CreateBuffersForAllToAllWithNeighbors());
+					ConcurrentDictionary<int, double[]> sendValues = Indexer.CreateBuffersForAllToAllWithNeighbors(nodeID);
+					ConcurrentDictionary<int, double[]> recvValues = Indexer.CreateBuffersForAllToAllWithNeighbors(nodeID);
+					buffers = (sendValues, recvValues);
 					cachedBuffers[nodeID] = buffers;
 				}
 				else
@@ -587,9 +562,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 			else
 			{
-				DistributedOverlappingIndexer.Local localIndexer = Indexer.GetLocalComponent(nodeID);
-				ConcurrentDictionary<int, double[]> sendValues = localIndexer.CreateBuffersForAllToAllWithNeighbors();
-				ConcurrentDictionary<int, double[]> recvValues = localIndexer.CreateBuffersForAllToAllWithNeighbors();
+				ConcurrentDictionary<int, double[]> sendValues = Indexer.CreateBuffersForAllToAllWithNeighbors(nodeID);
+				ConcurrentDictionary<int, double[]> recvValues = Indexer.CreateBuffersForAllToAllWithNeighbors(nodeID);
 				return (sendValues, recvValues);
 			}
 		}

@@ -46,9 +46,9 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public DistributedOverlappingIndexer Indexer { get; }
 
-		public int NumColumns => Indexer.NumUniqueEntries;
+		public int NumColumns => Indexer.NumGlobalIndices;
 
-		public int NumRows => Indexer.NumUniqueEntries;
+		public int NumRows => Indexer.NumGlobalIndices;
 
 		public void Multiply(IVectorView lhsVector, IVector rhsVector)
 		{
