@@ -265,7 +265,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		{
 			if ((lhsVector is DistributedOverlappingVector lhsCasted) && (rhsVector is DistributedOverlappingVector rhsCasted))
 			{
-				MultiplyIntoResult(lhsCasted, rhsVector, transposeThis);
+				MultiplyIntoResult(lhsCasted, rhsCasted, transposeThis);
 			}
 			else
 			{
