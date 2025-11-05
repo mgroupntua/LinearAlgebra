@@ -679,7 +679,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public override bool HasSameFormat(SkylineMatrix otherMatrix) => this.diagOffsets == otherMatrix.diagOffsets;
 
-		public virtual void LinearCombinationIntoThis(double thisCoefficient, SkylineMatrix otherMatrix, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, SkylineMatrix otherMatrix, double otherCoefficient)
 		{
 			if (HasSameFormat(otherMatrix))
 			{
@@ -730,7 +730,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <remarks>
 		/// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
 		/// </remarks>
-		public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
 		{
 			if (vector is Vector casted) return Multiply(casted);
 			else throw new NotImplementedException();
@@ -754,7 +754,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
 		/// </summary>
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (this.values.Length == 0)
 			{

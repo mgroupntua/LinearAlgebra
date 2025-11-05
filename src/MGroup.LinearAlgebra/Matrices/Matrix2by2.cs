@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The internal array that stores the entries of the matrix. It should only be used for passing the raw array to linear 
 		/// algebra libraries.
 		/// </summary>
-		internal double[,] InternalData => data;
+		internal double[,] RawData => data;
 
 		public override double this[int rowIdx, int colIdx]
 		{

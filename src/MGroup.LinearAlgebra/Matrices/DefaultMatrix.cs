@@ -282,6 +282,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
+
+			rhsVector.Clear();
 			if (transposeThis)
 			{
 				Preconditions.CheckMultiplicationDimensionsMatrixVectorTranspose(this, lhsVector, rhsVector);
@@ -289,7 +291,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int j = 0; j < lhsVector.Length; ++j)
 					{
-						rhsVector.Set(i, this[j, i] * lhsVector[j]);
+						rhsVector.AddToIndex(i, this[j, i] * lhsVector[j]);
 					}
 				}
 			}
@@ -300,7 +302,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int j = 0; j < lhsVector.Length; ++j)
 					{
-						rhsVector.Set(i, this[i, j] * lhsVector[j]);
+						rhsVector.AddToIndex(i, this[i, j] * lhsVector[j]);
 					}
 				}
 			}
