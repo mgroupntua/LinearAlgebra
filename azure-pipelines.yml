@@ -60,11 +60,11 @@ steps:
 - task: DotNetCoreCLI@2
   name: dotnetBuild
   displayName: "Build projects"
-  projects: |
-    **/MGroup.LinearAlgebra.sln
-    !**/*.local_dev.sln
   inputs:
     command: 'build'
+    projects: |
+      **/MGroup.LinearAlgebra.sln
+      !**/*.local_dev.sln
     arguments: '--no-restore --nologo --configuration $(buildConfiguration) /p:AssemblyVersion=$(GitVersion.AssemblySemVer) /p:Version=$(GitVersion.SemVer) /p:SourceLinkCreate=true'
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'GitVersion.AssemblySemVer'
