@@ -39,6 +39,7 @@ steps:
   displayName: "Restore nugets"
   inputs:
     command: 'restore'
+    projects: 'MGroup.LinearAlgebra.sln'
     verbosityRestore: 'Normal'
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
