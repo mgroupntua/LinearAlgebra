@@ -346,7 +346,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
-			var result = Matrix.CreateZero(NumRows, NumColumns);
+			var result = Matrix.CreateZero(NumColumns, NumRows);
 			for (int i = 0; i < NumRows; ++i)
 			{
 				for (int j = 0; j < NumColumns; ++j)

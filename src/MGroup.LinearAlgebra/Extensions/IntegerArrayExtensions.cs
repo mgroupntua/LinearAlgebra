@@ -63,6 +63,6 @@ namespace MGroup.LinearAlgebra.Extensions
         /// Copies a matrix to a 2D int[,] array. Only the integer part of each double entry is retained.
         /// </summary>
         public static int[,] ToIntArray(this IMatrixView matrix) //TODO: Also for IIndexable1D
-            => matrix.CopytoArray2D().ToIntArray();
+            => matrix.CopyToArray2D().ToIntArray();
     }
 }

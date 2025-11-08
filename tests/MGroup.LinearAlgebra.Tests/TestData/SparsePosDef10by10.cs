@@ -24,6 +24,18 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			{  0.0,  0.0,  0.0,  0.0,  1.0,  3.0,  0.0,  2.0,  0.0, 30.0 }
 		};
 
+		public static double[,] SubmatrixRows13Cols45 => new double[,]
+		{
+			{ 0.0,  0.0 },
+			{ 3.0,  1.0 },
+			{ 2.0,  4.0 },
+		};
+
+		public static double[] Diagonal => new double[]
+		{
+			21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0
+		};
+
 		public static double[] SkylineValues => new double[]
 		{
 			21.0,
