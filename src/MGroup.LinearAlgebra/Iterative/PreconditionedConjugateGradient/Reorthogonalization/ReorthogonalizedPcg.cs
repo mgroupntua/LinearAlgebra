@@ -64,10 +64,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 
 			// x0 = D_nd * x_d, x_d = inv(Q_nd * D_nd) * D_nd^T * b
 			// D_nd = [d_1 ... d_nd], Q_nd = A * D_nd = [q_1 ... q_nd], Q_nd * D_nd = diag([d1*A*d1 ... d_nd*A*d_nd])
-			for (var i = 0; i < ReorthoCache.Directions.Count; ++i)
+			for (int i = 0; i < ReorthoCache.Directions.Count; ++i)
 			{
 				// x_d[i] = (d_i * b) / (d_i * q_i) 
-				var xd = ReorthoCache.Directions[i].DotProduct(rhsNew) / ReorthoCache.DirectionsTimesMatrixTimesDirections[i];
+				double xd = ReorthoCache.Directions[i].DotProduct(rhsNew) / ReorthoCache.DirectionsTimesMatrixTimesDirections[i];
 
 				Debug.Assert(!double.IsNaN(xd));
 				Debug.Assert(!double.IsPositiveInfinity(xd));
@@ -196,7 +196,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 					return new IterativeStatistics
 					{
 						AlgorithmName = name,
-						HasConverged = true,
+						HasConverged = ResidualNormRatio <= ResidualTolerance,
 						HasStagnated = hasStagnated,
 						NumIterationsRequired = iteration + 1,
 						ResidualNormRatioEstimation = ResidualNormRatio,

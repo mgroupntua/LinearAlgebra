@@ -464,7 +464,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				0.0, rhsVector.RawData, 0, 1);
 		}
 
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		public override double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
 			double aggregator = identityValue;
 			for (int j = 0; j < data.Length; ++j)
@@ -482,7 +482,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return finalize(aggregator);
 		}
 
-		public IMatrix Transpose() => Transpose(true);
+		public override IMatrix Transpose() => Transpose(true);
 
 		public SymmetricMatrix Transpose(bool copyInternalArray) 
 			=> CreateFromPackedColumnMajorArray(data, Order, Definiteness, copyInternalArray);

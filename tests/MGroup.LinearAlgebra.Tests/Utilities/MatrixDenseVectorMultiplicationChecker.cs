@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			bool transposeMatrix)
 		{
 			var lhs = Vector.CreateFromArray(lhsVector, true);
-			var rhs = Vector.CreateZero(rhsVectorExpected.Length);
+			var rhs = Vector.CreateWithValue(rhsVectorExpected.Length, -3.33);
 			multiplyVectorIntoResultFunc(matrix, lhs, rhs, transposeMatrix);
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}

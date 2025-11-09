@@ -18,11 +18,24 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			this.comparer = new MatrixComparer(1E-13);
 			CreateLhsVectorFunc = x => Vector.CreateFromArray(x, true);
 			CreateZeroRhsVectorFunc = n => Vector.CreateZero(n);
+			CreateRandomVectorFunc = n =>
+			{
+				int seed = 13;
+				var rng = new Random(seed);
+				var result = Vector.CreateZero(n);
+				for (int i = 0; i < n; i++)
+				{
+					result[i] = rng.NextDouble();
+				}
+				return result;
+			};
 		}
 
 		internal Func<double[], IVectorView> CreateLhsVectorFunc { get; set; }
 
 		internal Func<int, IVector> CreateZeroRhsVectorFunc { get; set; }
+
+		internal Func<int, IVector> CreateRandomVectorFunc { get; set; }
 
 		internal double Tolerance
 		{
@@ -41,7 +54,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			bool transposeMatrix)
 		{
 			var lhs = CreateLhsVectorFunc(lhsVector);
-			IVector rhs = CreateZeroRhsVectorFunc(rhsVectorExpected.Length);
+			IVector rhs = CreateRandomVectorFunc(rhsVectorExpected.Length);
 			matrix.MultiplyIntoResult(lhs, rhs, transposeMatrix);
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}

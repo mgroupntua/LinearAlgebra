@@ -82,7 +82,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Copies the entries of the matrix into a 2-dimensional array. The returned array has length(0) = number of rows 
 		/// and length(1) = number of columns. 
 		/// </summary>
-		public static double[,] CopytoArray2D(this IMatrixView matrix)
+		public static double[,] CopyToArray2D(this IMatrixView matrix)
 		{
 			var clone = new double[matrix.NumRows, matrix.NumColumns];
 			for (int i = 0; i < matrix.NumRows; ++i)

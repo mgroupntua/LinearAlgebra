@@ -15,8 +15,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 	public sealed class DistributedOverlappingMatrix<TMatrix> : DefaultMatrix
 		where TMatrix : class, IMatrix
 	{
-		private GlobalIndexer globalIndexer;
-
 		public DistributedOverlappingMatrix(DistributedOverlappingIndexer indexer)
 		{
 			this.Indexer = indexer;
@@ -29,18 +27,17 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
 
-		public override int NumRows => Indexer.NumUniqueEntries;
+		public override int NumRows => Indexer.NumGlobalIndices;
 
-		public override int NumColumns => Indexer.NumUniqueEntries;
+		public override int NumColumns => Indexer.NumGlobalIndices;
 
 		public override double this[int rowIdx, int colIdx]
 		{
 			get
 			{
-				CreateGlobalIndexerIfMissing();
-				globalIndexer.CheckGlobalIndex2D(rowIdx, colIdx);
-				IReadOnlyDictionary<int, int> localRowIndices = globalIndexer.FindLocalIndicesOf(rowIdx);
-				IReadOnlyDictionary<int, int> localColIndices =  globalIndexer.FindLocalIndicesOf(colIdx);
+				Indexer.CheckGlobalIndex2D(rowIdx, colIdx);
+				IReadOnlyDictionary<int, int> localRowIndices = Indexer.FindLocalIndicesOf(rowIdx);
+				IReadOnlyDictionary<int, int> localColIndices = Indexer.FindLocalIndicesOf(colIdx);
 
 				foreach ((int nodeID, int localColIdx) in localColIndices)
 				{
@@ -60,10 +57,9 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 			set
 			{
-				CreateGlobalIndexerIfMissing();
-				globalIndexer.CheckGlobalIndex2D(rowIdx, colIdx);
-				IReadOnlyDictionary<int, int> localRowIndices = globalIndexer.FindLocalIndicesOf(rowIdx);
-				IReadOnlyDictionary<int, int> localColIndices = globalIndexer.FindLocalIndicesOf(colIdx);
+				Indexer.CheckGlobalIndex2D(rowIdx, colIdx);
+				IReadOnlyDictionary<int, int> localRowIndices = Indexer.FindLocalIndicesOf(rowIdx);
+				IReadOnlyDictionary<int, int> localColIndices = Indexer.FindLocalIndicesOf(colIdx);
 
 				foreach ((int nodeID, int localColIdx) in localColIndices)
 				{
@@ -129,17 +125,16 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public override Matrix CopyToFullMatrix()
 		{
-			CreateGlobalIndexerIfMissing();
 			var result = Matrix.CreateZero(NumRows, NumColumns);
 			Environment.DoPerNodeSerially(nodeID =>
 			{
 				TMatrix localMatrix = LocalMatrices[nodeID];
 				for (int localRowIdx = 0; localRowIdx < localMatrix.NumRows; localRowIdx++)
 				{
-					int globalRowIdx = globalIndexer.FindGlobalIndexOf(nodeID, localRowIdx);
+					int globalRowIdx = Indexer.FindGlobalIndexOf(nodeID, localRowIdx);
 					for (int localColIdx = 0; localColIdx < localMatrix.NumColumns; localColIdx++)
 					{
-						int globalColIdx = globalIndexer.FindGlobalIndexOf(nodeID, localColIdx);
+						int globalColIdx = Indexer.FindGlobalIndexOf(nodeID, localColIdx);
 						result[globalRowIdx, globalColIdx] = localMatrix[localRowIdx, localColIdx];
 					}
 				}
@@ -270,7 +265,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		{
 			if ((lhsVector is DistributedOverlappingVector lhsCasted) && (rhsVector is DistributedOverlappingVector rhsCasted))
 			{
-				MultiplyIntoResult(lhsCasted, rhsVector, transposeThis);
+				MultiplyIntoResult(lhsCasted, rhsCasted, transposeThis);
 			}
 			else
 			{
@@ -319,20 +314,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			var transpose = new DistributedOverlappingMatrix<TMatrix>(Indexer);
 			Environment.DoPerNode(nodeID => transpose.LocalMatrices[nodeID] = (TMatrix)this.LocalMatrices[nodeID].Transpose());
 			return transpose;
-		}
-
-		private void CreateGlobalIndexerIfMissing()
-		{
-			if (globalIndexer == null)
-			{
-				lock (globalIndexer)
-				{
-					if (globalIndexer == null) // in case another thread created it before this thread got the lock
-					{
-						globalIndexer = new GlobalIndexer(Indexer);
-					}
-				}
-			}
 		}
 	}
 }

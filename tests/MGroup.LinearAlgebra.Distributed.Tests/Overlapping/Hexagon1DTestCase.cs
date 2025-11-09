@@ -29,6 +29,8 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
     {
 		public static int NumComputeNodes => 6;
 
+		public static int NumGlobalEntries => 12;
+
 		public static int[,] AllNodeNeighbors => new int[,]
 		{
 			{ 5, 1 },
@@ -110,17 +112,11 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		public static DistributedOverlappingIndexer CreateIndexer(IComputeEnvironment environment)
 		{
 			var indexer = new DistributedOverlappingIndexer(environment);
-			Action<int> initializeIndexer = n =>
-			{
-				var commonEntries = CreateCommonEntriesWithNeighbors(n);
-				var numEntries = 3;
-				indexer.GetLocalComponent(n).Initialize(numEntries, commonEntries);
-			};
-			environment.DoPerNode(initializeIndexer);
-
+			indexer.Initialize(
+				nodeID => LocalIndexerDto.CreateWithNewContent(numIndices: 3, CreateCommonEntriesWithNeighbors(nodeID))
+			);
 			return indexer;
 		}
-
 
 		public static int[] GetNeighborsOfNode(int nodeID)
 		{

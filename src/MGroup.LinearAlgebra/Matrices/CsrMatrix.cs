@@ -45,16 +45,6 @@ namespace MGroup.LinearAlgebra.Matrices
 			this.NumColumns = numCols;
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
-		/// </summary>
-		public MatrixSymmetry MatrixSymmetry { get; set; }
-
-		/// <summary>
-		/// See <see cref="IIndexable2D.MatrixSymmetry"/>.
-		/// </summary>
-		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
-
 		public override int NumColumns { get; }
 
 		/// <summary>

@@ -76,7 +76,7 @@ namespace MGroup.LinearAlgebra.Reduction
         /// <param name="reducible">A matrix, vector or similar collection.</param>
         public static double Norm2(this IReducible reducible)
         {
-            return reducible.Reduce(0.0, (x, sum) => x + sum, (nz, sum) => sum, sum => Math.Sqrt(sum));
+            return reducible.Reduce(0.0, (x, sum) => x * x + sum, (nz, sum) => sum, Math.Sqrt);
         }
 
         /// <summary>

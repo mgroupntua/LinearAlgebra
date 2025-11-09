@@ -93,6 +93,37 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
+		public static double ReduceMaxAbs(double[] vector)
+		{
+			double result = -1.0;
+			for (int i = 0; i < vector.Length; i++)
+			{
+				if (Math.Abs(vector[i]) > result)
+				{
+					result = Math.Abs(vector[i]);
+				}
+			}
+
+			return result;
+		}
+
+		public static double ReduceMaxAbs(double[,] matrix)
+		{
+			double result = -1.0;
+			for (int i = 0; i < matrix.GetLength(0); i++)
+			{
+				for (int j = 0; j < matrix.GetLength(1); j++)
+				{
+					if (Math.Abs(matrix[i, j]) > result)
+					{
+						result = Math.Abs(matrix[i, j]);
+					}
+				}
+			}
+
+			return result;
+		}
+
 		public static double[] Round(double[] vector, int decimals)
 		{
 			int n = vector.Length;

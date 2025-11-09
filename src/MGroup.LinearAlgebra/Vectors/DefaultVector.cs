@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < thisIndices.Length; ++i)
 			{
-				this[thisIndices[i]] = otherVector[i];
+				this[thisIndices[i]] += otherVector[i];
 			}
 		}
 
@@ -58,12 +58,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		public virtual void AxpySubvectorIntoThis(
 			int destinationIndex, IVectorView sourceVector, double sourceCoefficient, int sourceIndex, int length)
 		{
-			if (destinationIndex + length <= this.Length)
+			if (destinationIndex + length > this.Length)
 			{
 				throw new NonMatchingDimensionsException("Not enough space on this vector to write the requested entries.");
 			}
 
-			if (sourceIndex + length <= sourceVector.Length)
+			if (sourceIndex + length > sourceVector.Length)
 			{
 				throw new NonMatchingDimensionsException("The source vector does not have as many entries as requested.");
 			}
@@ -136,12 +136,12 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public virtual void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
 		{
-			if (destinationIndex + length <= this.Length)
+			if (destinationIndex + length > this.Length)
 			{
 				throw new NonMatchingDimensionsException("Not enough space on this vector to write the requested entries.");
 			}
 
-			if (sourceIndex + length <= sourceVector.Length)
+			if (sourceIndex + length > sourceVector.Length)
 			{
 				throw new NonMatchingDimensionsException("The source vector does not have as many entries as requested.");
 			}
@@ -266,12 +266,52 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		public virtual IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
-			=> DoEntrywise(otherVector, (x, y) => thisCoefficient * x + otherCoefficient * y);
+		{
+			Preconditions.CheckVectorDimensions(this, otherVector);
+			if (this.HasSameFormat(otherVector))
+			{
+				IVector result = Copy(copyIndexingData: false);
+				result.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+				return result;
+			}
+			else
+			{
+				WarnAboutPerformanceBottlenecks();
+				ProhibitPerformanceBottlenecks();
+				var result = new double[Length];
+				for (int i = 0; i < Length; i++)
+				{
+					result[i] = thisCoefficient * this[i] + otherCoefficient * otherVector[i];
+				}
+
+				return Vector.CreateFromArray(result, false);
+			}
+		}
 
 		public virtual void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
-			=> DoEntrywiseIntoThis(otherVector, (x, y) => thisCoefficient * x + otherCoefficient * y);
+		{
+			Preconditions.CheckVectorDimensions(this, otherVector);
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			for (int i = 0; i < Length; i++)
+			{
+				this[i] = thisCoefficient * this[i] + otherCoefficient * otherVector[i];
+			}
+		}
 
-		public virtual double Norm2() => Reductions.Norm2(this);
+		public virtual double Norm2()
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			double sum = 0.0;
+			for (int i = 0; i < this.Length; ++i)
+			{
+				double x = this[i];
+				sum += x * x;
+			}
+
+			return Math.Sqrt(sum);
+		}
 
 		public virtual double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
@@ -286,9 +326,25 @@ namespace MGroup.LinearAlgebra.Vectors
 			return finalize(accumulator);
 		}
 
-		public virtual IVector Scale(double scalar) => DoToAllEntries(x => scalar * x);
+		public virtual IVector Scale(double scalar)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			IVector result;
+			result = Copy(copyIndexingData: false);
+			result.ScaleIntoThis(scalar);
+			return result;
+		}
 
-		public virtual void ScaleIntoThis(double scalar) => DoToAllEntries(x => scalar * x);
+		public virtual void ScaleIntoThis(double scalar)
+		{
+			WarnAboutPerformanceBottlenecks();
+			ProhibitPerformanceBottlenecks();
+			for (int i = 0; i < Length; i++)
+			{
+				this[i] *= scalar;
+			}
+		}
 
 		public virtual void Set(int index, double value) => this[index] = value;
 
