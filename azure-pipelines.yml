@@ -3,9 +3,6 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
-variables:
-  enableSonarCloud: false
-
 trigger:
 - develop
 
@@ -21,6 +18,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   testProject: 'tests/MGroup.LinearAlgebra.Tests'
+  enableSonarCloud: false
 
 steps:
 - task: PowerShell@2
