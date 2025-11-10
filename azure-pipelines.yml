@@ -44,6 +44,15 @@ steps:
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
 
+# Trying to debug SonarCloud. Remove this step when done.
+- task: PowerShell@2
+  displayName: "List solution files before SonarCloud"
+  inputs:
+    targetType: inline
+    script: |
+      Write-Host "Current directory: $(Build.SourcesDirectory)"
+      Get-ChildItem -Recurse -Filter *.sln | ForEach-Object { Write-Host "Found solution: $($_.FullName)" }
+
 - task: SonarCloudPrepare@1
   condition: ne(variables['Build.Reason'], 'PullRequest')
   displayName: "Prepares SonarCloud analysis"
@@ -53,6 +62,7 @@ steps:
     scannerMode: 'MSBuild'
     projectKey: 'LinearAlgebra'
     extraProperties: |
+      sonar.projectBaseDir=$(Build.SourcesDirectory)
       sonar.cs.opencover.reportsPaths="$(Build.SourcesDirectory)/coverage/coverage.opencover.xml"
       sonar.c.file.suffixes=-
       sonar.cpp.file.suffixes=-
