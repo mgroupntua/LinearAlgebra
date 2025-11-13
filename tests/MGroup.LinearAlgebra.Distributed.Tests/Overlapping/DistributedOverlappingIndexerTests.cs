@@ -226,7 +226,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests.Overlapping
 		[Theory]
 		[InlineData(EnvironmentChoice.SequentialSharedEnvironment)]
 		[InlineData(EnvironmentChoice.TplSharedEnvironment)]
-		public static void TestReuseAsBasisForNewIndexer(EnvironmentChoice env)
+		public static void TestReuseAsBasisForNewIndexerManaged(EnvironmentChoice env)
 			=> TestReuseAsBasisForNewIndexer(env.CreateEnvironment());
 
 		internal static void TestReuseAsBasisForNewIndexer(IComputeEnvironment environment)
