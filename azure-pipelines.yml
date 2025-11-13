@@ -18,7 +18,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   testProject: 'tests/MGroup.LinearAlgebra.Tests'
-  enableSonarCloud: false
+  enableSonarCloud: true
 
 steps:
 - task: PowerShell@2
