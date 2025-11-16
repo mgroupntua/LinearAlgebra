@@ -28,8 +28,8 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// doesn't have to define the dimensions of the linear system, which is useful when testing or benchmarking, at the
 		/// expense of little extra safety.
 		/// </remarks>
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector) => lhsVector.CopyFrom(rhsVector);
+		public void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector) => lhsVector.CopyFrom(rhsVector);
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified) { }
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified) { }
 	}
 }

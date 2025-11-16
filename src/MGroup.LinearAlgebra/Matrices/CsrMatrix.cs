@@ -288,7 +288,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return (this.colIndices == other.colIndices) && (this.rowOffsets == other.rowOffsets);
 		}
 
-		public override Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public override Matrix MultiplyLeft(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			//TODO: To use BLAS for this too, we must accept row major matrices as output.
 			if (transposeOther)
@@ -327,7 +327,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public override Matrix MultiplyRight(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			if (transposeOther)
 			{
@@ -400,7 +400,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector casted) return Multiply(casted, transposeThis);
 
@@ -438,7 +438,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (this.values.Length == 0)
 			{
@@ -529,7 +529,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     <paramref name="result"/>.<see cref="IIndexable1D.Length"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the arguments do not satisfy the described 
 		///     constraints.</exception>
-		public void MultiplyVectorSection(IVectorView vectorRight, int vectorStart, Vector result, int resultStart)
+		public void MultiplyVectorSection(IReadOnlyVector vectorRight, int vectorStart, Vector result, int resultStart)
 		{
 			Preconditions.CheckMultiplicationDimensionsSection(this, vectorRight, vectorStart, result, resultStart);
 			if (this.values.Length == 0)

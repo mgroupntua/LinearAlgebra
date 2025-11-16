@@ -263,7 +263,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
 		}
 
-		public override Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public override Matrix MultiplyLeft(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			//TODO: To use BLAS for this too, we must accept row major matrices as output.
 			if (transposeOther)
@@ -302,7 +302,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public override Matrix MultiplyRight(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			// TODO: Throwing exceptions when csc is on the left seems attractive.
 			if (transposeOther)
@@ -376,7 +376,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 
@@ -414,7 +414,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (this.values.Length == 0)
 			{

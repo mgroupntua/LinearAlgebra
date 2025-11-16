@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Reduction
         /// Calculates the average over all entries of a vector.
         /// </summary>
         /// <param name="vector">The vector upon which this reduction will be applied.</param>
-        public static double Average(this IVectorView vector)
+        public static double Average(this IReadOnlyVector vector)
         {
             return vector.Reduce(0.0, (x, sum) => x + sum, (nz, sum) => sum, sum => sum / vector.Length);
         }

@@ -182,7 +182,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public override bool HasSameFormat(TriangularUpper other) => this.Order == other.Order;
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector lhsDense)
 			{
@@ -212,7 +212,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{

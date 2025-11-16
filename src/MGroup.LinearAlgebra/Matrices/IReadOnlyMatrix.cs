@@ -11,14 +11,14 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// It supports common operations that do not mutate the underlying matrix. If you need to store a matrix and then pass it
 	/// around or allow acceess to it, consider using this interface instead of <see cref="Matrix"/> for extra safety.
 	/// </summary>
-	public interface IMatrixView :
-		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, IDiagonalAccessible
+	public interface IReadOnlyMatrix :
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IReadOnlyMatrix, IMatrix>, ISliceable2D, IDiagonalAccessible
 	{
 		/// <summary>
 		/// Performs the following operation for all (i, j):
 		/// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-		/// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/> and 
-		/// <see cref="LinearCombination(double, IMatrixView, double)"/>. Named after BLAS axpy (y = a * x plus y).
+		/// Optimized version of <see cref="IReadOnlyMatrix.DoEntrywise(IReadOnlyMatrix, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombination(double, IReadOnlyMatrix, double)"/>. Named after BLAS axpy (y = a * x plus y).
 		/// The resulting matrix is written in a new object and then returned.
 		/// </summary>
 		/// <param name="otherMatrix">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
@@ -26,10 +26,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-		IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient);
+		IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 		/// <summary>
-		/// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
+		/// Copies this <see cref="IReadOnlyMatrix"/> object. A new matrix of the same type as this object is initialized and 
 		/// returned.
 		/// </summary>
 		/// <param name="copyIndexingData">
@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </param>
 		IMatrix Copy(bool copyIndexingData = false);
 
-		/// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
+		/// Copies this <see cref="IReadOnlyMatrix"/> object. The new matrix will have all its entries explicitly stored.
 		/// </summary>
 		Matrix CopyToFullMatrix();
 
@@ -52,12 +52,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="other">The matrix to compare.</param>
 		/// <returns>True if the matrices have the same format. False otherwise.</returns>
-		bool HasSameFormat(IMatrixView other);
+		bool HasSameFormat(IReadOnlyMatrix other);
 
 		/// Performs the following operation for all (i, j):
 		/// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
 		/// <paramref name="otherMatrix"/>[i, j]. 
-		/// Optimized version of <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/>. 
+		/// Optimized version of <see cref="IReadOnlyMatrix.DoEntrywise(IReadOnlyMatrix, Func{double, double, double})"/>. 
 		/// The resulting matrix is written in a new object and then returned.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
@@ -66,7 +66,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-		IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
+		IMatrix LinearCombination(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 		/// <summary>
 		/// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
@@ -79,7 +79,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
 		///     different <see cref="IIndexable2D.NumColumns"/> than the <see cref="IIndexable2D.NumRows"/> of 
 		///     oper(this).</exception>
-		Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
+		Matrix MultiplyLeft(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false);
 
 		/// <summary>
 		/// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="other"/>).
@@ -92,7 +92,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
 		///     different <see cref="IIndexable2D.NumRows"/> than the <see cref="IIndexable2D.NumColumns"/> of 
 		///     oper(this).</exception>
-		Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
+		Matrix MultiplyRight(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false);
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
@@ -109,7 +109,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different than the 
 		/// <see cref="IIndexable2D.NumColumns"/> of oper(this).
 		/// </exception>
-		IVector Multiply(IVectorView vector, bool transposeThis = false);
+		IVector Multiply(IReadOnlyVector vector, bool transposeThis = false);
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -136,7 +136,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
 		/// method will try to.
 		/// </exception>
-		void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false);
+		void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false);
 		//TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
 
 		double IReducible.Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
@@ -163,9 +163,9 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
-		/// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
-		/// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
-		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IVectorView, bool)"/> are more 
+		/// implementations of <see cref="IReadOnlyMatrix"/> may offer more efficient transpositions, that do not copy the entries.
+		/// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IReadOnlyMatrix, bool, bool)"/>,
+		/// <see cref="MultiplyRight(IReadOnlyMatrix, bool, bool)"/> and <see cref="Multiply(IReadOnlyVector, bool)"/> are more 
 		/// effient generally.
 		/// </summary>
 		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.

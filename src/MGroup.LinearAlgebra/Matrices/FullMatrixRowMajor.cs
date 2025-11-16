@@ -68,7 +68,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public override IMatrix CreateZeroMatrixWithSameFormat()
 			=> new FullMatrixRowMajor(NumRows, NumColumns, new double[values.Length]);
 
-		public override bool HasSameFormat(IMatrixView other)
+		public override bool HasSameFormat(IReadOnlyMatrix other)
 		{
 			if (other is FullMatrixRowMajor casted)
 			{
@@ -78,7 +78,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return false;
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense)
 			{
@@ -98,7 +98,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (lhsVector is Vector denseLhs && rhsVector is Vector denseRhs)
 			{

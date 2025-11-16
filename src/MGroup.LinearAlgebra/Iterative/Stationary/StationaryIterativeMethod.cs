@@ -48,7 +48,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution)
+		public IterativeStatistics Solve(IReadOnlyMatrix matrix, IReadOnlyVector rhs, IVector solution)
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
 

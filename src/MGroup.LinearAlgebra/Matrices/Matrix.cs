@@ -359,9 +359,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
+		/// See <see cref="IReadOnlyMatrix.Axpy(IReadOnlyMatrix, double)"/>.
 		/// </summary>
-		public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) return Axpy(dense, otherCoefficient);
 			else return otherMatrix.LinearCombination(otherCoefficient, this, 1.0); // To avoid accessing zero entries
@@ -404,9 +404,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
+		/// See <see cref="IMatrix.AxpyIntoThis(IReadOnlyMatrix, double)"/>.
 		/// </summary>
-		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) AxpyIntoThis(dense, otherCoefficient);
 			else
@@ -488,9 +488,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void Clear() => Array.Clear(values, 0, values.Length);
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Copy(bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.Copy(bool)"/>.
 		/// </summary>
-		IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy();
+		IMatrix IReadOnlyMatrix.Copy(bool copyIndexingData) => Copy();
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Matrix"/> by copying the entries of this instance.
@@ -524,7 +524,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Conversions.FullColMajorToArray2D(values, NumRows, NumColumns);
 		}
 
-		/// See <see cref="IMatrixView.CopyToFullMatrix()"/>
+		/// See <see cref="IReadOnlyMatrix.CopyToFullMatrix()"/>
 		/// </summary>
 		public Matrix CopyToFullMatrix() => Copy();
 
@@ -534,9 +534,9 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// <summary>
-		/// See <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/>.
+		/// See <see cref="IReadOnlyMatrix.DoEntrywise(IReadOnlyMatrix, Func{double, double, double})"/>.
 		/// </summary>
-		public IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		public IMatrix DoEntrywise(IReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix dense) return DoEntrywise(dense, binaryOperation);
 			else return matrix.DoEntrywise(this, (x, y) => binaryOperation(y, x)); // To avoid accessing zero entries.
@@ -556,7 +556,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
 		/// </summary>
-		public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		public void DoEntrywiseIntoThis(IReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix dense) DoEntrywiseIntoThis(dense, binaryOperation);
 			else
@@ -585,7 +585,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
 		/// </summary>
-		IMatrix IEntrywiseOperableView2D<IMatrixView, IMatrix>.DoToAllEntries(Func<double, double> unaryOperation)
+		IMatrix IEntrywiseOperableView2D<IReadOnlyMatrix, IMatrix>.DoToAllEntries(Func<double, double> unaryOperation)
 			=> DoToAllEntries(unaryOperation);
 
 		/// <summary>
@@ -799,7 +799,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(submatrix, numNewRows, numNewCols);
 		}
 
-		public bool HasSameFormat(IMatrixView other)
+		public bool HasSameFormat(IReadOnlyMatrix other)
 		{
 			if (other is Matrix casted)
 			{
@@ -936,9 +936,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		public bool IsZero(double tolerance) => DenseStrategies.IsZero(values, tolerance);
 
 		/// <summary>
-		/// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
+		/// See <see cref="IReadOnlyMatrix.LinearCombination(double, IReadOnlyMatrix, double)"/>.
 		/// </summary>
-		public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public IMatrix LinearCombination(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) return LinearCombination(thisCoefficient, dense, otherCoefficient);
 			else return otherMatrix.LinearCombination(otherCoefficient, this, thisCoefficient); // To avoid accessing zero entries
@@ -980,9 +980,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
+		/// See <see cref="IMatrix.LinearCombinationIntoThis(double, IReadOnlyMatrix, double)"/>.
 		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) LinearCombinationIntoThis(thisCoefficient, dense, otherCoefficient);
 			else
@@ -1025,17 +1025,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyLeft(IMatrixView, bool, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.MultiplyLeft(IReadOnlyMatrix, bool, bool)"/>.
 		/// </summary>
-		public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public Matrix MultiplyLeft(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			return other.MultiplyRight(this, transposeOther, transposeThis);
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyRight(IMatrixView, bool, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.MultiplyRight(IReadOnlyMatrix, bool, bool)"/>.
 		/// </summary>
-		public Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		public Matrix MultiplyRight(IReadOnlyMatrix other, bool transposeThis = false, bool transposeOther = false)
 		{
 			if (other is Matrix dense) return MultiplyRight(dense, transposeThis, transposeOther);
 			else return other.MultiplyLeft(this, transposeOther, transposeThis);
@@ -1089,9 +1089,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.Multiply(IReadOnlyVector, bool)"/>.
 		/// </summary>
-		public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -1116,9 +1116,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.MultiplyIntoResult(IReadOnlyVector, IVector, bool)"/>.
 		/// </summary>
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -1268,9 +1268,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Scale(double)"/>.
+		/// See <see cref="IReadOnlyMatrix.Scale(double)"/>.
 		/// </summary>
-		IMatrix IMatrixView.Scale(double scalar) => Scale(scalar);
+		IMatrix IReadOnlyMatrix.Scale(double scalar) => Scale(scalar);
 
 		/// <summary>
 		/// Performs the following operation for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>:
@@ -1399,9 +1399,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Transpose"/>.
+		/// See <see cref="IReadOnlyMatrix.Transpose"/>.
 		/// </summary>
-		IMatrix IMatrixView.Transpose() => Transpose();
+		IMatrix IReadOnlyMatrix.Transpose() => Transpose();
 
 		/// <summary>
 		/// Initializes a new <see cref="Matrix"/> instance, that is transpose to this: result[i, j] = this[j, i]. The entries 

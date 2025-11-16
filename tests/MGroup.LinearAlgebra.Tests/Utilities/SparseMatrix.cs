@@ -427,7 +427,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 		}
 
-		private void CheckSystemSolution(IVectorView vector)
+		private void CheckSystemSolution(IReadOnlyVector vector)
 		{
 			if (NumRows != NumColumns)
 			{
@@ -440,7 +440,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 		}
 
-		private void CheckVectorMult(IVectorView vector)
+		private void CheckVectorMult(IReadOnlyVector vector)
 		{
 			if (vector.Length != NumColumns)
 			{

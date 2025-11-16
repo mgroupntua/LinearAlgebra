@@ -68,7 +68,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
 		///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
 		///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
 		/// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-		public (IVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IVector rhsVector, double shift = 0.0)
+		public (IVector solution, MinresStatistics stats) Solve(IReadOnlyMatrix matrix, IVector rhsVector, double shift = 0.0)
 			=> SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, null, shift);
 
 		/// <summary>
@@ -83,7 +83,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
 		/// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
 		///     positive definite, contrary to A.</param>
 		/// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-		public (IVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IVector rhsVector,
+		public (IVector solution, MinresStatistics stats) Solve(IReadOnlyMatrix matrix, IVector rhsVector,
 			IPreconditioner preconditioner, double shift = 0.0)
 			=> SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, preconditioner, shift);
 
@@ -389,7 +389,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
 		/// <summary>
 		/// Calculates (A - shift * I) * v = A*v - shift*v
 		/// </summary>
-		private static void ShiftedMatrixVectorMult(ILinearTransformation matrix, IVectorView x, IVector y, double shift)
+		private static void ShiftedMatrixVectorMult(ILinearTransformation matrix, IReadOnlyVector x, IVector y, double shift)
 		{
 			//TODO: this should just be implemented as a wrapping LinearTransformation
 			if (shift == 0.0) matrix.Multiply(x, y);

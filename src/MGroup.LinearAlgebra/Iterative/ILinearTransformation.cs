@@ -36,6 +36,6 @@ namespace MGroup.LinearAlgebra.Iterative
         /// <exception cref="Exceptions.NonMatchingDimensionsException">
         /// Thrown if <paramref name="lhsVector"/> or <paramref name="rhsVector"/> violate the described constraints.
         /// </exception>
-        void Multiply(IVectorView lhsVector, IVector rhsVector);
+        void Multiply(IReadOnlyVector lhsVector, IVector rhsVector);
     }
 }

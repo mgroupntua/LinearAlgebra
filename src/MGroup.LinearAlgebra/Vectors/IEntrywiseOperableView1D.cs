@@ -3,7 +3,7 @@ using System;
 namespace MGroup.LinearAlgebra.Vectors
 {
     public interface IEntrywiseOperableView1D<TVectorIn, TVectorOut>
-        where TVectorIn : IVectorView
+        where TVectorIn : IReadOnlyVector
         where TVectorOut : IVector
     {
         /// <summary>

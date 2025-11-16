@@ -32,7 +32,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static IVector Add(this IVectorView thisVector, IVectorView otherVector)
+		public static IVector Add(this IReadOnlyVector thisVector, IReadOnlyVector otherVector)
 			=> thisVector.Axpy(otherVector, 1.0);
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static void AddIntoThis(this IVector thisVector, IVectorView otherVector) 
+		public static void AddIntoThis(this IVector thisVector, IReadOnlyVector otherVector) 
 			=> thisVector.AxpyIntoThis(otherVector, 1.0);
 
 
@@ -93,7 +93,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     </exception>
 		/// <exception cref="PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
 		///     is not permitted by the vector storage format.</exception>
-		public static void AddSubvectorIntoThis(this IVector destinationVector, int destinationIndex, IVectorView sourceVector,
+		public static void AddSubvectorIntoThis(this IVector destinationVector, int destinationIndex, IReadOnlyVector sourceVector,
 			int sourceIndex, int length) 
 			=> destinationVector.AxpySubvectorIntoThis(destinationIndex, sourceVector, 1.0, sourceIndex, length);
 
@@ -137,7 +137,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		public static TVectorOut MultiplyEntrywise<TVectorIn, TVectorOut>(
 			this IEntrywiseOperableView1D<TVectorIn, TVectorOut> thisVector, TVectorIn otherVector)
-			where TVectorIn: IVectorView
+			where TVectorIn: IReadOnlyVector
 			where TVectorOut: IVector
 			=> thisVector.DoEntrywise(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise is less verbose.
 
@@ -182,7 +182,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		public static void MultiplyEntrywiseIntoThis<TVectorIn>(
 			this IEntrywiseOperable1D<TVectorIn> thisVector, TVectorIn otherVector)
-			where TVectorIn: IVectorView
+			where TVectorIn: IReadOnlyVector
 			=> thisVector.DoEntrywiseIntoThis(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise() is less verbose.
 
 		/// <summary>
@@ -226,7 +226,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static IVector Subtract(this IVectorView thisVector, IVectorView otherVector)
+		public static IVector Subtract(this IReadOnlyVector thisVector, IReadOnlyVector otherVector)
 			=> thisVector.Axpy(otherVector, -1.0);
 
 		/// <summary>
@@ -246,7 +246,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static void SubtractIntoThis(this IVector thisVector, IVectorView otherVector)
+		public static void SubtractIntoThis(this IVector thisVector, IReadOnlyVector otherVector)
 			=> thisVector.AxpyIntoThis(otherVector, -1.0);
 
 		/// <summary>
@@ -287,7 +287,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
 		///     is not permitted by the vector storage format.</exception>
 		public static void SubtractSubvectorIntoThis(this IVector destinationVector, int destinationIndex,
-			IVectorView sourceVector, int sourceIndex, int length)
+			IReadOnlyVector sourceVector, int sourceIndex, int length)
 			=> destinationVector.AxpySubvectorIntoThis(destinationIndex, sourceVector, -1.0, sourceIndex, length);
 	}
 }

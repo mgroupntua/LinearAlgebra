@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 		/// <param name="other"></param>
 		public void LinkWith(IStationaryIteration other);
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified);
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified);
 
 	}
 }

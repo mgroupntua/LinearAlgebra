@@ -56,13 +56,13 @@ namespace MGroup.LinearAlgebra.Extensions
         /// <summary>
         /// Copies a vector to an 1D dimensional int[] array. Only the integer part of each double entry is retained.
         /// </summary>
-        public static int[] ToIntArray(this IVectorView vector) //TODO: Also for IIndexable1D
+        public static int[] ToIntArray(this IReadOnlyVector vector) //TODO: Also for IIndexable1D
             => vector.CopyToArray().ToIntArray();
 
         /// <summary>
         /// Copies a matrix to a 2D int[,] array. Only the integer part of each double entry is retained.
         /// </summary>
-        public static int[,] ToIntArray(this IMatrixView matrix) //TODO: Also for IIndexable1D
+        public static int[,] ToIntArray(this IReadOnlyMatrix matrix) //TODO: Also for IIndexable1D
             => matrix.CopyToArray2D().ToIntArray();
     }
 }

@@ -5,7 +5,7 @@ using System;
 namespace MGroup.LinearAlgebra.Vectors
 {
     public interface IEntrywiseOperable1D<TVectorIn>
-        where TVectorIn : IVectorView
+        where TVectorIn : IReadOnlyVector
     {
         /// <summary>
         /// Performs a binary operation on each pair of entries: 

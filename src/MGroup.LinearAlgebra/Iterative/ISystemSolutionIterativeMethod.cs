@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Iterative
 	{
 		void Clear();
 
-		IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
+		IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IReadOnlyVector rhs,
 			IVector solution, bool initialGuessIsZero);
 	}
 }

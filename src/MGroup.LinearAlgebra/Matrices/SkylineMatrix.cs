@@ -725,12 +725,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.Multiply(IReadOnlyVector, bool)"/>.
 		/// </summary>
 		/// <remarks>
 		/// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
 		/// </remarks>
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector casted) return Multiply(casted);
 			else throw new NotImplementedException();
@@ -752,9 +752,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// See <see cref="IReadOnlyMatrix.MultiplyIntoResult(IReadOnlyVector, IVector, bool)"/>.
 		/// </summary>
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if (this.values.Length == 0)
 			{

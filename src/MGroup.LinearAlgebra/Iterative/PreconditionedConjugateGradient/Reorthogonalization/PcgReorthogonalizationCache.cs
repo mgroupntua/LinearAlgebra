@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 		/// <summary>
 		/// The conjugate direction vectors stored so far.
 		/// </summary>
-		public List<IVectorView> Directions { get; } = new List<IVectorView>();
+		public List<IReadOnlyVector> Directions { get; } = new List<IReadOnlyVector>();
 
 		/// <summary>
 		/// The products <see cref="Directions"/> * systemMatrix * <see cref="Directions"/> stored so far.
@@ -30,7 +30,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 		/// <summary>
 		/// The products systemMatrix * <see cref="Directions"/> stored so far.
 		/// </summary>
-		public List<IVectorView> MatrixTimesDirections { get; } = new List<IVectorView>();
+		public List<IReadOnlyVector> MatrixTimesDirections { get; } = new List<IReadOnlyVector>();
 
 		public bool AreAllDirectionsConjugate(double tolerance)
 		{

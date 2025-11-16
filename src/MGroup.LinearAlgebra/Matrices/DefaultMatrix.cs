@@ -41,12 +41,12 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public abstract IMatrix CreateZeroMatrixWithSameFormat();
 
-		public abstract bool HasSameFormat(IMatrixView otherMatrix);
+		public abstract bool HasSameFormat(IReadOnlyMatrix otherMatrix);
 
-		public virtual IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public virtual IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 			=> LinearCombination(1.0, otherMatrix, otherCoefficient);
 
-		public virtual void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public virtual void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 			=> LinearCombinationIntoThis(1.0, otherMatrix, otherCoefficient);
 
 		public virtual IMatrix Copy(bool copyIndexingData = false)
@@ -85,7 +85,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public virtual IMatrix DoEntrywise(IMatrixView otherMatrix, Func<double, double, double> binaryOperation)
+		public virtual IMatrix DoEntrywise(IReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			if (this.HasSameFormat(otherMatrix) && (binaryOperation(0.0, 0.0) == 0.0))
@@ -111,7 +111,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public virtual void DoEntrywiseIntoThis(IMatrixView otherMatrix, Func<double, double, double> binaryOperation)
+		public virtual void DoEntrywiseIntoThis(IReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
 			WarnAboutPerformanceBottlenecks();
@@ -265,20 +265,20 @@ namespace MGroup.LinearAlgebra.Matrices
 			return submatrix;
 		}
 
-		public virtual IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public virtual IMatrix LinearCombination(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 			=> DoEntrywise(otherMatrix, (x, y) => thisCoefficient * x + otherCoefficient * y);
 
-		public virtual void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public virtual void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 			=> DoEntrywiseIntoThis(otherMatrix, (x, y) => thisCoefficient * x + otherCoefficient * y);
 
-		public virtual IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public virtual IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			Vector result = transposeThis ? Vector.CreateZero(this.NumColumns) : Vector.CreateZero(this.NumRows);
 			MultiplyIntoResult(vector, result, transposeThis);
 			return result;
 		}
 
-		public virtual void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public virtual void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -308,10 +308,10 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public virtual Matrix MultiplyLeft(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false)
+		public virtual Matrix MultiplyLeft(IReadOnlyMatrix otherMatrix, bool transposeThis = false, bool transposeOther = false)
 			=> MultiplyMatrices(otherMatrix, this, transposeOther, transposeThis);
 
-		public virtual Matrix MultiplyRight(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false)
+		public virtual Matrix MultiplyRight(IReadOnlyMatrix otherMatrix, bool transposeThis = false, bool transposeOther = false)
 			=> MultiplyMatrices(this, otherMatrix, transposeThis, transposeOther);
 
 		public virtual double Reduce(
@@ -359,7 +359,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		private static Matrix MultiplyMatrices(
-			IMatrixView matrixLeft, IMatrixView matrixRight, bool transposeLeft, bool transposeRight)
+			IReadOnlyMatrix matrixLeft, IReadOnlyMatrix matrixRight, bool transposeLeft, bool transposeRight)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();

@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Commons
 	/// </summary>
 	public static class DenseStrategies
 	{
-		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector,
+		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IReadOnlyVector otherVector,
 			int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector)
+		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IReadOnlyVector otherVector)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void CopyNonContiguously(IVector destinationVector, IVectorView sourceVector, int[] sourceIndices)
+		public static void CopyNonContiguously(IVector destinationVector, IReadOnlyVector sourceVector, int[] sourceIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -73,7 +73,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		public static void CopyNonContiguously(
-			IVector destinationVector, int[] destinationIndices, IVectorView sourceVector, int[] sourceIndices)
+			IVector destinationVector, int[] destinationIndices, IReadOnlyVector sourceVector, int[] sourceIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -118,7 +118,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return Matrix.CreateFromArray(result, m, n, false);
 		}
 
-		public static Vector DoEntrywise(IVectorView vector1, IVectorView vector2,
+		public static Vector DoEntrywise(IReadOnlyVector vector1, IReadOnlyVector vector2,
 			Func<double, double, double> binaryOperation)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -152,7 +152,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		//DELETE
-		public static void DoEntrywiseIntoMatrix1(IMatrix matrix1, IMatrixView matrix2,
+		public static void DoEntrywiseIntoMatrix1(IMatrix matrix1, IReadOnlyMatrix matrix2,
 			Func<double, double, double> binaryOperation)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -296,7 +296,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return result;
 		}
 
-		public static Matrix Multiply(IMatrixView matrix1, IMatrixView matrix2, bool transpose1, bool transpose2)
+		public static Matrix Multiply(IReadOnlyMatrix matrix1, IReadOnlyMatrix matrix2, bool transpose1, bool transpose2)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -376,7 +376,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector Multiply(IMatrixView matrix, IVectorView vector, bool transposeMatrix)
+		public static Vector Multiply(IReadOnlyMatrix matrix, IReadOnlyVector vector, bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -410,7 +410,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void MultiplyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector,
+		public static void MultiplyIntoResult(IReadOnlyMatrix matrix, IReadOnlyVector lhsVector, IVector rhsVector,
 			bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -868,7 +868,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Matrix Transpose(IMatrixView matrix)
+		public static Matrix Transpose(IReadOnlyMatrix matrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();

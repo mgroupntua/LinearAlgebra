@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			};
 		}
 
-		internal Func<double[], IVectorView> CreateLhsVectorFunc { get; set; }
+		internal Func<double[], IReadOnlyVector> CreateLhsVectorFunc { get; set; }
 
 		internal Func<int, IVector> CreateZeroRhsVectorFunc { get; set; }
 
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			set => comparer = new MatrixComparer(1E-13);
 		}
 
-		internal virtual void CheckMultiplication(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
+		internal virtual void CheckMultiplication(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
 			var lhs = CreateLhsVectorFunc(lhsVector);
@@ -50,7 +50,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}
 
-		internal virtual void CheckMultiplicationIntoResult(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
+		internal virtual void CheckMultiplicationIntoResult(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
 			var lhs = CreateLhsVectorFunc(lhsVector);
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}
 
-		internal virtual void CheckAllMultiplications(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected,
+		internal virtual void CheckAllMultiplications(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected,
 			bool transposeMatrix)
 		{
 			CheckMultiplication(matrix, lhsVector, rhsVectorExpected, transposeMatrix);

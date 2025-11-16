@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Tests.Mocking
 
 		public override IMatrix CreateZeroMatrixWithSameFormat() => new MockDefaultMatrix(NumRows, NumColumns);
 
-		public override bool HasSameFormat(IMatrixView otherMatrix)
+		public override bool HasSameFormat(IReadOnlyMatrix otherMatrix)
 		{
 			if (otherMatrix is MockDefaultMatrix casted && casted.NumRows == this.NumRows && casted.NumColumns == this.NumColumns)
 			{

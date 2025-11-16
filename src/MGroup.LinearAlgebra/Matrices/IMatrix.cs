@@ -6,13 +6,13 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// Operations specified by this interface modify the matrix. Therefore it is possible that they may throw exceptions if they 
 	/// are used on sparse or triangular storage matrix formats.
 	/// </summary>
-	public interface IMatrix : IMatrixView, IEntrywiseOperable2D<IMatrixView>
+	public interface IMatrix : IReadOnlyMatrix, IEntrywiseOperable2D<IReadOnlyMatrix>
 	{
 		/// <summary>
 		/// Performs the following operation for all (i, j):
 		/// this[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-		/// Optimized version of <see cref="DoEntrywiseIntoThis(IMatrixView, Func{double, double, double})"/> and 
-		/// <see cref="LinearCombinationIntoThis(double, IMatrixView, double)"/>. Named after BLAS axpy (y = a*x plus y). 
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IReadOnlyMatrix, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombinationIntoThis(double, IReadOnlyMatrix, double)"/>. Named after BLAS axpy (y = a*x plus y). 
 		/// The resulting matrix overwrites the entries of this.
 		/// </summary>
 		/// <param name="other">A matrix with the same <see cref="IIndexable2D.NumRows"/> and 
@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
 		///     is not permitted by the matrix storage format.</exception>
-		void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient);
+		void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 		/// <summary>
 		/// Sets all entries to 0. For sparse or block matrices: the indexing arrays will not be mutated. Therefore the sparsity  
@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Performs the following operation for all (i, j):
 		/// this[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
 		/// <paramref name="otherMatrix"/>[i, j]. 
-		/// Optimized version of <see cref="DoEntrywiseIntoThis(IMatrixView, Func{double, double, double})"/>.
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IReadOnlyMatrix, Func{double, double, double})"/>.
 		/// The resulting matrix overwrites the entries of this.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
 		///     is not permitted by the matrix storage format.</exception>
-		void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
+		void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 		/// <summary>
 		/// Performs the following operation for all (i, j): this[i, j] = <paramref name="scalar"/> * this[i, j].

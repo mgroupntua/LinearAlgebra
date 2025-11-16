@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
@@ -30,7 +30,7 @@ namespace MGroup.LinearAlgebra.Matrices
             return matrix.Multiply(asVector, transposeThis).RawData;
         }
 
-        public static Matrix ThisTimesOtherTimesThisTranspose(this IMatrixView thisMatrix, IMatrixView other)
+        public static Matrix ThisTimesOtherTimesThisTranspose(this IReadOnlyMatrix thisMatrix, IReadOnlyMatrix other)
         {
             return thisMatrix.MultiplyLeft(thisMatrix.MultiplyRight(other, false, false), true, false);
         }
@@ -41,7 +41,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="csr">The matrix that will be multiplied "outside".</param>
         /// <param name="other">The matrix that will be multiplied "inside". It must be square.</param>
-        public static Matrix ThisTimesOtherTimesThisTranspose(this CsrMatrix csr, IMatrixView other)
+        public static Matrix ThisTimesOtherTimesThisTranspose(this CsrMatrix csr, IReadOnlyMatrix other)
         { //TODO: Perhaps this should not be a separate method than the one where other is Matrix
             if (other is Matrix dense) csr.ThisTimesOtherTimesThisTranspose(dense);
 
@@ -98,7 +98,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="csc">The matrix that will be multiplied "outside".</param>
         /// <param name="other">The matrix that will be multiplied "inside". It must be square.</param>
-        public static Matrix ThisTransposeTimesOtherTimesThis(this CscMatrix csc, IMatrixView other)
+        public static Matrix ThisTransposeTimesOtherTimesThis(this CscMatrix csc, IReadOnlyMatrix other)
         { //TODO: Perhaps this should not be a separate method than the one where other is Matrix
             if (other is Matrix dense) return csc.ThisTransposeTimesOtherTimesThis(dense);
 
@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="dense">The matrix that will be multiplied "outside".</param>
         /// <param name="other">The matrix that will be multiplied "inside". It must be square.</param>
-        public static Matrix ThisTransposeTimesOtherTimesThis(this Matrix dense, IMatrixView other)
+        public static Matrix ThisTransposeTimesOtherTimesThis(this Matrix dense, IReadOnlyMatrix other)
         { //TODO: Perhaps this should not be a separate method than the one where other is Matrix
             if (other is Matrix otherDense) return dense.ThisTransposeTimesOtherTimesThis(otherDense);
 

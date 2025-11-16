@@ -11,9 +11,9 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 
 	internal class MatrixDenseVectorMultiplicationChecker : MatrixVectorMultiplicationChecker
 	{
-		internal delegate Vector MultiplyDenseVector(IMatrixView matrix, Vector lhs, bool transposeMatrix);
+		internal delegate Vector MultiplyDenseVector(IReadOnlyMatrix matrix, Vector lhs, bool transposeMatrix);
 
-		internal delegate void MultiplyDenseVectorIntoResult(IMatrixView matrix, Vector lhs, Vector rhs, bool transposeMatrix);
+		internal delegate void MultiplyDenseVectorIntoResult(IReadOnlyMatrix matrix, Vector lhs, Vector rhs, bool transposeMatrix);
 
 		private readonly MultiplyDenseVector multiplyVectorFunc;
 		private readonly MultiplyDenseVectorIntoResult multiplyVectorIntoResultFunc;
@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			this.multiplyVectorIntoResultFunc = multiplyVectorIntoResultFunc;
 		}
 
-		internal void CheckMultiplicationDense(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
+		internal void CheckMultiplicationDense(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
 			var lhs = Vector.CreateFromArray(lhsVector, true);
@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}
 
-		internal void CheckMultiplicationIntoResultDense(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected, 
+		internal void CheckMultiplicationIntoResultDense(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected, 
 			bool transposeMatrix)
 		{
 			var lhs = Vector.CreateFromArray(lhsVector, true);
@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			comparer.AssertEqual(rhsVectorExpected, rhs);
 		}
 
-		internal override void CheckAllMultiplications(IMatrixView matrix, double[] lhsVector, double[] rhsVectorExpected,
+		internal override void CheckAllMultiplications(IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVectorExpected,
 			bool transposeMatrix)
 		{
 			CheckMultiplication(matrix, lhsVector, rhsVectorExpected, transposeMatrix);

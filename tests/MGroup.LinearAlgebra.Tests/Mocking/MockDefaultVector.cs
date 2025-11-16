@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Mocking
 
 		public override IVector CreateZeroVectorWithSameFormat() => new MockDefaultVector(Length);
 
-		public override bool HasSameFormat(IVectorView other)
+		public override bool HasSameFormat(IReadOnlyVector other)
 		{
 			if (other is MockDefaultVector casted && casted.Length == this.Length)
 			{

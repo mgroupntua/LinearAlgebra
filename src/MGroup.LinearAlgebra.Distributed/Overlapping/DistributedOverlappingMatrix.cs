@@ -83,7 +83,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public override void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public override void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public DistributedOverlappingMatrix<TMatrix> CreateZeroMatrixSame()
 			=> new DistributedOverlappingMatrix<TMatrix>(Indexer);
 
-		public override void DoEntrywiseIntoThis(IMatrixView otherMatrix, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
 		{
 			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
@@ -207,7 +207,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceAnd(flags);
 		}
 
-		public override bool HasSameFormat(IMatrixView otherMatrix)
+		public override bool HasSameFormat(IReadOnlyMatrix otherMatrix)
 		{
 			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
@@ -220,7 +220,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public bool HasSameFormat(DistributedOverlappingMatrix<TMatrix> otherMatrix)
 			=> this.Indexer.IsCompatibleWith(otherMatrix.Indexer);
 
-		public override void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is DistributedOverlappingMatrix<TMatrix> casted)
 			{
@@ -247,7 +247,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is DistributedOverlappingVector lhsCasted)
 			{
@@ -261,7 +261,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is DistributedOverlappingVector lhsCasted) && (rhsVector is DistributedOverlappingVector rhsCasted))
 			{

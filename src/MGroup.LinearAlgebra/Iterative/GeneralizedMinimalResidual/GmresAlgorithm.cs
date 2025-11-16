@@ -36,13 +36,13 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 			this.residual = null;
 		}
 
-		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
+		public IterativeStatistics Solve(IReadOnlyMatrix matrix, IPreconditioner preconditioner, IReadOnlyVector rhs, IVector solution,
 			bool initialGuessIsZero)
 		{
 			return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero);
 		}
 
-		public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
+		public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IReadOnlyVector rhs,
 			IVector solution, bool initialGuessIsZero)
 		{
 			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);

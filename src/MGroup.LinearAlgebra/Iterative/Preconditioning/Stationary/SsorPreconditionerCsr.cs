@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 
 		public override IPreconditioner CopyWithInitialSettings() => new SsorPreconditionerCsr(relaxationFactor);
 
-		public override void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public override void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified)
 		{
 			base.UpdateMatrix(matrix, isPatternModified);
 			if (isPatternModified || workArray == null)

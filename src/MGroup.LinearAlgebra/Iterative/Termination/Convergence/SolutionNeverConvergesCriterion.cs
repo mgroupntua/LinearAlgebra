@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 	/// </summary>
 	public class SolutionNeverConvergesCriterion : ISolutionConvergenceCriterion
 	{
-		public double CalculateConvergenceMetric(IVectorView currentSolution, IVectorView previousSolution) => double.MaxValue;
+		public double CalculateConvergenceMetric(IReadOnlyVector currentSolution, IReadOnlyVector previousSolution) => double.MaxValue;
 
 		public ISolutionConvergenceCriterion CopyWithInitialSettings() => new SolutionNeverConvergesCriterion();
 

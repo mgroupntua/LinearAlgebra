@@ -33,9 +33,9 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 			return this;
 		}
 
-		public void ApplyPreSmoothers(IVectorView rhs, IVector solution) => ApplySmoothers(preSmoothers, rhs, solution);
+		public void ApplyPreSmoothers(IReadOnlyVector rhs, IVector solution) => ApplySmoothers(preSmoothers, rhs, solution);
 
-		public void ApplyPostSmoothers(IVectorView rhs, IVector solution) => ApplySmoothers(postSmoothers, rhs, solution);
+		public void ApplyPostSmoothers(IReadOnlyVector rhs, IVector solution) => ApplySmoothers(postSmoothers, rhs, solution);
 
 		public MultigridLevelSmoothing CopyWithInitialSettings()
 		{
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 			return this;
 		}
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified)
 		{
 			CheckSmoothers();
 			foreach ((IStationaryIteration stationaryIteration, _) in preSmoothers)
@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 		}
 
 		private static void ApplySmoothers(List<(IStationaryIteration stationaryIteration, int numApplications)> smoothers,
-			IVectorView rhs, IVector solution)
+			IReadOnlyVector rhs, IVector solution)
 		{
 			var rhsDense = (Vector)rhs;
 			var solutionDense = (Vector)solution;

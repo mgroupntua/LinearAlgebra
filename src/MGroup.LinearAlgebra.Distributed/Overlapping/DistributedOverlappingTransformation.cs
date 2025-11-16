@@ -50,7 +50,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public int NumRows => Indexer.NumGlobalIndices;
 
-		public void Multiply(IVectorView lhsVector, IVector rhsVector)
+		public void Multiply(IReadOnlyVector lhsVector, IVector rhsVector)
 		{
 			DistributedOverlappingVector distributedInput = CastToDistributed(lhsVector);
 			DistributedOverlappingVector distributedOutput = CastToDistributed(rhsVector);
@@ -73,7 +73,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			output.SumOverlappingEntries();
 		}
 
-		private static DistributedOverlappingVector CastToDistributed(IVectorView vector)
+		private static DistributedOverlappingVector CastToDistributed(IReadOnlyVector vector)
 		{
 			if (vector is DistributedOverlappingVector casted)
 			{

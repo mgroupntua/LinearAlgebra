@@ -71,7 +71,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		/// solver.
 		/// </param>
 		/// <param name="lhsVector">Initial guess for the solution vector. Usually it is zero.</param>
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		public void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector)
 		{
 			var rhs = (Vector)rhsVector;
 			var solution = (Vector)lhsVector;
@@ -126,7 +126,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		/// <exception cref="InvalidSparsityPatternException">
 		/// Thrown if the matrix of the linear system is not in CSR format.
 		/// </exception>
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified)
 		{
 			if (prolongation == null)
 			{

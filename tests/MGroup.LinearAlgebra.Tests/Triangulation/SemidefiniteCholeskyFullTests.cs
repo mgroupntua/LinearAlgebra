@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 	/// </summary>
 	public static class SemidefiniteCholeskyFullTests
 	{
-		internal static void CheckNullSpace(IMatrixView unfactorizedMatrix, IReadOnlyList<double[]> nullSpaceBasis,
+		internal static void CheckNullSpace(IReadOnlyMatrix unfactorizedMatrix, IReadOnlyList<double[]> nullSpaceBasis,
 			double tolerance)
 		{
 			var comparer = new MatrixComparer(tolerance);
