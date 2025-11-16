@@ -47,7 +47,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The direction vector d, used to update the solution vector: x = x + α * d.
 		/// </summary>
-		public IVectorView Direction => direction;
+		public IReadOnlyVector Direction => direction;
 
 		/// <summary>
 		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
 		/// </summary>
-		public IVectorView MatrixTimesDirection => matrixTimesDirection;
+		public IReadOnlyVector MatrixTimesDirection => matrixTimesDirection;
 
 		/// <summary>
 		/// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -77,7 +77,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector s = inv(M) * r
 		/// </summary>
-		public IVectorView PrecondResidual => precondResidual;
+		public IReadOnlyVector PrecondResidual => precondResidual;
 
 		/// <summary>
 		/// The dot product r(t) * (inv(M) * r(t)) of the current iteration t.
@@ -92,17 +92,17 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The residual vector r = b - A * x.
 		/// </summary>
-		public IVectorView Residual => residual;
+		public IReadOnlyVector Residual => residual;
 
 		/// <summary>
 		/// The right hand side of the linear system b = A * x.
 		/// </summary>
-		public IVectorView Rhs { get; protected set; }
+		public IReadOnlyVector Rhs { get; protected set; }
 
 		/// <summary>
 		/// The current approximation to the solution of the linear system A * x = b
 		/// </summary>
-		public IVectorView Solution => solution;
+		public IReadOnlyVector Solution => solution;
 
 		/// <summary>
 		/// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -156,7 +156,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
+		public IterativeStatistics Solve(IReadOnlyMatrix matrix, IPreconditioner preconditioner, IReadOnlyVector rhs, IVector solution,
 			bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
 			=> Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero);
 
@@ -189,7 +189,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
+		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IReadOnlyVector rhs,
 			IVector solution, bool initialGuessIsZero)
 		{
 			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);

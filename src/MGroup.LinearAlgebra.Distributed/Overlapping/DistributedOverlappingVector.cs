@@ -149,7 +149,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceAnd(localResults);
 		}
 
-		public override void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
+		public override void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is DistributedOverlappingVector casted)
 			{
@@ -189,7 +189,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return new DistributedOverlappingVector(indexerCloned, localVectorsCloned);
 		}
 
-		public override void CopyFrom(IVectorView otherVector)
+		public override void CopyFrom(IReadOnlyVector otherVector)
 		{
 			if (otherVector is DistributedOverlappingVector casted)
 			{
@@ -237,7 +237,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public override IVector CreateZeroVectorWithSameFormat() => CreateZeroVectorSame();
 
-		public override void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			if (otherVector is DistributedOverlappingVector casted)
 			{
@@ -274,7 +274,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			Environment.DoPerNode(node => this.LocalVectors[node].DoToAllEntriesIntoThis(unaryOperation));
 		}
 
-		public override double DotProduct(IVectorView otherVector)
+		public override double DotProduct(IReadOnlyVector otherVector)
 		{
 			if (otherVector is DistributedOverlappingVector casted)
 			{
@@ -287,7 +287,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		}
 
 		/// <summary>
-		/// Same as <see cref="IVectorView.DotProduct(IVectorView)"/>.
+		/// Same as <see cref="IReadOnlyVector.DotProduct(IReadOnlyVector)"/>.
 		/// </summary>
 		/// <remarks>
 		/// Warning: This does not work correctly if 2 local vectors have different values at the same common entry. In such 
@@ -344,7 +344,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceAnd(flags);
 		}
 
-		public override bool HasSameFormat(IVectorView other)
+		public override bool HasSameFormat(IReadOnlyVector other)
 		{
 			if (other is DistributedOverlappingVector casted)
 			{
@@ -357,7 +357,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public bool HasSameFormat(DistributedOverlappingVector other) => this.Indexer.IsCompatibleWith(other.Indexer);
 
 		public override void LinearCombinationIntoThis(
-			double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+			double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is DistributedOverlappingVector casted)
 			{

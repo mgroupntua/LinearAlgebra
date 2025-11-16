@@ -3,7 +3,7 @@ using System;
 namespace MGroup.LinearAlgebra.Matrices
 {
     public interface IEntrywiseOperable2D<TMatrixIn>
-        where TMatrixIn : IMatrixView
+        where TMatrixIn : IReadOnlyMatrix
     {
         /// <summary>
         /// Performs a binary operation on each pair of entries:  

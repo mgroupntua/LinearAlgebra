@@ -185,10 +185,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static SymmetricMatrix operator *(SymmetricMatrix matrix, double scalar)
 			=> matrix.ScaleSameFormat(scalar);
 
-		public static IMatrixView operator *(SymmetricMatrix matrixLeft, IMatrixView matrixRight)
+		public static IReadOnlyMatrix operator *(SymmetricMatrix matrixLeft, IReadOnlyMatrix matrixRight)
 			=> matrixLeft.MultiplyRight(matrixRight, false, false);
 
-		public static IMatrixView operator *(IMatrixView matrixLeft, SymmetricMatrix matrixRight)
+		public static IReadOnlyMatrix operator *(IReadOnlyMatrix matrixLeft, SymmetricMatrix matrixRight)
 			=> matrixRight.MultiplyLeft(matrixLeft, false, false);
 
 		public static Vector operator *(SymmetricMatrix matrixLeft, Vector vectorRight)
@@ -199,7 +199,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		#endregion
 
-		public override IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public override IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted) return Axpy(casted, otherCoefficient);
 			else return DoEntrywise(otherMatrix, (x1, x2) => x1 + otherCoefficient * x2); //TODO: optimize this
@@ -274,7 +274,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public SymmetricMatrix DoEntrywise(SymmetricMatrix matrix, Func<double, double, double> binaryOperation)
 			=> DoEntrywiseSameFormat(matrix, binaryOperation);
 
-		public override void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is SymmetricMatrix casted)
 			{
@@ -368,7 +368,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public override bool HasSameFormat(SymmetricMatrix other) => this.Order == other.Order;
 
-		public override void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted)
 			{
@@ -400,7 +400,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			this.Definiteness = DefiniteProperty.Unknown;
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector lhsDense)
 			{
@@ -425,7 +425,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{

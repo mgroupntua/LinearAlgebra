@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Extensions
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/>.Length is different than the <see cref="IIndexable2D.NumColumns"/> of oper(this).
         /// </exception>
-        public static double[] Multiply(this IMatrixView matrix, double[] vector, bool transposeThis = false)
+        public static double[] Multiply(this IReadOnlyMatrix matrix, double[] vector, bool transposeThis = false)
         {
             var result = new double[transposeThis ? matrix.NumColumns : matrix.NumRows];
             matrix.MultiplyIntoResult(Vector.CreateFromArray(vector), Vector.CreateFromArray(result), transposeThis);
@@ -186,7 +186,7 @@ namespace MGroup.LinearAlgebra.Extensions
         /// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
         /// method will try to.
         /// </exception>
-        public static void MultiplyIntoResult(this IMatrixView matrix, double[] lhsVector, double[] rhsVector,
+        public static void MultiplyIntoResult(this IReadOnlyMatrix matrix, double[] lhsVector, double[] rhsVector,
             bool transposeThis = false)
             => matrix.MultiplyIntoResult(Vector.CreateFromArray(lhsVector), Vector.CreateFromArray(rhsVector), transposeThis);
 

@@ -22,8 +22,8 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="rhsVector"/> or <paramref name="lhsVector"/> 
 		/// is different than the number of rows of this <see cref="IPreconditioner"/>.
 		/// </exception>
-		void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector);
+		void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector);
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified);
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified);
 	}
 }

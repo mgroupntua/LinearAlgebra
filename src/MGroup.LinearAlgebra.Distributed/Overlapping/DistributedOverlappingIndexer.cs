@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public int NumGlobalIndices { get; private set; }
 
-		public DistributedOverlappingVector CastCompatibleVector(IVectorView vector)
+		public DistributedOverlappingVector CastCompatibleVector(IReadOnlyVector vector)
 		{
 			if (vector is DistributedOverlappingVector distributedVector)
 			{

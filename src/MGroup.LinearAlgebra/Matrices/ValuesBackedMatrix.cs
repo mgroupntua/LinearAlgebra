@@ -44,7 +44,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <returns>True if the matrices have the same format. False otherwise.</returns>
 		public abstract bool HasSameFormat(TMatrix other);
 
-		public override IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public override IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is TMatrix casted && HasSameFormat(casted))
 			{
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public override void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is TMatrix casted)
 			{
@@ -142,7 +142,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public override IMatrix CreateZeroMatrixWithSameFormat() => CreateZeroMatrixSame();
 
-		public override IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+		public override IMatrix DoEntrywise(IReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is TMatrix casted && HasSameFormat(casted))
 			{
@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is TMatrix casted)
 			{
@@ -284,7 +284,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override bool HasSameFormat(IMatrixView otherMatrix)
+		public override bool HasSameFormat(IReadOnlyMatrix otherMatrix)
 		{
 			if (otherMatrix is TMatrix casted)
 			{
@@ -294,7 +294,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return false;
 		}
 
-		public override IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override IMatrix LinearCombination(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is TMatrix casted && HasSameFormat(casted))
 			{
@@ -309,7 +309,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is TMatrix casted)
 			{

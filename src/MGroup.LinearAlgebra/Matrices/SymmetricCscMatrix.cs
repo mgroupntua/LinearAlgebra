@@ -213,14 +213,14 @@ namespace MGroup.LinearAlgebra.Matrices
 			return (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			var result = Vector.CreateZero(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, vector, result.RawData);
 			return result;
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
 		{
 			rhsVector.Clear(); // TODO: add this as an optional flag or convert the method to axpy like.
 			if (rhsVector is Vector denseVector)

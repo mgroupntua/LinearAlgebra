@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <paramref name="original"/>.
 		/// </summary>
 		/// <param name="original">The original vector to copy.</param>
-		public static Vector CreateFromVector(IVectorView original)
+		public static Vector CreateFromVector(IReadOnlyVector original)
 		{
 			if (original is Vector casted) return casted.Copy();
 			double[] clone = new double[original.Length];
@@ -157,9 +157,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		#endregion
 
 		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
+		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IReadOnlyVector, int[])"/>
 		/// </summary>
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			if (thisIndices.Length != otherIndices.Length) throw new NonMatchingDimensionsException(
 				"thisIndices and otherIndices must have the same length.");
@@ -177,9 +177,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
+		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IReadOnlyVector)"/>
 		/// </summary>
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector)
 		{
 			if (thisIndices.Length != otherVector.Length) throw new NonMatchingDimensionsException(
 				"thisIndices and otherVector must have the same length.");
@@ -213,7 +213,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="destinationIdx"/>, <paramref name="sourceVector"/> or <paramref name="sourceIdx"/> 
 		/// violate the described constraints.
 		/// </exception>
-		public void AddSubvectorIntoThis(int destinationIdx, IVectorView sourceVector, int sourceIdx, int length)
+		public void AddSubvectorIntoThis(int destinationIdx, IReadOnlyVector sourceVector, int sourceIdx, int length)
 		{
 			if (destinationIdx + sourceVector.Length > this.Length) throw new NonMatchingDimensionsException(
 				"The entries to set exceed this vector's length");
@@ -246,9 +246,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
+		/// See <see cref="IReadOnlyVector.Axpy(IReadOnlyVector, double)"/>.
 		/// </summary>
-		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
+		public IVector Axpy(IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is Vector dense) return Axpy(dense, otherCoefficient);
 			else if (otherVector is SparseVector sparse)
@@ -283,9 +283,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.AxpyIntoThis(IVectorView, double)"/>.
+		/// See <see cref="IVector.AxpyIntoThis(IReadOnlyVector, double)"/>.
 		/// </summary>
-		public void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
+		public void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is Vector dense) AxpyIntoThis(dense, otherCoefficient);
 			else
@@ -322,9 +322,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>.
+		/// See <see cref="IVector.CopySubvectorFrom(int, IReadOnlyVector, int, int)"/>.
 		/// </summary>
-		public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
+		public void AxpySubvectorIntoThis(int destinationIndex, IReadOnlyVector sourceVector, double sourceCoefficient,
 			int sourceIndex, int length)
 		{
 			Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
@@ -356,7 +356,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Copy() => Vector.CreateFromArray(data, true); //TODO: Perhaps this should use BLAS
 
 		/// <summary>
-		/// See <see cref="IVectorView.CopyToArray"/>.
+		/// See <see cref="IReadOnlyVector.CopyToArray"/>.
 		/// </summary>
 		public double[] CopyToArray() //Perhaps this should use BLAS
 		{
@@ -380,9 +380,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopyFrom(IVectorView)"/>
+		/// See <see cref="IVector.CopyFrom(IReadOnlyVector)"/>
 		/// </summary>
-		public void CopyFrom(IVectorView sourceVector)
+		public void CopyFrom(IReadOnlyVector sourceVector)
 		{
 			Preconditions.CheckVectorDimensions(this, sourceVector);
 			if (sourceVector is Vector casted) Array.Copy(casted.data, this.data, this.Length);
@@ -406,9 +406,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
+		/// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IReadOnlyVector, int[])"/>
 		/// </summary>
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			if (thisIndices.Length != otherIndices.Length) throw new NonMatchingDimensionsException(
 				"thisIndices and otherIndices must have the same length.");
@@ -444,9 +444,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
+		/// See <see cref="IVector.CopyNonContiguouslyFrom(IReadOnlyVector, int[])"/>
 		/// </summary>
-		public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
+		public void CopyNonContiguouslyFrom(IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			if (otherIndices.Length != this.Length) throw new NonMatchingDimensionsException(
 				"otherIndices and this vector must have the same length.");
@@ -461,9 +461,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
+		/// See <see cref="IVector.CopySubvectorFrom(int, IReadOnlyVector, int, int)"/>
 		/// </summary>
-		public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+		public void CopySubvectorFrom(int destinationIndex, IReadOnlyVector sourceVector, int sourceIndex, int length)
 		{
 			//TODO: Perhaps a syntax closer to Array: 
 			// e.g. Vector.Copy(sourceVector, sourceIndex, destinationVector, destinationIndex, length)
@@ -478,7 +478,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVectorView.CreateZeroVectorWithSameFormat"/>
+		/// See <see cref="IReadOnlyVector.CreateZeroVectorWithSameFormat"/>
 		/// </summary>
 		public IVector CreateZeroVectorWithSameFormat() => new Vector(new double[Length]);
 
@@ -488,7 +488,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
 		/// </summary>
-		public IVector DoEntrywise(IVectorView vector, Func<double, double, double> binaryOperation)
+		public IVector DoEntrywise(IReadOnlyVector vector, Func<double, double, double> binaryOperation)
 		{
 			if (vector is Vector casted) return DoEntrywise(vector, binaryOperation);
 			else return vector.DoEntrywise(this, (x, y) => binaryOperation(y, x)); // To avoid accessing zero entries.
@@ -508,7 +508,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
 		/// </summary>
-		public void DoEntrywiseIntoThis(IVectorView vector, Func<double, double, double> binaryOperation)
+		public void DoEntrywiseIntoThis(IReadOnlyVector vector, Func<double, double, double> binaryOperation)
 		{
 			if (vector is Vector casted) DoEntrywiseIntoThis(casted, binaryOperation);
 			else
@@ -530,7 +530,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
 		/// </summary>
-		IVector IEntrywiseOperableView1D<IVectorView, IVector>.DoToAllEntries(Func<double, double> unaryOperation) 
+		IVector IEntrywiseOperableView1D<IReadOnlyVector, IVector>.DoToAllEntries(Func<double, double> unaryOperation) 
 			=> DoToAllEntries(unaryOperation);
 
 		/// <summary>
@@ -552,9 +552,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVectorView.DotProduct(IVectorView)"/>.
+		/// See <see cref="IReadOnlyVector.DotProduct(IReadOnlyVector)"/>.
 		/// </summary>
-		public double DotProduct(IVectorView vector)
+		public double DotProduct(IReadOnlyVector vector)
 		{
 			if (vector is Vector casted) return DotProduct(casted);
 			else return vector.DotProduct(this); // Let the more complex/efficient object operate.
@@ -621,7 +621,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public bool HasSameFormat(IVectorView other)
+		public bool HasSameFormat(IReadOnlyVector other)
 		{
 			if (other is Vector casted && casted.Length == this.Length)
 			{
@@ -642,9 +642,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		public bool IsZero(double tolerance) => DenseStrategies.IsZero(data, tolerance);
 
 		/// <summary>
-		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
+		/// See <see cref="IReadOnlyVector.LinearCombination(double, IReadOnlyVector, double)"/>.
 		/// </summary>
-		public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public IVector LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is Vector casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
 			else return otherVector.LinearCombination(otherCoefficient, this, thisCoefficient); // To avoid accessing zero entries
@@ -684,9 +684,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVector.LinearCombinationIntoThis(double, IVectorView, double)"/>.
+		/// See <see cref="IVector.LinearCombinationIntoThis(double, IReadOnlyVector, double)"/>.
 		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is Vector casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
 			else
@@ -750,7 +750,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVectorView.Norm2"/>
+		/// See <see cref="IReadOnlyVector.Norm2"/>
 		/// </summary>
 		public double Norm2() => GlobalProvider.Blas.Dnrm2(Length, data, 0, 1);
 
@@ -855,9 +855,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// See <see cref="IVectorView.Scale(double)"/>.
+		/// See <see cref="IReadOnlyVector.Scale(double)"/>.
 		/// </summary>
-		IVector IVectorView.Scale(double scalar) => Scale(scalar);
+		IVector IReadOnlyVector.Scale(double scalar) => Scale(scalar);
 
 		/// <summary>
 		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 

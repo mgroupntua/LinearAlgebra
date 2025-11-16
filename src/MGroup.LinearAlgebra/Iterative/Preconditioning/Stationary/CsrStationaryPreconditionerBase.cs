@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 			provider = new ManagedStationaryIterationProvider();
 		}
 
-		public virtual void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public virtual void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified)
 		{
 			Preconditions.CheckSquare(matrix);
 			if (matrix is CsrMatrix csrMatrix)
@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 			}
 		}
 
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		public void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector)
 		{
 			if (rhsVector is Vector rhs && lhsVector is Vector lhs)
 			{

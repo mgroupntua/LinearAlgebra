@@ -65,7 +65,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public IPreconditioner CopyWithInitialSettings() => new DistributedOverlappingJacobiPreconditioner(environment, diagonal);
 
 
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		public void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector)
 		{
 			if (rhsVector is DistributedOverlappingVector rhsCasted && lhsVector is DistributedOverlappingVector lhsCasted)
 			{
@@ -79,6 +79,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 		}
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified) { } 
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified) { } 
 	}
 }

@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckIndex1D(IVectorView vector, int idx)
+		public static void CheckIndex1D(IReadOnlyVector vector, int idx)
 		{
 			if ((idx < 0) || (idx >= vector.Length))
 			{
@@ -87,8 +87,8 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckMultiplicationDimensionsSection(IIndexable2D matrixLeft, IVectorView vectorRight,
-			int vectorStart, IVectorView result, int resultStart)
+		public static void CheckMultiplicationDimensionsSection(IIndexable2D matrixLeft, IReadOnlyVector vectorRight,
+			int vectorStart, IReadOnlyVector result, int resultStart)
 		{
 			if (vectorStart + matrixLeft.NumColumns > vectorRight.Length)
 			{
@@ -103,8 +103,8 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckMultiplicationDimensions(IIndexable2D matrix, IVectorView lhsVector, int lhsOffset,
-			IVectorView rhsVector, int rhsOffset, bool transposeMatrix)
+		public static void CheckMultiplicationDimensions(IIndexable2D matrix, IReadOnlyVector lhsVector, int lhsOffset,
+			IReadOnlyVector rhsVector, int rhsOffset, bool transposeMatrix)
 		{
 			int m, n;
 			if (transposeMatrix)
@@ -173,7 +173,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckSameColDimension(IIndexable2D matrix, IVectorView vector)
+		public static void CheckSameColDimension(IIndexable2D matrix, IReadOnlyVector vector)
 		{
 			if (matrix.NumColumns != vector.Length)
 			{
@@ -203,7 +203,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckSameRowDimension(IIndexable2D matrix, IVectorView vector)
+		public static void CheckSameRowDimension(IIndexable2D matrix, IReadOnlyVector vector)
 		{
 			if (matrix.NumRows != vector.Length)
 			{
@@ -267,7 +267,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CheckSystemSolutionDimensions(IIndexable2D matrix, IVectorView rhsVector)
+		public static void CheckSystemSolutionDimensions(IIndexable2D matrix, IReadOnlyVector rhsVector)
 		{
 			if (matrix.NumRows != rhsVector.Length)
 			{

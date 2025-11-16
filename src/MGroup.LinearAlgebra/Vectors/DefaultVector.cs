@@ -19,9 +19,9 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public abstract IVector CreateZeroVectorWithSameFormat();
 
-		public abstract bool HasSameFormat(IVectorView other);
+		public abstract bool HasSameFormat(IReadOnlyVector other);
 
-		public virtual void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+		public virtual void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			if (thisIndices.Length != otherIndices.Length)
 			{
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
+		public virtual void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -49,14 +49,14 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public virtual void AddToIndex(int index, double value) => this[index] = this[index] + value;
 
-		public virtual IVector Axpy(IVectorView otherVector, double otherCoefficient)
+		public virtual IVector Axpy(IReadOnlyVector otherVector, double otherCoefficient)
 			=> LinearCombination(1.0, otherVector, otherCoefficient);
 
-		public virtual void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
+		public virtual void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient)
 			=> LinearCombinationIntoThis(1.0, otherVector, otherCoefficient);
 
 		public virtual void AxpySubvectorIntoThis(
-			int destinationIndex, IVectorView sourceVector, double sourceCoefficient, int sourceIndex, int length)
+			int destinationIndex, IReadOnlyVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
 		{
 			if (destinationIndex + length > this.Length)
 			{
@@ -93,7 +93,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return clone;
 		}
 
-		public virtual void CopyFrom(IVectorView sourceVector)
+		public virtual void CopyFrom(IReadOnlyVector sourceVector)
 		{
 			Preconditions.CheckVectorDimensions(this, sourceVector);
 			WarnAboutPerformanceBottlenecks();
@@ -109,7 +109,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+		public virtual void CopyNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			if (thisIndices.Length != otherIndices.Length)
 			{
@@ -124,7 +124,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
+		public virtual void CopyNonContiguouslyFrom(IReadOnlyVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -134,7 +134,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+		public virtual void CopySubvectorFrom(int destinationIndex, IReadOnlyVector sourceVector, int sourceIndex, int length)
 		{
 			if (destinationIndex + length > this.Length)
 			{
@@ -167,7 +167,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return result;
 		}
 
-		public virtual IVector DoEntrywise(IVectorView otherVector, Func<double, double, double> binaryOperation)
+		public virtual IVector DoEntrywise(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (this.HasSameFormat(otherVector) && (binaryOperation(0.0, 0.0) == 0.0))
@@ -190,7 +190,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
+		public virtual void DoEntrywiseIntoThis(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			WarnAboutPerformanceBottlenecks();
@@ -229,7 +229,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual double DotProduct(IVectorView vector)
+		public virtual double DotProduct(IReadOnlyVector vector)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
 			WarnAboutPerformanceBottlenecks();
@@ -265,7 +265,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return true;
 		}
 
-		public virtual IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public virtual IVector LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (this.HasSameFormat(otherVector))
@@ -288,7 +288,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		public virtual void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public virtual void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			WarnAboutPerformanceBottlenecks();

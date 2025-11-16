@@ -1,6 +1,6 @@
 //TODO: perhaps I should return IVectorView instead of IVector. By returning IVectorView I can have classes that only implement
 //      IVectorView. On the other hand, I cannot mutate the returned type, so its usefulness is limited.
-//TODO: Should IVector Copy() be defined in IVectorView? It doesn't mutate the original vector. However, the return type should
+//TODO: Should IVector Copy() be defined in IReadOnlyVector? It doesn't mutate the original vector. However, the return type should
 //      still be IVector, since there wouldn't be a point in getting an immutable copy of an immutable class. Same for IMatrixView
 namespace MGroup.LinearAlgebra.Vectors
 {
@@ -10,23 +10,23 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// It supports common operations that do not mutate the underlying vector. If you need to store a vector and then pass it
 	/// around or allow acceess to it, consider using this interface instead of <see cref="Vector"/> for extra safety.
 	/// </summary>
-	public interface IVectorView : IIndexable1D, IReducible, IEntrywiseOperableView1D<IVectorView, IVector>
+	public interface IReadOnlyVector : IIndexable1D, IReducible, IEntrywiseOperableView1D<IReadOnlyVector, IVector>
 	{
 		/// <summary>
 		/// Performs the following operation for all i:
 		/// result[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
-		/// Optimized version of <see cref="IVectorView.DoEntrywise(IVectorView, Func{double, double, double})"/> and 
-		/// <see cref="LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
+		/// Optimized version of <see cref="IReadOnlyVector.DoEntrywise(IReadOnlyVector, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombination(double, IReadOnlyVector, double)"/>. Named after BLAS axpy (y = a*x plus y).
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
 		/// <param name="otherVector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
 		///     <see cref="IIndexable1D.Length"/> than this.</exception>
-		IVector Axpy(IVectorView otherVector, double otherCoefficient);
+		IVector Axpy(IReadOnlyVector otherVector, double otherCoefficient);
 
 		/// <summary>
-		/// Copies this <see cref="IVectorView"/> object. A new vector of the same type as this object is initialized and 
+		/// Copies this <see cref="IReadOnlyVector"/> object. A new vector of the same type as this object is initialized and 
 		/// returned.
 		/// </summary>
 		/// <param name="copyIndexingData">
@@ -51,20 +51,20 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// result = sum over all i of this[i] * <paramref name="vector"/>[i]).
 		/// </summary>
 		/// <param name="vector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
-		double DotProduct(IVectorView vector);
+		double DotProduct(IReadOnlyVector vector);
 
 		/// <summary>
 		/// Returns true if the only difference betweens this vector and <paramref name="other"/> is their values.
 		/// </summary>
 		/// <param name="other">The vector to compare.</param>
 		/// <returns>True if the vectors have the same format. False otherwise.</returns>
-		bool HasSameFormat(IVectorView other);
+		bool HasSameFormat(IReadOnlyVector other);
 
 		/// <summary>
 		/// Performs the following operation for all i:
 		/// result[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> * 
 		/// <paramref name="otherVector"/>[i].
-		/// Optimized version of <see cref="DoEntrywiseIntoThis(IVectorView, Func{double, double, double})"/>.
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IReadOnlyVector, Func{double, double, double})"/>.
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this vector.</param>
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
 		///     <see cref="IIndexable1D.Length"/> than this.</exception>
-		IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient);
+		IVector LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient);
 
 		/// <summary>
 		/// Calculates the Euclidian norm or 2-norm of this vector. For more see 

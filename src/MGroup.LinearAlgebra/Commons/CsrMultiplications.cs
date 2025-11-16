@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Commons
 	internal static class CsrMultiplications
 	{
 		internal static void CsrTimesMatrix(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time
 			{
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTimesMatrixTrans(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time
 			{
@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IReadOnlyVector lhs, double[] rhs)
 		{
 			for (int i = 0; i < numCsrRows; ++i)
 			{
@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, IVector rhs)
+			IReadOnlyVector lhs, IVector rhs)
 		{
 			for (int i = 0; i < numCsrRows; ++i)
 			{
@@ -92,7 +92,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesMatrix(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time
 			{
@@ -113,7 +113,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesMatrixTrans(int numCsrRows, double[] csrValues, int[] csrRowOffsets,
-			int[] csrColIndices, IMatrixView other, Matrix result)
+			int[] csrColIndices, IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time
 			{
@@ -134,7 +134,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IReadOnlyVector lhs, double[] rhs)
 		{
 			// A^T * x = linear combination of columns of A^T = rows of A, with the entries of x as coefficients
 			for (int i = 0; i < numCsrRows; ++i)
@@ -150,7 +150,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, IVector rhs)
+			IReadOnlyVector lhs, IVector rhs)
 		{
 			var temp = new double[rhs.Length];
 			CsrTransTimesVector(numCsrRows, csrValues, csrRowOffsets, csrColIndices, lhs, temp);
@@ -171,7 +171,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void MatrixTimesCsr(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int r = 0; r < result.NumRows; ++r) // Compute one output row at a time.
 			{
@@ -192,7 +192,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void MatrixTimesCsrTrans(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time.
 			{
@@ -213,7 +213,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void MatrixTransTimesCsr(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IMatrixView other, Matrix result)
+			IReadOnlyMatrix other, Matrix result)
 		{
 			for (int r = 0; r < result.NumRows; ++r) // Compute one output row at a time.
 			{
@@ -234,7 +234,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void MatrixTransTimesCsrTrans(int numCsrRows, double[] csrValues, int[] csrRowOffsets,
-			int[] csrColIndices, IMatrixView other, Matrix result)
+			int[] csrColIndices, IReadOnlyMatrix other, Matrix result)
 		{
 			for (int c = 0; c < result.NumColumns; ++c) // Compute one output column at a time
 			{
@@ -317,7 +317,7 @@ namespace MGroup.LinearAlgebra.Commons
 		/// <param name="lhs">The left hand side vector.</param>
 		/// <param name="rhs">The right hand side vector. Will not be cleared</param>
 		internal static void SymmetricCsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IReadOnlyVector lhs, double[] rhs)
 		{
 			// A * x = (L+D+U) * x.
 			// D * x is a simple vector dot product

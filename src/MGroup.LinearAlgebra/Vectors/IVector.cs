@@ -10,7 +10,7 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// Operations specified by this interface modify the vector. Therefore it is possible that they may throw exceptions if they
 	/// are used on sparse vector formats and the zero entries are overwritten.
 	/// </summary>
-	public interface IVector : IVectorView, IEntrywiseOperable1D<IVectorView>
+	public interface IVector : IReadOnlyVector, IEntrywiseOperable1D<IReadOnlyVector>
 	{
 		/// <summary>
 		/// Adds selected entries from <paramref name="otherVector"/> to this vector:
@@ -34,13 +34,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Adds selected entries from <paramref name="otherVector"/> to this vector:
 		/// this[<paramref name="thisIndices"/>[i]] += <paramref name="otherVector"/>[i], for 0 &lt;= i
 		/// &lt; <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/> = <paramref name="thisIndices"/>.Length.
-		/// Contrary to <see cref="AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>, access to the entries of
+		/// Contrary to <see cref="AddIntoThisNonContiguouslyFrom(int[], IReadOnlyVector, int[])"/>, access to the entries of
 		/// <paramref name="otherVector"/> is contiguous.
 		/// </summary>
 		/// <param name="thisIndices">
@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
-		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector);
+		void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector);
 
 		/// <summary>
 		/// Similar to <see cref="Set(int, double)"/>, but will add <paramref name="value"/> to the existing entry at <paramref name="index"/>.
@@ -77,8 +77,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// Performs the following operation for all i:
 		/// this[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i].
-		/// Optimized version of <see cref="IVector.DoEntrywise(IVectorView, Func{double, double, double})"/> and
-		/// <see cref="IVector.LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
+		/// Optimized version of <see cref="IVector.DoEntrywise(IReadOnlyVector, Func{double, double, double})"/> and
+		/// <see cref="IVector.LinearCombination(double, IReadOnlyVector, double)"/>. Named after BLAS axpy (y = a*x plus y).
 		/// The resulting vector overwrites the entries of this.
 		/// </summary>
 		/// <param name="otherVector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
@@ -89,7 +89,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void AxpyIntoThis(IVectorView otherVector, double otherCoefficient);
+		void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient);
 
 		/// <summary>
 		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient, int sourceIndex,
+		void AxpySubvectorIntoThis(int destinationIndex, IReadOnlyVector sourceVector, double sourceCoefficient, int sourceIndex,
 			int length);
 
 		/// <summary>
@@ -133,7 +133,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void CopyFrom(IVectorView sourceVector);
+		void CopyFrom(IReadOnlyVector sourceVector);
 
 		/// <summary>
 		/// Copies selected entries from <paramref name="otherVector"/> to this vector:
@@ -157,13 +157,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> or <paramref name="otherIndices"/> violate the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices);
+		void CopyNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Copies selected entries from <paramref name="otherVector"/> to this vector:
 		/// this[i] = <paramref name="otherVector"/>[<paramref name="otherIndices"/>[i]],
 		/// for 0 &lt;= i &lt; this.<see cref="IIndexable1D.Length"/> = <paramref name="otherIndices"/>.Length.
-		/// Contrary to <see cref="CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>, access to the entries of this vector
+		/// Contrary to <see cref="CopyNonContiguouslyFrom(int[], IReadOnlyVector, int[])"/>, access to the entries of this vector
 		/// is contiguous.
 		/// </summary>
 		/// <param name="otherVector">The vector from which entries will be copied.</param>
@@ -178,7 +178,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="otherIndices"/> violates the described constraints.
 		/// </exception>
-		void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices);
+		void CopyNonContiguouslyFrom(IReadOnlyVector otherVector, int[] otherIndices);
 
 		/// <summary>
 		/// Copies <paramref name="length"/> consecutive entries from <paramref name="sourceVector"/> to this
@@ -202,13 +202,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length);
+		void CopySubvectorFrom(int destinationIndex, IReadOnlyVector sourceVector, int sourceIndex, int length);
 
 		/// <summary>
 		/// Performs the following operation for all i:
 		/// this[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> *
 		/// <paramref name="otherMatrix"/>[i].
-		/// Optimized version of <see cref="DoEntrywiseIntoThis(IVectorView, Func{double, double, double})"/>.
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IReadOnlyVector, Func{double, double, double})"/>.
 		/// The resulting vector overwrites the entries of this.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this vector.</param>
@@ -220,7 +220,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient);
+		void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient);
 
 		/// <summary>
 		/// Performs the following operation for all i: this[i] = <paramref name="scalar"/> * this[i].

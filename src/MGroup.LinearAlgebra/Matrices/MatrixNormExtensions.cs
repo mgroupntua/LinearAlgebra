@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// https://www.mathworks.com/help/matlab/ref/norm.html#bvhji30-4
         /// </summary>
         /// <param name="matrix"></param>
-        public static double NormInf(this IMatrixView matrix) //TODO: matrix norms should be in a dedicated extensions class.
+        public static double NormInf(this IReadOnlyMatrix matrix) //TODO: matrix norms should be in a dedicated extensions class.
         {
             double max = double.MinValue;
             for (int i = 0; i < matrix.NumRows; ++i)

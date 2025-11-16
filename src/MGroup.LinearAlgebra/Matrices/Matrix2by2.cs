@@ -164,7 +164,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			=> matrixRight.Multiply(vectorLeft, true);
 		#endregion
 
-		public override IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		public override IMatrix Axpy(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix2by2 casted) return Axpy(casted, otherCoefficient);
 			else
@@ -200,7 +200,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			});
 		}
 
-		public override void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public override void AxpyIntoThis(IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix2by2 casted) AxpyIntoThis(casted, otherCoefficient);
 			else
@@ -257,7 +257,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public override IMatrix CreateZeroMatrixWithSameFormat() => Matrix2by2.CreateZero();
 
-		public override IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		public override IMatrix DoEntrywise(IReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix2by2 casted) return DoEntrywise(casted, binaryOperation);
 			else
@@ -280,7 +280,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			});
 		}
 
-		public override void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		public override void DoEntrywiseIntoThis(IReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix2by2 casted) DoEntrywiseIntoThis(casted, binaryOperation);
 			else
@@ -353,7 +353,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Vector.CreateFromArray(new double[] { data[rowIndex, 0], data[rowIndex, 1] });
 		}
 
-		public override bool HasSameFormat(IMatrixView other) => other is Matrix2by2;
+		public override bool HasSameFormat(IReadOnlyMatrix other) => other is Matrix2by2;
 
 		/// <summary>
 		/// Calculates the inverse matrix and returns it in a new <see cref="Matrix2by2"/> instance. This only works if this 
@@ -386,7 +386,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return (new Matrix2by2(inverse), det);
 		}
 
-		public override IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override IMatrix LinearCombination(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix2by2 casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
 			else if (thisCoefficient == 1.0) return Axpy(otherMatrix, otherCoefficient);
@@ -432,7 +432,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			});
 		}
 
-		public override void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix2by2 casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
 			else if (thisCoefficient == 1.0) AxpyIntoThis(otherMatrix, otherCoefficient);
@@ -514,7 +514,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix2by2(result);
 		}
 
-		public override IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public override IVector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector2 casted) return Multiply(casted, transposeThis);
 
@@ -561,7 +561,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public override void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+		public override void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is Vector2 lhsDense) && (rhsVector is Vector2 rhsDense))
 			{

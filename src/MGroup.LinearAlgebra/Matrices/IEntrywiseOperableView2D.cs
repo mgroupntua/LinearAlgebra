@@ -3,7 +3,7 @@ using System;
 namespace MGroup.LinearAlgebra.Matrices
 {
     public interface IEntrywiseOperableView2D<TMatrixIn, TMatrixOut>
-        where TMatrixIn : IMatrixView
+        where TMatrixIn : IReadOnlyMatrix
         where TMatrixOut : IMatrix
     {
         /// <summary>

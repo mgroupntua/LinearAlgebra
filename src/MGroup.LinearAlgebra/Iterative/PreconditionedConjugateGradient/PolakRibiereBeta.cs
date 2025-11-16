@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private IVector residualOld;
 
 		/// <summary>
-		/// See <see cref="IPcgBetaParameterCalculation.Initialize(IVectorView)"/>.
+		/// See <see cref="IPcgBetaParameterCalculation.Initialize(IReadOnlyVector)"/>.
 		/// </summary>
 		public void Initialize(PcgAlgorithmBase pcg) => residualOld = pcg.Residual.Copy();
 

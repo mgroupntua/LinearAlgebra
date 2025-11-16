@@ -11,13 +11,13 @@ namespace MGroup.LinearAlgebra.Iterative
 	/// </summary>
 	public class ExplicitMatrixTransformation : ILinearTransformation
 	{
-		private readonly IMatrixView matrix;
+		private readonly IReadOnlyMatrix matrix;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ExplicitMatrixTransformation"/> that wraps the provided <paramref name="matrix"/>.
 		/// </summary>
 		/// <param name="matrix">The matrix that will be multiplied with vectors during the iterative algorithms.</param>
-		public ExplicitMatrixTransformation(IMatrixView matrix) => this.matrix = matrix;
+		public ExplicitMatrixTransformation(IReadOnlyMatrix matrix) => this.matrix = matrix;
 
 		/// <summary>
 		/// <inheritdoc/>
@@ -32,6 +32,6 @@ namespace MGroup.LinearAlgebra.Iterative
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public void Multiply(IVectorView lhsVector, IVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void Multiply(IReadOnlyVector lhsVector, IVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
 	}
 }

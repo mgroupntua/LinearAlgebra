@@ -41,7 +41,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// <summary>
 		/// <inheritdoc/>
 		/// </summary>
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		public void SolveLinearSystem(IReadOnlyVector rhsVector, IVector lhsVector)
 		{
 			Preconditions.CheckSystemSolutionDimensions(inverseDiagonal.Length, rhsVector.Length);
 			if ((rhsVector is Vector rhs) && (lhsVector is Vector lhs))
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 			}
 		}
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public void UpdateMatrix(IReadOnlyMatrix matrix, bool isPatternModified)
 		{
 			this.inverseDiagonal = matrix.GetDiagonalAsArray();
 			for (int i = 0; i < inverseDiagonal.Length; ++i)

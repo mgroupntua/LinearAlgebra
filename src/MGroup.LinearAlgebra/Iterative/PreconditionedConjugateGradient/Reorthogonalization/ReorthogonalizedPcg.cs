@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IVectorView rhsNew, IVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IReadOnlyVector rhsNew, IVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
@@ -88,7 +88,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 			ReorthoCache.Clear();
 		}
 
-		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IReadOnlyVector rhs,
 			IVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
@@ -232,7 +232,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 			}
 		}
 
-		private void UpdateDirectionVector(IVectorView preconditionedResidual, IVector direction)
+		private void UpdateDirectionVector(IReadOnlyVector preconditionedResidual, IVector direction)
 		{
 			bool useReortho = DirectionVectorsRetention.KeepUsingReorthogonalization();
 

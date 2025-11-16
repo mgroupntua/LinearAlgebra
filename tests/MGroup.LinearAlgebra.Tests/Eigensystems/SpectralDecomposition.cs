@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			}
 		}
 
-		public bool CanRecomposeOriginalMatrix(IMatrixView originalMatrix)
+		public bool CanRecomposeOriginalMatrix(IReadOnlyMatrix originalMatrix)
 		{
 			if (!useRightEigenvectors)
 			{
