@@ -32,11 +32,11 @@ namespace MGroup.LinearAlgebra.Implementations
         /// </summary>
         double Dnrm2(int n, double[] x, int offsetX, int incX);
 
-        /// <summary>
-        /// x = alpha * x. See
-        /// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga793bdd0739bbd0e0ec8655a0df08981a.html#ga793bdd0739bbd0e0ec8655a0df08981a
-        /// </summary>
-        void Dscal(int n, double alpha, double[] x, int offsetX, int incX);
+		/// <summary>
+		/// Scales a vector by a constant: x = alpha * x. See
+		/// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga793bdd0739bbd0e0ec8655a0df08981a.html#ga793bdd0739bbd0e0ec8655a0df08981a
+		/// </summary>
+		void Dscal(int n, double alpha, double[] x, int offsetX, int incX);
         #endregion
 
         #region BLAS Level 2
