@@ -20,11 +20,14 @@ namespace MGroup.LinearAlgebra.Implementations
 		/// </summary>
 		void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
 
-        /// <summary>
-        /// result = x * y. See
-        /// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga75066c4825cb6ff1c8ec4403ef8c843a.html#ga75066c4825cb6ff1c8ec4403ef8c843a
-        /// </summary>
-        double Ddot(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
+
+		void Dcopy(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
+
+		/// <summary>
+		/// result = x * y. See
+		/// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga75066c4825cb6ff1c8ec4403ef8c843a.html#ga75066c4825cb6ff1c8ec4403ef8c843a
+		/// </summary>
+		double Ddot(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
 
         /// <summary>
         /// result = sqrt(x * x). See
@@ -37,16 +40,18 @@ namespace MGroup.LinearAlgebra.Implementations
 		/// http://www.netlib.org/lapack/explore-html/de/da4/group__double__blas__level1_ga793bdd0739bbd0e0ec8655a0df08981a.html#ga793bdd0739bbd0e0ec8655a0df08981a
 		/// </summary>
 		void Dscal(int n, double alpha, double[] x, int offsetX, int incX);
-        #endregion
 
-        #region BLAS Level 2
+		void Dswap(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY);
+		#endregion
 
-        /// <summary>
-        /// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a general matrix, stored in full column-major 
+		#region BLAS Level 2
+
+		/// <summary>
+		/// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a general matrix, stored in full column-major 
 		/// format. See
-        /// http://www.netlib.org/lapack/explore-html/d7/d15/group__double__blas__level2_gadd421a107a488d524859b4a64c1901a9.html#gadd421a107a488d524859b4a64c1901a9
-        /// </summary>
-        void Dgemv(TransposeMatrix transA, int m, int n, double alpha, double[] a, int offsetA, int ldA,
+		/// http://www.netlib.org/lapack/explore-html/d7/d15/group__double__blas__level2_gadd421a107a488d524859b4a64c1901a9.html#gadd421a107a488d524859b4a64c1901a9
+		/// </summary>
+		void Dgemv(TransposeMatrix transA, int m, int n, double alpha, double[] a, int offsetA, int ldA,
             double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY);
 
 		/// <summary>
@@ -99,6 +104,8 @@ namespace MGroup.LinearAlgebra.Implementations
         /// <param name="k">The number of columns of op(A), which must be equal to the number of rows of op(B).</param>
         void Dgemm(TransposeMatrix transA, TransposeMatrix transB, int m, int n, int k, double alpha,
             double[] a, int offsetA, int ldA, double[] b, int offsetB, int ldB, double beta, double[] c, int offsetC, int ldC);
-        #endregion
-    }
+
+		void Dtrsm(MultiplicationSide side, StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] b, int offsetB, int ldB);
+		#endregion
+	}
 }
