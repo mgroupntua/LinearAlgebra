@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedBlasProvider : IBlasProvider
+	public partial class CustomBlasProvider : IBlasProvider
 	{
 		// Performs a rank-1 update: A = A + α*x*y^T
 		public void Dger(int m, int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY, double[] a, int offsetA, int ldA)

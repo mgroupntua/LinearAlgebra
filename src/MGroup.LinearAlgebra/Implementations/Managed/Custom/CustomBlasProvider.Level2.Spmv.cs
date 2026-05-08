@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedBlasProvider : IBlasProvider
+	public partial class CustomBlasProvider : IBlasProvider
 	{
 		public void Dspmv(StoredTriangle uplo, int n,
 			double alpha, double[] a, int offsetA, double[] x, int offsetX, int incX,

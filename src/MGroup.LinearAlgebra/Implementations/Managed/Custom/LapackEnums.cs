@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 

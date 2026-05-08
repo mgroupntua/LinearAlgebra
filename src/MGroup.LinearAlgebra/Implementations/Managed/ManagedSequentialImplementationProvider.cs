@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public ManagedSequentialImplementationProvider(double luPivotTolerance = LUCSparseNet.DefaultPivotTolerance)
 		{
 			this.luPivotTolerance = luPivotTolerance;
-			Blas = ManagedBlasProvider.UniqueInstance;
+			Blas = CustomBlasProvider.UniqueInstance;
 			SparseBlas = ManagedSparseBlasProvider.UniqueInstance;
 			LapackLinearEquations = new LapackLinearEquationsFacade(ManagedLapackProvider.UniqueInstance);
 			LapackLeastSquares = new LapackLeastSquaresFacadeDouble(ManagedLapackProvider.UniqueInstance);

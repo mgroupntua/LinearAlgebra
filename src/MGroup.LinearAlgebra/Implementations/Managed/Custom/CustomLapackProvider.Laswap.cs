@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedLapackProvider : ILapackProvider
+	public partial class CustomLapackProvider : ILapackProvider
 	{
 		// Applies a sequence of row interchanges (pivoting) to a matrix, typically as part of LU factorization.
 		public void Dlaswp(int n, double[] a, int offsetA, int ldA, int k1, int k2, int[] ipiv, int offsetIpiv, int incx)

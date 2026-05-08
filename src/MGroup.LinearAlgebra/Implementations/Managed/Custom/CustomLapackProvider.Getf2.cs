@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedLapackProvider : ILapackProvider
+	public partial class CustomLapackProvider : ILapackProvider
 	{
 		// DGETF2 performs an unblocked LU factorization with partial pivoting of a general matrix.
 		public void Dgetf2(int m, int n, double[] a, int offsetA, int ldA, int[] ipiv, int offsetIpiv, out int info)

@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedBlasProvider : IBlasProvider
+	public partial class CustomBlasProvider : IBlasProvider
 	{
 		public void Dtrsv(StoredTriangle uplo, TransposeMatrix trans, DiagonalValues diag, int n, double[] A, int offsetA, int lda, double[] x, int offsetX, int incX)
 		{

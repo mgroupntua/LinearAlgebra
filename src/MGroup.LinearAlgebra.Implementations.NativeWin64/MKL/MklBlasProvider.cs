@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 	{
 		public static MklBlasProvider UniqueInstance { get; } = new MklBlasProvider();
 
-		private static readonly ManagedBlasProvider defaultProvider = ManagedBlasProvider.UniqueInstance;
+		private static readonly CustomBlasProvider defaultProvider = CustomBlasProvider.UniqueInstance;
 
 		private MklBlasProvider() { } // private constructor for singleton pattern
 

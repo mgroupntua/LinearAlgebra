@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedLapackProvider : ILapackProvider
+	public partial class CustomLapackProvider : ILapackProvider
 	{
 		private int Iparmq(IlaenvSpec spec, int n, int ilo, int ihi, int lwork)
 		{

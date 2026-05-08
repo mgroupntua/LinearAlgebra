@@ -1,11 +1,11 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	using DotNumerics.LinearAlgebra.CSLapack;
+	//using DotNumerics.LinearAlgebra.CSLapack;
 
-	public partial class ManagedLapackProvider : ILapackProvider
+	public partial class CustomLapackProvider : ILapackProvider
 	{
 		/// <summary>
 		/// Computes LU factorization of a general MxN matrix using partial pivoting.

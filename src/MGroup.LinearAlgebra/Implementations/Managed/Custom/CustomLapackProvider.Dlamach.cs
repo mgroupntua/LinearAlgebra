@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedLapackProvider : ILapackProvider
+	public partial class CustomLapackProvider : ILapackProvider
 	{
 		private const double MachineEpsilon = 2.2204460492503131e-16;
 		private const double SafeMinimum = 2.2250738585072014e-308;

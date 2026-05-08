@@ -9,6 +9,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	using DotNumerics.LinearAlgebra.CSLapack;
 
 	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ILapackProvider"/>. Uses the 
@@ -60,6 +61,13 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public void Dgeqrf(int m, int n, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
 			=> dgeqrf.Run(m, n, ref a, offsetA, ldA, ref tau, offsetTau, ref work, offsetWork, lWork, ref info);
+
+
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgetrf.aspx
+		/// </summary>
+		public void Dgetrf(int m, int n, double[] a, int offsetA, int ldA, int[] ipiv, int offsetIpiv, ref int info)
+			=> dgetrf.Run(m, n, ref a, offsetA, ldA, ref ipiv, offsetIpiv, ref info);
 
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgetri.aspx
@@ -205,11 +213,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					for (int i = 0; i < nRhs; ++i)
 					{
 						// b = U^T \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.Transpose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.Transpose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * nRhs, 1);
 
 						// b = U \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.NoTranspose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.NoTranspose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * nRhs, 1);
 					}
 				}
@@ -219,11 +227,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 					for (int i = 0; i < nRhs; ++i)
 					{
 						// b = L \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.NoTranspose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.NoTranspose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * n, 1);
 
 						// b = L^T \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.Transpose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.Transpose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * n, 1);
 					}
 				}

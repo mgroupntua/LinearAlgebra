@@ -1,9 +1,9 @@
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
 	using System;
 	using System.Diagnostics;
 
-	public partial class ManagedBlasProvider : IBlasProvider
+	public partial class CustomBlasProvider : IBlasProvider
 	{
 		public void Dgemm(TransposeMatrix transA, TransposeMatrix transB, int m, int n, int k, double alpha, double[] A, int offsetA, int lda, double[] B, int offsetB, int ldb, double beta, double[] C, int offsetC, int ldc)
 		{
