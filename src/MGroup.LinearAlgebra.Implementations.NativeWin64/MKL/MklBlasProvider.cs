@@ -2,6 +2,7 @@ using IntelMKL.LP64;
 
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Implementations.Managed;
+using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
 namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
