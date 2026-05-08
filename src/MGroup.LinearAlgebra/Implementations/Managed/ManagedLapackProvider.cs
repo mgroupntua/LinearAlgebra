@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSLapack/Default.aspx) for the most
 	/// part. For LAPACK subroutines not provided by DotNumerics, custom C# implementations are used instead. 
 	/// </summary>
-	public class ManagedLapackProvider : ILapackProvider
+	public partial class ManagedLapackProvider : ILapackProvider
 	{
 		private static readonly DGEEV dgeev = new DGEEV();
 		private static readonly DGELQF dgelqf = new DGELQF();
@@ -29,6 +29,8 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private static readonly DGETRS dgetrs = new DGETRS();
 		private static readonly DSYEV dsyev = new DSYEV();
 		private static readonly DTRSM dtrsm = new DTRSM();
+
+		private ManagedBlasProvider blas = ManagedBlasProvider.UniqueInstance;
 
 		public static ManagedLapackProvider UniqueInstance { get; } = new ManagedLapackProvider();
 
@@ -58,12 +60,6 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public void Dgeqrf(int m, int n, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
 			=> dgeqrf.Run(m, n, ref a, offsetA, ldA, ref tau, offsetTau, ref work, offsetWork, lWork, ref info);
-
-		/// <summary>
-		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgetrf.aspx
-		/// </summary>
-		public void Dgetrf(int m, int n, double[] a, int offsetA, int ldA, int[] ipiv, int offsetIpiv, ref int info)
-			=> dgetrf.Run(m, n, ref a, offsetA, ldA, ref ipiv, offsetIpiv, ref info);
 
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgetri.aspx
