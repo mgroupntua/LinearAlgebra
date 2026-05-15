@@ -3,7 +3,6 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.Reortho
 {
 	using System;
 	using System.Diagnostics;
-	using DotNumerics.LinearAlgebra.CSEispack;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;

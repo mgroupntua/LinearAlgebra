@@ -6,10 +6,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 {
 	using System;
 
-	using DotNumerics.LinearAlgebra.CSLapack;
+	//using DotNumerics.LinearAlgebra.CSLapack;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.DotNumerics;
 	using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 
 	/// <summary>

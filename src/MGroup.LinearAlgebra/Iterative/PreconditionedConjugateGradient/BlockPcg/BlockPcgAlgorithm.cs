@@ -1,7 +1,6 @@
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient.BlockPcg
 {
 	using System;
-	using DotNumerics.LinearAlgebra.CSEispack;
 
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;

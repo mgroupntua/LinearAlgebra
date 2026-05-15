@@ -12,11 +12,11 @@
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <UserSecretsId>de28439c-273e-4760-a412-ea3b7b476079</UserSecretsId>
   </PropertyGroup>
  
   <ItemGroup>
     <PackageReference Include="CSparse" Version="4.2.0" />
-    <PackageReference Include="DotNumerics" Version="1.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
  

@@ -9,7 +9,6 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Distributed.Utilities;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Reduction;
-using DotNumerics.FortranLibrary;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 

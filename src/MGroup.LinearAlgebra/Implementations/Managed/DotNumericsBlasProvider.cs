@@ -1,11 +1,11 @@
-using System;
-
-using MGroup.LinearAlgebra.Implementations.Managed.Custom;
-using DotNumerics.LinearAlgebra.CSLapack;
-
-//TODO: find a managed BLAS that supports the methods DotNumerics doesn't.
 namespace MGroup.LinearAlgebra.Implementations.Managed
 {
+	using System;
+
+	using MGroup.LinearAlgebra.Implementations.Managed.Custom;
+	//using DotNumerics.LinearAlgebra.CSLapack;
+	using MGroup.LinearAlgebra.Implementations.DotNumerics;
+
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasProvider"/>. Uses the 
 	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSBlas/Default.aspx) for the most
