@@ -21,6 +21,7 @@ namespace MGroup.LinearAlgebra.Tests
 			LibsToTest = NativeLibsToTest.CreateWithNone();
 			ProvidersToTest = new TheoryData<IImplementationProvider>();
 			ProvidersToTest.Add(new ManagedSequentialImplementationProvider());
+			ProvidersToTest.Add(new DotNumericsImplementationProvider());
 
 			try
 			{
