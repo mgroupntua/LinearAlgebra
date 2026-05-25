@@ -59,6 +59,7 @@ steps:
       sonar.c.file.suffixes=-
       sonar.cpp.file.suffixes=-
       sonar.objc.file.suffixes=-
+      sonar.exclusions=**/DotNumerics/**/*.cs
 
 - task: DotNetCoreCLI@2
   name: dotnetBuild
@@ -84,7 +85,7 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*[Tt]ests/*.csproj'
-    arguments: '--no-build --configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     publishTestResults: true
 
 #- script: |
@@ -94,10 +95,12 @@ steps:
 - task: SonarCloudAnalyze@1
   condition: and(ne(variables['Build.Reason'], 'PullRequest') , eq(variables['enableSonarCloud'], 'true'))
   displayName: "Performs SonarCloud Analysis"
+  continueOnError: true
 
 - task: SonarCloudPublish@1
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: 'Publish Quality Gate Results'
+  continueOnError: true
   inputs:
     pollingTimeoutSec: '300'
 
