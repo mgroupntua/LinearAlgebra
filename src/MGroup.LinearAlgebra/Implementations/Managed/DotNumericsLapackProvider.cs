@@ -6,16 +6,19 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 {
 	using System;
 
-	using DotNumerics.LinearAlgebra.CSLapack;
+	//using DotNumerics.LinearAlgebra.CSLapack;
 
 	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Implementations;
+	using MGroup.LinearAlgebra.Implementations.DotNumerics;
+	using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 
 	/// <summary>
 	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ILapackProvider"/>. Uses the 
 	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSLapack/Default.aspx) for the most
 	/// part. For LAPACK subroutines not provided by DotNumerics, custom C# implementations are used instead. 
 	/// </summary>
-	public class ManagedLapackProvider : ILapackProvider
+	public partial class DotNumericsLapackProvider : ILapackProvider
 	{
 		private static readonly DGEEV dgeev = new DGEEV();
 		private static readonly DGELQF dgelqf = new DGELQF();
@@ -30,9 +33,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		private static readonly DSYEV dsyev = new DSYEV();
 		private static readonly DTRSM dtrsm = new DTRSM();
 
-		public static ManagedLapackProvider UniqueInstance { get; } = new ManagedLapackProvider();
+		private DotNumericsBlasProvider blas = DotNumericsBlasProvider.UniqueInstance;
 
-		private ManagedLapackProvider() { } // private constructor for singleton pattern
+		public static DotNumericsLapackProvider UniqueInstance { get; } = new DotNumericsLapackProvider();
+
+		private DotNumericsLapackProvider() { } // private constructor for singleton pattern
 
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgeev.aspx
@@ -58,6 +63,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public void Dgeqrf(int m, int n, double[] a, int offsetA, int ldA, double[] tau, int offsetTau,
 			double[] work, int offsetWork, int lWork, ref int info)
 			=> dgeqrf.Run(m, n, ref a, offsetA, ldA, ref tau, offsetTau, ref work, offsetWork, lWork, ref info);
+
 
 		/// <summary>
 		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgetrf.aspx
@@ -128,10 +134,10 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 
 			// Start with an identity matrix
 			var inverse = new double[n * n];
-			for (int i = 0; i < n; ++i) inverse[i * ldA + i] = 1.0;
+			for (var i = 0; i < n; ++i) inverse[i * ldA + i] = 1.0;
 
 			// Solve (L*L^T) * inverse = I or (U^T*U) * inverse = I
-			int infoSolve = LapackUtilities.DefaultInfo;
+			var infoSolve = LapackUtilities.DefaultInfo;
 			Dpotrs(uplo, n, n, a, offsetA, ldA, inverse, 0, n, ref infoSolve);
 
 			// Copy the inverse matrix over the factorization
@@ -182,10 +188,10 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 			{
 				// Start with an identity matrix
 				var inverse = new double[n * n];
-				for (int i = 0; i < n; ++i) inverse[i * n + i] = 1.0;
+				for (var i = 0; i < n; ++i) inverse[i * n + i] = 1.0;
 
 				// Solve (L*L^T) * inverse = I or (U^T*U) * inverse = I
-				int infoSolve = LapackUtilities.DefaultInfo;
+				var infoSolve = LapackUtilities.DefaultInfo;
 				Dpptrs(uplo, n, n, a, offsetA, inverse, 0, n, ref infoSolve);
 
 				// Copy the inverse matrix over the factorization
@@ -206,28 +212,28 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 				if (IsUpper(uplo))
 				{
 					// Process each column separately
-					for (int i = 0; i < nRhs; ++i)
+					for (var i = 0; i < nRhs; ++i)
 					{
 						// b = U^T \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.Transpose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.Transpose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * nRhs, 1);
 
 						// b = U \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.NoTranspose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Upper, TransposeMatrix.NoTranspose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * nRhs, 1);
 					}
 				}
 				else
 				{
 					// Process each column separately
-					for (int i = 0; i < nRhs; ++i)
+					for (var i = 0; i < nRhs; ++i)
 					{
 						// b = L \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.NoTranspose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.NoTranspose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * n, 1);
 
 						// b = L^T \ b
-						ManagedBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.Transpose,
+						CustomBlasProvider.UniqueInstance.Dtpsv(StoredTriangle.Lower, TransposeMatrix.Transpose,
 							DiagonalValues.NonUnit, n, a, offsetA, b, offsetB + i * n, 1);
 					}
 				}

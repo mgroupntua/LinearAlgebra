@@ -2,6 +2,7 @@ using IntelMKL.LP64;
 
 using MGroup.LinearAlgebra.Implementations;
 using MGroup.LinearAlgebra.Implementations.Managed;
+using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
 namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
@@ -18,7 +19,7 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 	{
 		public static MklBlasProvider UniqueInstance { get; } = new MklBlasProvider();
 
-		private static readonly ManagedBlasProvider defaultProvider = ManagedBlasProvider.UniqueInstance;
+		private static readonly CustomBlasProvider defaultProvider = CustomBlasProvider.UniqueInstance;
 
 		private MklBlasProvider() { } // private constructor for singleton pattern
 
@@ -35,6 +36,9 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 		/// </summary>
 		public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
 			=> Blas.Daxpy(ref n, ref alpha, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
+
+		public void Dcopy(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
+			=> Blas.Dcopy(ref n, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
 
 		/// <summary>
 		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-dot#D4E53C70-D8FA-4095-A800-4203CAFE64FE
@@ -53,6 +57,12 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 		/// </summary>
 		public void Dscal(int n, double alpha, double[] x, int offsetX, int incX)
 			=> Blas.Dscal(ref n, ref alpha, ref x[offsetX], ref incX);
+
+		public void Dswap(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
+		{
+			Blas.Dswap(ref n, ref x[offsetX], ref incX, ref y[offsetY], ref incY);
+		}
+
 		#endregion
 
 		#region BLAS Level 2
@@ -112,6 +122,11 @@ namespace MGroup.LinearAlgebra.Implementations.NativeWin64.MKL
 			double[] a, int offsetA, int ldA, double[] b, int offsetB, int ldB, double beta, double[] c, int offsetC, int ldC)
 			=> Blas.Dgemm(transA.Translate(), transB.Translate(), ref m, ref n, ref k, ref alpha, ref a[offsetA], ref ldA,
 				ref b[offsetB], ref ldB, ref beta, ref c[offsetC], ref ldC);
+
+		public void Dtrsm(MultiplicationSide side, StoredTriangle uplo, TransposeMatrix transA, DiagonalValues diag, int m, int n, double alpha, double[] a, int offsetA, int ldA, double[] b, int offsetB, int ldB)
+		{
+			Blas.Dtrsm(side.Translate(), uplo.Translate(), transA.Translate(), diag.Translate(), ref m, ref n, ref alpha, ref a[offsetA], ref ldA, ref b[offsetB], ref ldB);
+		}
 		#endregion
 	}
 }

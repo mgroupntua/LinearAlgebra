@@ -3,7 +3,7 @@ using System;
 //TODO: Some of these could be done by calling other BLAS, LAPACK functions. See the LAPACK source.
 //TODO: Use a port of reference LAPACK here. Custom implementations should be in another namespace (e.g. Factorizations or 
 //      Triangulations)
-namespace MGroup.LinearAlgebra.Implementations.Managed
+namespace MGroup.LinearAlgebra.Implementations.Managed.Custom
 {
     /// <summary>
     /// Custom and unoptimized managed implementations of LAPACK like operations, for which I have not found 3rd party 
@@ -16,13 +16,13 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
             => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + j * ldA + i);
 
         internal static void CholeskyLowerPackedColMajor(int n, double[] a, int offsetA, ref int info)
-            => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + i + (j * (2 * n + 1 - j)) / 2);
+            => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + i + j * (2 * n + 1 - j) / 2);
 
         internal static void CholeskyUpperFullColMajor(int n, double[] a, int offsetA, int ldA, ref int info)
             => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + i * ldA + j); // Do not transpose access
 
         internal static void CholeskyUpperPackedColMajor(int n, double[] a, int offsetA, ref int info)
-            => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + j + (i * (i + 1)) / 2); //Transpose access
+            => CholeskyTemplate(n, a, ref info, (i, j) => offsetA + j + i * (i + 1) / 2); //Transpose access
 
         /// <summary>
         /// For Cholesky algorithm, see 
@@ -33,14 +33,14 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
         /// </summary>
         private static void CholeskyTemplate(int n, double[] a, ref int info, Func<int, int, int> FindIndex)
         {
-            for (int i = 0; i < n; ++i)
+            for (var i = 0; i < n; ++i)
             {
                 // Calculate the diagonal entry of column i
-                int diagIdx = FindIndex(i, i);
-                double diagValue = a[diagIdx];
-                for (int k = 0; k < i; ++k)
+                var diagIdx = FindIndex(i, i);
+                var diagValue = a[diagIdx];
+                for (var k = 0; k < i; ++k)
                 {
-                    int colIdx = FindIndex(i, k);
+                    var colIdx = FindIndex(i, k);
                     diagValue -= a[colIdx] * a[colIdx];
                 }
 
@@ -53,11 +53,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
                 a[diagIdx] = diagValue;
 
                 // Calculate the subdiagonal entries of column i
-                for (int j = i+1; j < n; ++j)
+                for (var j = i+1; j < n; ++j)
                 {
-                    int rowIdx = FindIndex(j, i);
-                    double nominator = a[rowIdx];
-                    for (int k = 0; k < i; ++k)
+                    var rowIdx = FindIndex(j, i);
+                    var nominator = a[rowIdx];
+                    for (var k = 0; k < i; ++k)
                     {
                         nominator -= a[FindIndex(i, k)] * a[FindIndex(j, k)];
                     }
