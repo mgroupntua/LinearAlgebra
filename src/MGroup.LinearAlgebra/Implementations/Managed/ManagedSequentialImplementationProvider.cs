@@ -4,6 +4,7 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Implementations.Managed.Custom;
 	using MGroup.LinearAlgebra.Triangulation;
 
 	/// <summary>
@@ -18,11 +19,11 @@ namespace MGroup.LinearAlgebra.Implementations.Managed
 		public ManagedSequentialImplementationProvider(double luPivotTolerance = LUCSparseNet.DefaultPivotTolerance)
 		{
 			this.luPivotTolerance = luPivotTolerance;
-			Blas = ManagedBlasProvider.UniqueInstance;
+			Blas = CustomBlasProvider.UniqueInstance;
 			SparseBlas = ManagedSparseBlasProvider.UniqueInstance;
-			LapackLinearEquations = new LapackLinearEquationsFacade(ManagedLapackProvider.UniqueInstance);
-			LapackLeastSquares = new LapackLeastSquaresFacadeDouble(ManagedLapackProvider.UniqueInstance);
-			LapackEigensystems = new LapackEigensystemsFacade(ManagedLapackProvider.UniqueInstance);
+			LapackLinearEquations = new LapackLinearEquationsFacade(DotNumericsLapackProvider.UniqueInstance);
+			LapackLeastSquares = new LapackLeastSquaresFacadeDouble(DotNumericsLapackProvider.UniqueInstance);
+			LapackEigensystems = new LapackEigensystemsFacade(DotNumericsLapackProvider.UniqueInstance);
 			Reordering = new ManagedReorderingProvider();
 		}
 
