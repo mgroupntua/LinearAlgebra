@@ -45,7 +45,7 @@ steps:
     feedsToUse: 'config'
     nugetConfigPath: 'NuGet.Config'
 
-- task: SonarCloudPrepare@3.1
+- task: SonarCloudPrepare@3
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: "Prepares SonarCloud analysis"
   inputs:
@@ -92,12 +92,12 @@ steps:
 #    dotnet test --logger trx --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=$(Build.SourcesDirectory)/coverage/ $(testProject)
 #  displayName: 'Runs tests'
 
-- task: SonarCloudAnalyze@3.1
+- task: SonarCloudAnalyze@3
   condition: and(ne(variables['Build.Reason'], 'PullRequest') , eq(variables['enableSonarCloud'], 'true'))
   displayName: "Performs SonarCloud Analysis"
   continueOnError: true
 
-- task: SonarCloudPublish@3.1
+- task: SonarCloudPublish@3
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['enableSonarCloud'], 'true'))
   displayName: 'Publish Quality Gate Results'
   continueOnError: true
